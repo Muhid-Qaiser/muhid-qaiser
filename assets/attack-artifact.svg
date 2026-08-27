@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="76" viewBox="0 0 360 76">
-<rect x="1" y="1" width="358" height="74" rx="12" fill="#0d131a" stroke="#26313d" stroke-width="2"/>
-<rect x="1" y="1" width="5" height="74" rx="2" fill="#67e8f9"/>
-<text x="22" y="31" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#e8edf2">03 // ARTIFACT POISONING</text>
-<text x="22" y="52" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#8896a5">attack the trust boundary</text>
-<text x="329" y="45" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#67e8f9">›</text>
-</svg>
