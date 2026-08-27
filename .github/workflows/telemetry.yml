@@ -1,0 +1,44 @@
+name: Refresh profile telemetry
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/update_telemetry.py"
+      - ".github/workflows/telemetry.yml"
+      - "README.md"
+  schedule:
+    - cron: "23 3 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-writes
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Sync latest main
+        run: git pull --rebase origin main
+
+      - name: Generate telemetry SVG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROFILE_LOGIN: Muhid-Qaiser
+        run: python scripts/update_telemetry.py
+
+      - name: Commit refreshed telemetry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/telemetry.svg
+          git diff --cached --quiet || git commit -m "chore: refresh profile telemetry"
+          git push

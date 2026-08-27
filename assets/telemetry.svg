@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330">
+<rect x="1" y="1" width="1198" height="328" rx="18" fill="#070b10" stroke="#26313d" stroke-width="2"/>
+<text x="38" y="47" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#67e8f9">LIVE // GITHUB TELEMETRY</text>
+<text x="38" y="78" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#e8edf2">Signal, not badge clutter.</text>
+
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<rect x="38" y="105" width="240" height="83" rx="11" fill="#0d131a" stroke="#26313d"/>
+<text x="58" y="132" font-size="10" fill="#8896a5">PUBLIC REPOS</text><text x="58" y="169" font-size="30" font-weight="700" fill="#e8edf2">92</text>
+<rect x="293" y="105" width="240" height="83" rx="11" fill="#0d131a" stroke="#26313d"/>
+<text x="313" y="132" font-size="10" fill="#8896a5">STARS RECEIVED</text><text x="313" y="169" font-size="23" font-weight="700" fill="#f1d6b8">SYNC</text>
+<rect x="548" y="105" width="240" height="83" rx="11" fill="#0d131a" stroke="#26313d"/>
+<text x="568" y="132" font-size="10" fill="#8896a5">FOLLOWERS</text><text x="568" y="169" font-size="30" font-weight="700" fill="#67e8f9">5</text>
+<rect x="803" y="105" width="359" height="83" rx="11" fill="#0d131a" stroke="#26313d"/>
+<text x="823" y="132" font-size="10" fill="#8896a5">CONTRIBUTIONS / 12M</text><text x="823" y="169" font-size="23" font-weight="700" fill="#63e6be">SYNC ON FIRST ACTION RUN</text>
+
+<text x="38" y="224" font-size="10" fill="#8896a5">LANGUAGE SIGNAL</text>
+<rect x="38" y="240" width="1124" height="12" rx="6" fill="#121a22"/>
+<rect x="38" y="240" width="340" height="12" rx="6" fill="#67e8f9" opacity=".28"/>
+<text x="38" y="282" font-size="11" fill="#8896a5">The included workflow replaces this placeholder with live language bytes + a 52-week contribution heatmap.</text>
+<text x="38" y="305" font-size="10" fill="#8896a5">No Vercel stats cards. No third-party telemetry dependency. Data comes from GitHub's own API.</text>
+</g>
+</svg>
