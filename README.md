@@ -1,81 +1,58 @@
-<p align="center">
-  <img src="./assets/hero.svg" width="100%" alt="Muhid Qaiser — Computer Vision and Agentic Security" />
-</p>
+<img src="./assets/vessel.svg" width="100%" alt="Muhid Qaiser — AI Security Engineer. I red-team large language models and the agents built on them. Before this, computer vision, where adversarial examples were first found. The method did not change when the input became language." />
 
 <p align="center">
-  <a href="https://linkedin.com/in/muhid-qaiser">LinkedIn</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://medium.com/@muhid-qaiser">Medium</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://pk.linkedin.com/in/muhid-qaiser">LinkedIn</a>
+  &nbsp;·&nbsp;
+  <a href="https://muhid-qaiser.medium.com/">Medium</a>
+  &nbsp;·&nbsp;
   <a href="mailto:muhidqaiser02@gmail.com">Email</a>
 </p>
 
-## `FIELD LAB // TWO SIDES OF THE SAME SYSTEM`
+<img src="./assets/journal.svg" width="100%" alt="The Hunter's Journal. Three things I hunt, each crossing a boundary somebody believed was closed. The Injected Instruction hides in text the model was only asked to read; it crosses the instruction boundary. The Borrowed Hand waits for the guard to reach for a tool, then guides the hand; it crosses the action boundary. The Poisoned Pixel is a change too small for any eye that makes a classifier name the wrong thing with more confidence; it crosses the perception boundary." />
 
-<p align="center">
-  <img src="./assets/field-lab.svg" width="100%" alt="Computer Vision and Agentic Security field lab" />
-</p>
+<img src="./assets/map.svg" width="100%" alt="The Map: ninety-two public repositories drawn as a cave system, grouped into six regions — Perception with 27 chambers, Foundations with 20, Learning with 16, Language with 13, Agents with 10, and Silicon with 5. Chamber size is commits. A corridor runs off toward a dashed, empty region labelled Red Team, unmapped, because that work is private." />
 
-I started by teaching machines to **see**. Now I also study what happens when intelligent systems can **reason, use tools, and act** — and how those systems fail under adversarial pressure.
+<img src="./assets/ledger.svg" width="100%" alt="The Ledger: 92 repositories, 225 commits, 6 rebuilt from scratch, 6 regions mapped, 4 years on record. A histogram of every commit by hour of the day, busiest at 16:00." />
 
-## `PLAY // BREACH AGENT-01`
-
-<p align="center">
-  <img src="./assets/breach.svg" width="100%" alt="BREACH Agent-01 live profile game" />
-</p>
+<img src="./assets/relics-header.svg" width="100%" alt="Relics — four things worth picking up, chosen by hand rather than by star count." />
 
 <table>
 <tr>
-<td width="33%">
-  <a href="https://github.com/Muhid-Qaiser/muhid-qaiser/issues/new?title=%5BBREACH%5D%20PROMPT_INJECTION&body=Profile%20mini-simulation.%20Please%20submit%20without%20editing%20the%20title.">
-    <img src="./assets/attack-prompt.svg" width="100%" alt="Try prompt injection" />
+<td width="50%">
+  <a href="https://github.com/Muhid-Qaiser/TezNet">
+    <img src="./assets/relic-teznet.svg" width="100%" alt="TezNet — a convolutional network for classifying optical coherence tomography scans. Published, with the official implementation." />
   </a>
 </td>
-<td width="33%">
-  <a href="https://github.com/Muhid-Qaiser/muhid-qaiser/issues/new?title=%5BBREACH%5D%20TOOL_HIJACK&body=Profile%20mini-simulation.%20Please%20submit%20without%20editing%20the%20title.">
-    <img src="./assets/attack-tool.svg" width="100%" alt="Try tool hijack" />
+<td width="50%">
+  <a href="https://github.com/Muhid-Qaiser/AgroVQ-HybridNet">
+    <img src="./assets/relic-agrovq.svg" width="100%" alt="AgroVQ-HybridNet — visual question answering over crop imagery." />
   </a>
 </td>
-<td width="33%">
-  <a href="https://github.com/Muhid-Qaiser/muhid-qaiser/issues/new?title=%5BBREACH%5D%20ARTIFACT_POISONING&body=Profile%20mini-simulation.%20Please%20submit%20without%20editing%20the%20title.">
-    <img src="./assets/attack-artifact.svg" width="100%" alt="Try artifact poisoning" />
+</tr>
+<tr>
+<td width="50%">
+  <a href="https://github.com/Muhid-Qaiser/Multi-Doc-Rag-Hierarchical-CrewAI">
+    <img src="./assets/relic-crew.svg" width="100%" alt="Hierarchical Multi-Doc RAG — a master agent that decomposes a question and delegates it to sub-agents." />
+  </a>
+</td>
+<td width="50%">
+  <a href="https://github.com/Muhid-Qaiser/DeepSeek_from_Scratch">
+    <img src="./assets/relic-deepseek.svg" width="100%" alt="DeepSeek from Scratch — the architecture rebuilt and trained in PyTorch from nothing." />
   </a>
 </td>
 </tr>
 </table>
 
-<p align="center"><sub>
-A GitHub-native mini-game: choose an attack surface, submit the pre-filled issue, and an Action resolves the simulation, updates the scoreboard, comments the result, and closes the issue.
-</sub></p>
-
-## `LIVE // TELEMETRY`
+<img src="./assets/bench.svg" width="100%" alt="A bench under a lamp. Rest here." />
 
 <p align="center">
-  <img src="./assets/telemetry.svg" width="100%" alt="Live GitHub telemetry and language stats" />
+  <a href="https://pk.linkedin.com/in/muhid-qaiser">LinkedIn</a>
+  &nbsp;·&nbsp;
+  <a href="https://muhid-qaiser.medium.com/">Medium</a>
+  &nbsp;·&nbsp;
+  <a href="mailto:muhidqaiser02@gmail.com">Email</a>
 </p>
 
 <p align="center">
-  <sub>Automatically regenerated from GitHub's API. No external stats-card service.</sub>
-</p>
-
-## `SELECTED ARSENAL`
-
-<p align="center">
-  <code>PYTHON</code>
-  &nbsp;·&nbsp;
-  <code>PYTORCH</code>
-  &nbsp;·&nbsp;
-  <code>OPENCV</code>
-  &nbsp;·&nbsp;
-  <code>TRANSFORMERS</code>
-  &nbsp;·&nbsp;
-  <code>LLMs</code>
-  &nbsp;·&nbsp;
-  <code>AI AGENTS</code>
-  &nbsp;·&nbsp;
-  <code>AI SECURITY</code>
-</p>
-
-<p align="center">
-  <sub>PERCEIVE -> REASON -> ACT -> DEFEND</sub>
+  <sub>The map and the ledger redraw themselves nightly from the GitHub API. Nothing here is a badge service.</sub>
 </p>

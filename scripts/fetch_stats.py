@@ -1,0 +1,181 @@
+#!/usr/bin/env python3
+"""Collect the numbers the profile figures need, into data/stats.json.
+
+Deliberately does NOT publish a lines-of-code total: this account is mostly
+Jupyter notebooks, whose committed JSON carries base64 image outputs, so the
+raw additions figure is an artefact of the file format rather than work done.
+Repositories, regions and rebuilt-from-scratch counts are the honest signals.
+
+Kept separate from rendering so the drawing scripts can be re-run offline.
+"""
+import json, os, re, sys, time, urllib.request, urllib.error
+from collections import Counter
+from pathlib import Path
+
+LOGIN = os.environ.get("PROFILE_LOGIN", "Muhid-Qaiser")
+TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+TZ_FALLBACK = 5  # PKT, used only when a commit date carries no UTC offset
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "data" / "stats.json"
+
+if not TOKEN:
+    sys.exit("Set GITHUB_TOKEN (locally: export GITHUB_TOKEN=$(gh auth token))")
+
+HEADERS = {"Authorization": f"Bearer {TOKEN}", "User-Agent": "muhid-profile",
+           "Accept": "application/vnd.github+json"}
+
+# Regions of the map, tested in order — first match wins, so the more specific
+# vocabularies (agents, perception) are checked before the general ones.
+REGIONS = [
+    ("AGENTS", r"agent|crewai|langchain|langgraph|\brag\b|_rag|-rag|tool|interviewer|"
+               r"chatbot|prompt|multi-doc|multi_doc|ollama|mcp"),
+    ("PERCEPTION", r"yolo|cnn|image|vision|visual|segmentation|detection|opencv|ocr|face|"
+                   r"facial|emotion|pose|unet|resnet|teznet|oct|agrovq|bar_?code|"
+                   r"attendance|homer|cat-dog|natural-image|digital_image|topological"),
+    ("LANGUAGE", r"bert|gpt|transformer|translation|nlp|text|tts|speech|sentiment|spam|"
+                 r"naive|token|deepseek|llm|urdu|moderation|audio|huffman"),
+    ("SILICON", r"cuda|opencl|gpu|parallel|grpc|microservice|assembly|masm|x86|coal|"
+                r"comparative_analysis"),
+    ("LEARNING", r"random-forest|decision-tree|k-nearest|knn|churn|salary|regression|lstm|"
+                 r"prediction|auto-?encoder|genetic|search|astar|uniform|rating|deepdream|"
+                 r"swish|ann[_-]|neural|machine-learning|specialization|classification"),
+]
+SCRATCH = re.compile(r"scratch|vanilla", re.I)
+
+
+def rest(path, tries=6):
+    for attempt in range(tries):
+        req = urllib.request.Request(f"https://api.github.com{path}", headers=HEADERS)
+        try:
+            with urllib.request.urlopen(req, timeout=45) as r:
+                if r.status == 202:      # GitHub is still computing the stats
+                    time.sleep(2 + attempt * 2)
+                    continue
+                return [] if r.status == 204 else json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code in (404, 409):     # empty repository, or renamed
+                return []
+            if attempt < tries - 1:
+                time.sleep(2 + attempt * 3)
+                continue
+            raise
+    return []
+
+
+def graphql(query, **variables):
+    payload = json.dumps({"query": query, "variables": variables}).encode()
+    req = urllib.request.Request("https://api.github.com/graphql", data=payload,
+                                 method="POST",
+                                 headers={**HEADERS, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=45) as r:
+        body = json.load(r)
+    if body.get("errors"):
+        raise RuntimeError(body["errors"])
+    return body["data"]
+
+
+PROFILE_Q = """
+query($login:String!) {
+  user(login:$login) {
+    createdAt
+    followers { totalCount }
+    repositories(ownerAffiliations:OWNER, privacy:PUBLIC) { totalCount }
+    repos: repositories(first:100, ownerAffiliations:OWNER, isFork:false,
+                        privacy:PUBLIC, orderBy:{field:PUSHED_AT,direction:DESC}) {
+      nodes {
+        name description createdAt pushedAt stargazerCount
+        primaryLanguage { name color }
+        languages(first:10, orderBy:{field:SIZE,direction:DESC}) {
+          edges { size node { name color } }
+        }
+      }
+    }
+    contributionsCollection {
+      contributionCalendar { totalContributions }
+    }
+  }
+}
+"""
+
+
+def region_of(repo):
+    hay = f"{repo['name']} {repo.get('description') or ''}".lower()
+    for name, pattern in REGIONS:
+        if re.search(pattern, hay):
+            return name
+    return "FOUNDATIONS"
+
+
+print(f"· profile        {LOGIN}")
+user = graphql(PROFILE_Q, login=LOGIN)["user"]
+nodes = user["repos"]["nodes"]
+
+languages, colors = Counter(), {}
+for repo in nodes:
+    for edge in repo["languages"]["edges"]:
+        languages[edge["node"]["name"]] += edge["size"]
+        colors[edge["node"]["name"]] = edge["node"].get("color")
+
+print(f"· commits        walking {len(nodes)} repositories")
+hours = [0] * 24
+years = Counter()
+repos, total_commits = [], 0
+
+for i, repo in enumerate(nodes, 1):
+    mine = 0
+    for commit in rest(f"/repos/{LOGIN}/{repo['name']}/commits"
+                       f"?author={LOGIN}&per_page=100") or []:
+        date = ((commit.get("commit") or {}).get("author") or {}).get("date")
+        if not date or len(date) < 19:
+            continue
+        mine += 1
+        hour, tail = int(date[11:13]), date[19:]
+        if tail and tail[0] in "+-":
+            hour = (hour + (1 if tail[0] == "+" else -1) * int(tail[1:3])) % 24
+        else:
+            hour = (hour + TZ_FALLBACK) % 24
+        hours[hour] += 1
+        years[date[:4]] += 1
+
+    total_commits += mine
+    repos.append({
+        "name": repo["name"],
+        "description": repo.get("description") or "",
+        "created": repo["createdAt"][:10],
+        "pushed": repo["pushedAt"][:10],
+        "stars": repo["stargazerCount"],
+        "language": (repo.get("primaryLanguage") or {}).get("name") or "",
+        "commits": mine,
+        "region": region_of(repo),
+        "scratch": bool(SCRATCH.search(f"{repo['name']} {repo.get('description') or ''}")),
+    })
+    if i % 20 == 0:
+        print(f"    {i}/{len(nodes)}")
+
+by_region = Counter(r["region"] for r in repos)
+stats = {
+    "login": LOGIN,
+    "since": user["createdAt"][:10],
+    "repos": user["repositories"]["totalCount"],
+    "repos_mapped": len(repos),
+    "followers": user["followers"]["totalCount"],
+    "stars": sum(r["stars"] for r in repos),
+    "commits": total_commits,
+    "contributions_year": user["contributionsCollection"]["contributionCalendar"]["totalContributions"],
+    "scratch_builds": sum(1 for r in repos if r["scratch"]),
+    "regions": [{"name": n, "count": c} for n, c in
+                sorted(by_region.items(), key=lambda x: -x[1])],
+    "hours": hours,
+    "commits_by_year": dict(sorted(years.items())),
+    "languages": [{"name": n, "size": s, "color": colors.get(n)}
+                  for n, s in languages.most_common(10)],
+    "repo_list": repos,
+}
+
+OUT.parent.mkdir(parents=True, exist_ok=True)
+OUT.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+print(f"\nwrote {OUT}")
+print(f"  {stats['repos']} repositories · {total_commits} commits · "
+      f"{stats['scratch_builds']} rebuilt from scratch")
+for r in stats["regions"]:
+    print(f"    {r['name']:14} {r['count']}")

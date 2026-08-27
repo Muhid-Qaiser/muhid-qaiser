@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420"
+     viewBox="0 0 1200 420" role="img">
+<defs>
+  <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3"
+                  seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="inkSoft" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2"
+                  seed="19" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/>
+             <feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glowMed" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="6"/>
+  </filter>
+  <filter id="glowWide" x="-140%" y="-140%" width="380%" height="380%">
+    <feGaussianBlur stdDeviation="14"/>
+  </filter>
+  <radialGradient id="lantern" cx="50%" cy="46%" r="62%">
+    <stop offset="0%" stop-color="#16203A" stop-opacity=".95"/>
+    <stop offset="58%" stop-color="#0B1120" stop-opacity=".55"/>
+    <stop offset="100%" stop-color="#080B12" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="vignette" cx="50%" cy="50%" r="78%">
+    <stop offset="55%" stop-color="#080B12" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#000" stop-opacity=".72"/>
+  </radialGradient>
+
+  <linearGradient id="shell" x1="0" y1="0" x2="0.35" y2="1">
+    <stop offset="0%" stop-color="#FFFDF6"/>
+    <stop offset="55%" stop-color="#E9E6DC"/>
+    <stop offset="100%" stop-color="#B9BDC4"/>
+  </linearGradient>
+</defs>
+<style>
+  text { font-family: 'Palatino Linotype','Book Antiqua',Palatino,'URW Palladio L','Times New Roman',serif; }
+  .mote { animation: drift 11s ease-in-out infinite; transform-box: fill-box;
+           transform-origin: center; }
+  @keyframes drift {
+    0%   { transform: translate(0,6px);      opacity: 0; }
+    18%  { opacity: .85; }
+    72%  { opacity: .5; }
+    100% { transform: translate(5px,-30px); opacity: 0; }
+  }
+  .breathe { animation: breathe 6.5s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: .48 } 50% { opacity: .95 } }
+  @media (prefers-reduced-motion: reduce) {
+    .mote, .breathe { animation: none; opacity: .6; }
+  }
+</style>
+<rect width="1200" height="420" fill="#080B12"/>
+<ellipse cx="978" cy="200" rx="360" ry="270" fill="url(#lantern)"/>
+<g transform="translate(846,46) scale(1.24)">
+  <path d="M 34 120 C 22 90, 14 56, 7 26 C 5 19, 15 16, 19 24 C 31 56, 50 86, 70 98 C 84 76, 136 76, 150 98 C 170 86, 189 56, 201 24 C 205 16, 215 19, 213 26 C 206 56, 198 90, 186 120 C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z" fill="#A9E8F0" opacity=".2" filter="url(#glowWide)"/>
+  <g filter="url(#inkSoft)">
+    <path d="M 34 120 C 22 90, 14 56, 7 26 C 5 19, 15 16, 19 24 C 31 56, 50 86, 70 98 C 84 76, 136 76, 150 98 C 170 86, 189 56, 201 24 C 205 16, 215 19, 213 26 C 206 56, 198 90, 186 120 C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z" fill="url(#shell)"/>
+    <path d="M 34 120 C 22 90, 14 56, 7 26 C 5 19, 15 16, 19 24 C 31 56, 50 86, 70 98 C 84 76, 136 76, 150 98 C 170 86, 189 56, 201 24 C 205 16, 215 19, 213 26 C 206 56, 198 90, 186 120 C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z" fill="none" stroke="#6E7686" stroke-width="1.5" opacity=".55"/>
+    <ellipse cx="80" cy="143" rx="16" ry="28" fill="#080B12" transform="rotate(-9 80 143)"/>
+    <ellipse cx="140" cy="143" rx="16" ry="28" fill="#080B12" transform="rotate(9 140 143)"/>
+    <path d="M 46 104 C 38 118, 36 136, 39 156 C 42 190, 58 214, 82 224 C 57 202, 47 168, 48 134 Z" fill="#39404E" opacity=".3"/>
+  </g>
+  <path d="M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218" fill="none" stroke="#2A3040" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 108 104 L 122 99" fill="none" stroke="#2A3040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 107 170 L 92 182" fill="none" stroke="#2A3040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <g style="mix-blend-mode:screen">
+    <path d="M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218" fill="none" stroke="#A9E8F0" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
+    <path d="M 108 104 L 122 99" fill="none" stroke="#A9E8F0" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
+    <path d="M 107 170 L 92 182" fill="none" stroke="#A9E8F0" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
+    <path d="M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218" fill="none" stroke="#A9E8F0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
+    <path d="M 108 104 L 122 99" fill="none" stroke="#A9E8F0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
+    <path d="M 107 170 L 92 182" fill="none" stroke="#A9E8F0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
+  </g>
+  <path d="M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218" fill="none" stroke="#DEFBFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
+  <path d="M 108 104 L 122 99" fill="none" stroke="#DEFBFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
+  <path d="M 107 170 L 92 182" fill="none" stroke="#DEFBFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
+</g>
+<circle class="mote" cx="996.7" cy="254.3" r="2.00" fill="#A9E8F0" opacity="0" style="animation-delay:-6.2s;animation-duration:12.3s"/><circle class="mote" cx="1006.1" cy="164.3" r="1.47" fill="#A9E8F0" opacity="0" style="animation-delay:-10.6s;animation-duration:13.4s"/><circle class="mote" cx="971.6" cy="192.8" r="0.92" fill="#A9E8F0" opacity="0" style="animation-delay:-10.2s;animation-duration:14.7s"/><circle class="mote" cx="967.9" cy="355.7" r="2.05" fill="#A9E8F0" opacity="0" style="animation-delay:-8.4s;animation-duration:13.6s"/><circle class="mote" cx="976.0" cy="123.6" r="1.49" fill="#A9E8F0" opacity="0" style="animation-delay:-1.8s;animation-duration:9.4s"/><circle class="mote" cx="981.9" cy="127.2" r="1.40" fill="#A9E8F0" opacity="0" style="animation-delay:-10.2s;animation-duration:12.1s"/><circle class="mote" cx="1001.3" cy="273.7" r="1.45" fill="#A9E8F0" opacity="0" style="animation-delay:-6.2s;animation-duration:13.6s"/><circle class="mote" cx="984.5" cy="359.4" r="2.09" fill="#A9E8F0" opacity="0" style="animation-delay:-10.5s;animation-duration:14.9s"/><circle class="mote" cx="987.1" cy="175.1" r="1.18" fill="#A9E8F0" opacity="0" style="animation-delay:-7.3s;animation-duration:9.5s"/><circle class="mote" cx="993.0" cy="323.2" r="1.30" fill="#A9E8F0" opacity="0" style="animation-delay:-13.3s;animation-duration:15.7s"/><circle class="mote" cx="965.0" cy="170.3" r="1.98" fill="#A9E8F0" opacity="0" style="animation-delay:-12.0s;animation-duration:12.3s"/><circle class="mote" cx="992.8" cy="137.5" r="1.62" fill="#A9E8F0" opacity="0" style="animation-delay:-3.9s;animation-duration:14.4s"/><circle class="mote" cx="971.1" cy="199.8" r="2.05" fill="#A9E8F0" opacity="0" style="animation-delay:-1.7s;animation-duration:14.3s"/><circle class="mote" cx="982.2" cy="144.3" r="0.88" fill="#A9E8F0" opacity="0" style="animation-delay:-2.6s;animation-duration:14.6s"/><circle class="mote" cx="1004.2" cy="227.4" r="1.05" fill="#A9E8F0" opacity="0" style="animation-delay:-1.8s;animation-duration:14.1s"/><circle class="mote" cx="1010.1" cy="148.0" r="1.35" fill="#A9E8F0" opacity="0" style="animation-delay:-2.8s;animation-duration:10.5s"/><circle class="mote" cx="1033.0" cy="312.8" r="1.20" fill="#A9E8F0" opacity="0" style="animation-delay:-3.2s;animation-duration:15.2s"/><circle class="mote" cx="992.6" cy="325.1" r="1.63" fill="#A9E8F0" opacity="0" style="animation-delay:-9.6s;animation-duration:9.7s"/>
+<g filter="url(#glowWide)" opacity=".38"><text x="72" y="158" font-size="46" fill="#A9E8F0" letter-spacing="9" font-weight="normal" text-anchor="start" opacity="1">MUHID QAISER</text></g>
+<text x="72" y="158" font-size="46" fill="#E9E6DC" letter-spacing="9" font-weight="normal" text-anchor="start" opacity="1">MUHID QAISER</text>
+<path d="M 72 182 L 536 182" stroke="#E9E6DC" stroke-width="1.4" opacity=".28" filter="url(#ink)"/>
+<text x="72" y="221" font-size="17.5" fill="#E9E6DC" text-anchor="start" opacity="1">AI Security Engineer. I red-team large language models and the agents built on them.</text>
+<text x="72" y="253" font-size="15" fill="#8B96AB" font-style="italic" text-anchor="start" opacity="1">Before this, computer vision — where adversarial examples were first found.</text>
+<text x="72" y="279" font-size="15" fill="#8B96AB" font-style="italic" text-anchor="start" opacity="1">The method did not change when the input became language.</text>
+<path d="M 73 315 L 73 351" stroke="#A9E8F0" stroke-width="2" opacity=".75"/>
+<text x="92" y="330" font-size="11.5" fill="#A9E8F0" letter-spacing="3.6" font-weight="normal" text-anchor="start" opacity="1">A VESSEL IS ONLY AS GOOD AS ITS SEAL</text>
+<text x="92" y="351" font-size="13" fill="#8B96AB" font-style="italic" text-anchor="start" opacity="1">Islamabad, Pakistan</text>
+<rect width="1200" height="420" fill="url(#vignette)"/>
+</svg>

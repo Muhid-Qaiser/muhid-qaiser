@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="148"
+     viewBox="0 0 600 148" role="img">
+<defs>
+  <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3"
+                  seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="inkSoft" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2"
+                  seed="19" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/>
+             <feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glowMed" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="6"/>
+  </filter>
+  <filter id="glowWide" x="-140%" y="-140%" width="380%" height="380%">
+    <feGaussianBlur stdDeviation="14"/>
+  </filter>
+  <radialGradient id="lantern" cx="50%" cy="46%" r="62%">
+    <stop offset="0%" stop-color="#16203A" stop-opacity=".95"/>
+    <stop offset="58%" stop-color="#0B1120" stop-opacity=".55"/>
+    <stop offset="100%" stop-color="#080B12" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="vignette" cx="50%" cy="50%" r="78%">
+    <stop offset="55%" stop-color="#080B12" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#000" stop-opacity=".72"/>
+  </radialGradient>
+
+</defs>
+<style>
+  text { font-family: 'Palatino Linotype','Book Antiqua',Palatino,'URW Palladio L','Times New Roman',serif; }
+  .mote { animation: drift 11s ease-in-out infinite; transform-box: fill-box;
+           transform-origin: center; }
+  @keyframes drift {
+    0%   { transform: translate(0,6px);      opacity: 0; }
+    18%  { opacity: .85; }
+    72%  { opacity: .5; }
+    100% { transform: translate(5px,-30px); opacity: 0; }
+  }
+  .breathe { animation: breathe 6.5s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: .48 } 50% { opacity: .95 } }
+  @media (prefers-reduced-motion: reduce) {
+    .mote, .breathe { animation: none; opacity: .6; }
+  }
+</style>
+<rect width="600" height="148" fill="#080B12"/>
+<rect x="3" y="3" width="594" height="142" rx="5" fill="#111725" fill-opacity=".55" stroke="#E9E6DC" stroke-width="1.3" stroke-opacity=".26" filter="url(#ink)"/>
+<circle cx="66" cy="74" r="34" fill="#151D30"/><circle cx="66" cy="74" r="34" fill="none" stroke="#E9E6DC" stroke-width="1.2" opacity=".38" filter="url(#ink)"/><rect x="53.0" y="83" width="26" height="5" rx="1.5" fill="#B4BDCE" opacity="0.72"/><rect x="55.0" y="75" width="22" height="5" rx="1.5" fill="#B4BDCE" opacity="0.72"/><rect x="57.0" y="67" width="18" height="5" rx="1.5" fill="#B4BDCE" opacity="0.72"/><rect x="59.0" y="59" width="14" height="5" rx="1.5" fill="#A9E8F0" opacity="1"/>
+<text x="122" y="56" font-size="16" fill="#E9E6DC" letter-spacing="3.6" font-weight="normal" text-anchor="start" opacity="1">DEEPSEEK FROM SCRATCH</text>
+<text x="122" y="78" font-size="10" fill="#A9E8F0" letter-spacing="2.6" font-weight="normal" text-anchor="start" opacity="1">FROM SCRATCH</text>
+<text x="122" y="102" font-size="13.5" fill="#8B96AB" font-style="italic" text-anchor="start" opacity="1">The architecture rebuilt and trained in PyTorch from nothing,</text>
+<text x="122" y="122" font-size="13.5" fill="#8B96AB" font-style="italic" text-anchor="start" opacity="1">because reading the paper is not the same as running it.</text>
+<circle class="mote" cx="125.8" cy="92.1" r="1.63" fill="#A9E8F0" opacity="0" style="animation-delay:-2.7s;animation-duration:12.4s"/><circle class="mote" cx="452.2" cy="102.7" r="1.47" fill="#A9E8F0" opacity="0" style="animation-delay:-3.0s;animation-duration:12.5s"/><circle class="mote" cx="41.7" cy="63.4" r="1.56" fill="#A9E8F0" opacity="0" style="animation-delay:-7.5s;animation-duration:9.5s"/><circle class="mote" cx="160.8" cy="50.9" r="0.86" fill="#A9E8F0" opacity="0" style="animation-delay:-11.8s;animation-duration:16.0s"/><circle class="mote" cx="495.0" cy="85.4" r="0.84" fill="#A9E8F0" opacity="0" style="animation-delay:-5.6s;animation-duration:11.3s"/><circle class="mote" cx="100.2" cy="115.7" r="1.28" fill="#A9E8F0" opacity="0" style="animation-delay:-8.2s;animation-duration:10.1s"/>
+</svg>

@@ -1,0 +1,1123 @@
+{
+  "login": "Muhid-Qaiser",
+  "since": "2022-08-21",
+  "repos": 92,
+  "repos_mapped": 91,
+  "followers": 5,
+  "stars": 2,
+  "commits": 225,
+  "contributions_year": 47,
+  "scratch_builds": 6,
+  "regions": [
+    {
+      "name": "PERCEPTION",
+      "count": 27
+    },
+    {
+      "name": "FOUNDATIONS",
+      "count": 20
+    },
+    {
+      "name": "LEARNING",
+      "count": 16
+    },
+    {
+      "name": "LANGUAGE",
+      "count": 13
+    },
+    {
+      "name": "AGENTS",
+      "count": 10
+    },
+    {
+      "name": "SILICON",
+      "count": 5
+    }
+  ],
+  "hours": [
+    3,
+    10,
+    0,
+    6,
+    7,
+    0,
+    4,
+    3,
+    0,
+    11,
+    14,
+    11,
+    2,
+    20,
+    16,
+    11,
+    40,
+    6,
+    18,
+    16,
+    3,
+    3,
+    11,
+    10
+  ],
+  "commits_by_year": {
+    "2024": 59,
+    "2025": 129,
+    "2026": 37
+  },
+  "languages": [
+    {
+      "name": "Jupyter Notebook",
+      "size": 222886960,
+      "color": "#DA5B0B"
+    },
+    {
+      "name": "C++",
+      "size": 1047787,
+      "color": "#f34b7d"
+    },
+    {
+      "name": "Python",
+      "size": 802879,
+      "color": "#3572A5"
+    },
+    {
+      "name": "HTML",
+      "size": 545630,
+      "color": "#e34c26"
+    },
+    {
+      "name": "Assembly",
+      "size": 141361,
+      "color": "#6E4C13"
+    },
+    {
+      "name": "C#",
+      "size": 94109,
+      "color": "#7355dd"
+    },
+    {
+      "name": "CSS",
+      "size": 19301,
+      "color": "#663399"
+    },
+    {
+      "name": "Cuda",
+      "size": 14982,
+      "color": "#3A4E3A"
+    },
+    {
+      "name": "C",
+      "size": 1778,
+      "color": "#555555"
+    },
+    {
+      "name": "Dockerfile",
+      "size": 954,
+      "color": "#384d54"
+    }
+  ],
+  "repo_list": [
+    {
+      "name": "muhid-qaiser",
+      "description": "",
+      "created": "2026-08-27",
+      "pushed": "2026-08-27",
+      "stars": 0,
+      "language": "Python",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Agents_with_LangChain_and_LangGraph",
+      "description": "",
+      "created": "2026-07-01",
+      "pushed": "2026-07-01",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Bar_Code_Assessment",
+      "description": "",
+      "created": "2026-06-24",
+      "pushed": "2026-06-24",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 14,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Deriv_Test",
+      "description": "",
+      "created": "2026-05-22",
+      "pushed": "2026-05-22",
+      "stars": 0,
+      "language": "Python",
+      "commits": 2,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "AgroVQ-HybridNet",
+      "description": "",
+      "created": "2026-05-14",
+      "pushed": "2026-05-14",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Fundamental_Concepts_of_AI",
+      "description": "",
+      "created": "2026-03-31",
+      "pushed": "2026-04-30",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 7,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Robust_Fair_Moderation_System",
+      "description": "",
+      "created": "2026-04-19",
+      "pushed": "2026-04-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 9,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "DeepSeek_from_Scratch",
+      "description": "Creating and Training a DeepSeek model using torch from scratch",
+      "created": "2025-09-23",
+      "pushed": "2025-09-23",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": true
+    },
+    {
+      "name": "English_to_German_Translation_using_Vanilla_Transformer",
+      "description": "Training a Vanilla Transformer on Translating English to German sentences",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 4,
+      "region": "LANGUAGE",
+      "scratch": true
+    },
+    {
+      "name": "RAG_using_Ollama",
+      "description": "Using Ollama to create a Local RAG",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Comparative_Analysis_between_GPU_-_CPU_Model_Training",
+      "description": "Comparative Analysis between training an ANN model using GPU and CPU",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "SILICON",
+      "scratch": false
+    },
+    {
+      "name": "C-_Cuda_Practice",
+      "description": "Practicing Various Problems using Cuda for parallelization using C++",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Cuda",
+      "commits": 2,
+      "region": "SILICON",
+      "scratch": false
+    },
+    {
+      "name": "Matrix_Multiplication_Using_OpenCL",
+      "description": "Matrix Multiplication Using OpenCL in C++ for enhanced parallelization",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "C++",
+      "commits": 2,
+      "region": "SILICON",
+      "scratch": false
+    },
+    {
+      "name": "Text_to_Speech_Synthesis",
+      "description": "Experimenting with multiple TTS models for different languages",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Roman_Urdu_Text_to_Speech",
+      "description": "Creating a Model for Roman Urdu TTS",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 5,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Image_Classification_using_Digital_Image_Processing",
+      "description": "Classifying images using simply Digital Image Processing techniques from Scratch",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": true
+    },
+    {
+      "name": "Digital_Image_Processing_Filters",
+      "description": "Practicing various beginner digital image processing techniques",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 5,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Using_Distillation_and_Topological_Features_to_Enhance_Classification",
+      "description": "Using FitNet and Knowledge Distilation with Image Topological Features of an image to enhance image classification",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "ANN_from_Scratch",
+      "description": "Creating ANN models with various Activation functions using Numpy",
+      "created": "2025-07-19",
+      "pushed": "2025-07-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "FOUNDATIONS",
+      "scratch": true
+    },
+    {
+      "name": "Yolo_V1_From_Scratch",
+      "description": "A repo where I train and evaluate Yolo V1 using torch",
+      "created": "2025-06-23",
+      "pushed": "2025-06-23",
+      "stars": 0,
+      "language": "Python",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": true
+    },
+    {
+      "name": "YoloX_Fashion_Object_Detection",
+      "description": "Repo to Detect different apparels of fashion using YoloX repo",
+      "created": "2025-06-22",
+      "pushed": "2025-06-22",
+      "stars": 0,
+      "language": "",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "LeetCode_Attempts",
+      "description": "",
+      "created": "2025-04-13",
+      "pushed": "2025-05-05",
+      "stars": 0,
+      "language": "Python",
+      "commits": 24,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Text-to-Speech-and-Translation",
+      "description": "A Microservice program that provides a front end using streamlit, and backend using gRPC. Model is hosted in the gRPC server and can also be tested using Postman ",
+      "created": "2025-05-03",
+      "pushed": "2025-05-03",
+      "stars": 0,
+      "language": "Python",
+      "commits": 4,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Learning_GPTs",
+      "description": "A repo where i try out different variations of GPTs for Learning",
+      "created": "2025-04-10",
+      "pushed": "2025-04-12",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 8,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Exploring_LangChain_Components",
+      "description": "A repository where i explore different langchain components.",
+      "created": "2025-03-25",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Simpe-Python-Projects",
+      "description": "Projects I made while learning python",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Python",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Python-Practice",
+      "description": "",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Python",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Web-Dev-Practice",
+      "description": "Practicing Html/CSS",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "HTML",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Programming-Fundamentals-Assigments",
+      "description": "Assignments of Programming Fundamentals",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Candy-Crush-Game-C-SFML-",
+      "description": "Candy Crush Game in C++ and SFML Library",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Quiz-Management-System",
+      "description": "Quiz-Management-System in C++ using OOP",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "OOP-Cpp-Practice",
+      "description": "Practice Questions in OOP using C++",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "NUCES-University-Website",
+      "description": "Website of my FAST NUCES using HTML\\CSS\\Bootstrap",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "HTML",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Huffman-Algorithm",
+      "description": "Huffman Algorithm Practice",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Autocorrect-Notepad-Cpp-Quadlinkedlist",
+      "description": "A program for Notepad in C++ made with Quadlinkedlist that also has autocorrect feature.",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "SocialMedia-Posts-Interaction-LinkedList",
+      "description": "Social Media Posts interaction between users using OOP and LinkedLists",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Dijkstra-Algorithm-Cpp",
+      "description": "dijkstra algorithm in CPP to find shortest path in a journey with shortcuts ",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Data-Structures-Cpp",
+      "description": "Practice codes for Data Structures algorithms of various difficulties ",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C++",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Age-Prediction-of-Audio-using-LinearRegression",
+      "description": "Prediciting age with audio using Linear Regression",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "ExamScheduling-using-Genetic-Algorithm",
+      "description": "Scheduling Exams using Genetic Algorithm and Constraint Satisfactory Problem",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "AI-Searches-LabPractices",
+      "description": "Practice questions from my AI Lab course",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "x86-masm615-AssemblyLanguage-Practice",
+      "description": "Practice Qs from my COAL course using x86 processor using masm615",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Assembly",
+      "commits": 1,
+      "region": "SILICON",
+      "scratch": false
+    },
+    {
+      "name": "Mobile-Recommendation-Chatbot",
+      "description": "A mobile recommendating level 1 chatbot that accesses it's data using web-scrapping",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Budget-Management-App",
+      "description": "A budget managing desktop app made with C# ",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "C#",
+      "commits": 1,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Cat-Dog-Image-Classification",
+      "description": "Image classification using CNN of Cats and Dogs",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Emotions-Classification-using-DeepFace",
+      "description": "Classification of Emotions in real time using Deepface and OpenCv",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Emotions-Classification-CNN",
+      "description": "Classifying emotions using Convolutional Neural Networks",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Homer-Bart-CLassification",
+      "description": "Classifying homer and bart simpson using CNN and Finetuning pre-trained model",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Natural-Image-Classifcation",
+      "description": "Classifying Natural Scenary Images of 6 types using CNN",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Machine-Learning-Specialization-MyAttempt",
+      "description": "My attempt of the Machine Learning Specialization Course by Andrew Ng",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Prompt-Engineering",
+      "description": "Prompt Engineering Practice using OpenAI",
+      "created": "2024-06-28",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 1,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Flight-Delay-Prediction-ML",
+      "description": "Used alot of Data Engineering and Selection Techniques",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 3,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Random-Forest-Practice",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Decision-Tree-Practice",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "K-Nearest-Neighbors-Practice",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Statistical-Text-Classification-Naive-Bayes",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Spam-Ham-Naive-Bayes",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Sentiment-Analysis-Naive-Bayes",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Basic-RAG",
+      "description": "used OpenAI to create a basic RAG system",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Python",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Multi-Doc-Vacation-Assigning-Agentic-RAG-Ollama",
+      "description": "A Rag that retrieves information from HR Manual PDFs and also checks .csv file to see if an employee can take vacations or not based on their remaining vacations from the .csv file. Gemini 2.0 Model used",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Churn-Prediction-Streamlit-App",
+      "description": "used StreamLit",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Salary-Prediction-TensorFlow",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 3,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Finetuning-Bert-HuggingFace",
+      "description": "Finetuning Bert using HuggingFace",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Multi-Doc-RAG-Sequential-CrewAI",
+      "description": "Sequentially decides if next agent needs to be activated or not",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Python",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Multi-Doc-Rag-Hierarchical-CrewAI",
+      "description": "Master Agent delegates tasks to other agents",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 1,
+      "language": "Python",
+      "commits": 2,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "Vision-Transformer",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Transfer-Learning-using-ResNet",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "TezNet",
+      "description": "The Official Implementation of the TezNet Model used in the \"TezNet: An Efficient Convolutional Neural Network for Optical Coherence Tomography Classification\" Research Paper",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 1,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Glass-Segmentation-Sam2",
+      "description": "",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "UNET-Segmentation",
+      "description": "A Repo where i used UNET for various object segmentation",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Basic-CNN_Architectures",
+      "description": "A repo containing Implementation of Implementations of Basic CNN Architectures",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Object-Segmentation-Yolov8",
+      "description": "Implemention of Object Segmentation using Yolov8 for Beginners",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Object-Detection-Yolov8",
+      "description": "Implemention of Object Detection using Yolov8 for Beginners",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Exercise-Rep-Counting-using-Yolov8",
+      "description": "An implementation of Exercise Rep Counting using Yolov8",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Pose-Estimation-using-Caffe",
+      "description": "An implementation of Pose Estimation using Caffe",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Object-Counting-Yolov8",
+      "description": "An implementation of an object counting model using Yolov8 ",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Facial-Emotional_Recognition-Model-in-Real-Time",
+      "description": "An Implementation on a model that detects emotions on faces in real time",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "Auto-Encoders",
+      "description": "A repi with multiple Auto-Encoders Notebooks",
+      "created": "2025-03-27",
+      "pushed": "2025-03-27",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Automatic_Attendance_System",
+      "description": "An AI powered system that allows teachers to take attendance of all students with a snigle snap of the camera.",
+      "created": "2024-11-19",
+      "pushed": "2024-11-19",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 4,
+      "region": "PERCEPTION",
+      "scratch": false
+    },
+    {
+      "name": "ai-interviewer",
+      "description": "",
+      "created": "2024-11-15",
+      "pushed": "2024-11-15",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 3,
+      "region": "AGENTS",
+      "scratch": false
+    },
+    {
+      "name": "ANN_Classification_Churn_using_SWISH",
+      "description": "A simple ANN Model for predicting churning Clients, integrated with Streamlit.",
+      "created": "2024-08-16",
+      "pushed": "2024-08-16",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 4,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "DeepDream",
+      "description": "Using DeepDream Model using finetuned model",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Restuarant-Rating-Prediction",
+      "description": "Predicting Rating of a restuarant and finding out the most important features for the prediction",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Temperature-Prediction-using-LSTM",
+      "description": "Predicting temperature over a time period using LSTM",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Customer-Review-Sentiment-Analysis-using-ML",
+      "description": "Predicting Review Sentiment Analysis using ML models",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LANGUAGE",
+      "scratch": false
+    },
+    {
+      "name": "Object-Tracking-via-Histogram",
+      "description": "Tracking an object using Color pallets of a Histogram",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "CNN-from-Scratch",
+      "description": "creating a CNN from scratch",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "PERCEPTION",
+      "scratch": true
+    },
+    {
+      "name": "MySql-Practice",
+      "description": "Practicing MySql of my Database systems course",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "",
+      "commits": 2,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "Duck-Shooter-COAL",
+      "description": "Duck Shooter game using Assembly Language using x86 processor and masm615",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Assembly",
+      "commits": 2,
+      "region": "SILICON",
+      "scratch": false
+    },
+    {
+      "name": "AI-Searches-Practice",
+      "description": "practicing various AI searches and ML algorithms",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 4,
+      "region": "LEARNING",
+      "scratch": false
+    },
+    {
+      "name": "Astar-UniformCost-Searches",
+      "description": "A shortest path maze solving algorithm using both Astar and UniformCost searches",
+      "created": "2024-06-28",
+      "pushed": "2024-06-28",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "commits": 2,
+      "region": "LEARNING",
+      "scratch": false
+    }
+  ]
+}

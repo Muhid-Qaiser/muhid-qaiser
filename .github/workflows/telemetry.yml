@@ -1,44 +1,49 @@
-name: Refresh profile telemetry
+name: Redraw the map
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "scripts/update_telemetry.py"
-      - ".github/workflows/telemetry.yml"
-      - "README.md"
   schedule:
     - cron: "23 3 * * *"
+  push:
+    branches: [master]
+    paths:
+      - "scripts/**"
+      - ".github/workflows/telemetry.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: profile-writes
+  group: profile-redraw
   cancel-in-progress: false
 
 jobs:
-  update:
+  redraw:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: master
 
-      - name: Sync latest main
-        run: git pull --rebase origin main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Generate telemetry SVG
+      - name: Collect the numbers
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROFILE_LOGIN: Muhid-Qaiser
-        run: python scripts/update_telemetry.py
+        run: python scripts/fetch_stats.py
 
-      - name: Commit refreshed telemetry
+      - name: Redraw the data-driven figures
+        run: |
+          python scripts/build_map.py
+          python scripts/build_ledger.py
+
+      - name: Commit whatever changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/telemetry.svg
-          git diff --cached --quiet || git commit -m "chore: refresh profile telemetry"
+          git add assets/map.svg assets/ledger.svg data/stats.json
+          git diff --cached --quiet || git commit -m "Redraw the map and the ledger"
           git push
