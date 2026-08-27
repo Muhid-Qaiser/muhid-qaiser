@@ -27,16 +27,16 @@ HEADERS = {"Authorization": f"Bearer {TOKEN}", "User-Agent": "muhid-profile",
 # Regions of the map, tested in order — first match wins, so the more specific
 # vocabularies (agents, perception) are checked before the general ones.
 REGIONS = [
-    ("AGENTS", r"agent|crewai|langchain|langgraph|\brag\b|_rag|-rag|tool|interviewer|"
+    ("AGENTIC AI", r"agent|crewai|langchain|langgraph|\brag\b|_rag|-rag|tool|interviewer|"
                r"chatbot|prompt|multi-doc|multi_doc|ollama|mcp"),
-    ("PERCEPTION", r"yolo|cnn|image|vision|visual|segmentation|detection|opencv|ocr|face|"
+    ("COMPUTER VISION", r"yolo|cnn|image|vision|visual|segmentation|detection|opencv|ocr|face|"
                    r"facial|emotion|pose|unet|resnet|teznet|oct|agrovq|bar_?code|"
                    r"attendance|homer|cat-dog|natural-image|digital_image|topological"),
-    ("LANGUAGE", r"bert|gpt|transformer|translation|nlp|text|tts|speech|sentiment|spam|"
+    ("GENERATIVE AI", r"bert|gpt|transformer|translation|nlp|text|tts|speech|sentiment|spam|"
                  r"naive|token|deepseek|llm|urdu|moderation|audio|huffman"),
-    ("SILICON", r"cuda|opencl|gpu|parallel|grpc|microservice|assembly|masm|x86|coal|"
+    ("PARALLEL COMPUTE", r"cuda|opencl|gpu|parallel|grpc|microservice|assembly|masm|x86|coal|"
                 r"comparative_analysis"),
-    ("LEARNING", r"random-forest|decision-tree|k-nearest|knn|churn|salary|regression|lstm|"
+    ("MACHINE LEARNING", r"random-forest|decision-tree|k-nearest|knn|churn|salary|regression|lstm|"
                  r"prediction|auto-?encoder|genetic|search|astar|uniform|rating|deepdream|"
                  r"swish|ann[_-]|neural|machine-learning|specialization|classification"),
 ]

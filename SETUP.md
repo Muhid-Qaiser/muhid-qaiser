@@ -5,7 +5,7 @@ Push the contents of this folder to the root of your profile repository,
 
 ```text
 README.md
-assets/          vessel · journal · map · ledger · relics · bench (all SVG)
+assets/          vessel · map · ledger · bench · shop (all SVG)
 data/
   stats.json     collected from the GitHub API; the figures read from it
 scripts/
@@ -13,7 +13,7 @@ scripts/
   fetch_stats.py   walks the API and writes data/stats.json
   build_map.py     redraws assets/map.svg
   build_ledger.py  redraws assets/ledger.svg
-  build_vessel.py  build_journal.py  build_relics.py  build_bench.py
+  build_vessel.py  build_bench.py  build_shop.py
 .github/workflows/
   telemetry.yml  refetches and redraws the map and ledger nightly
 ```
@@ -36,19 +36,24 @@ python scripts/build_map.py
 python scripts/build_ledger.py
 ```
 
-The vessel, journal, relics and bench are hand-authored art and do not depend
-on the API — rebuild them only when you change the copy or the drawing.
+The vessel, bench and shop are hand-authored art and do not depend on the
+API — rebuild them only when you change the copy or the drawing.
 
 ## Changing things
 
 - **Palette and lettering** live in `scripts/theme.py`. Amber (`INFECT`) is
   reserved for a breach and is never used as decoration; keeping that rule is
   what stops the profile turning into generic neon.
-- **Map regions** are keyword rules in `fetch_stats.py` (`REGIONS`), with
-  hand-placed positions in `build_map.py` (`PLACES`). Add a repository and it
-  lands in a region automatically; move a region by editing its coordinates.
-- **Journal entries** and **relics** are plain lists at the top of
-  `build_journal.py` and `build_relics.py`.
+- **Map areas** are keyword rules in `fetch_stats.py` (`REGIONS`), with
+  hand-placed positions in `build_map.py` (`AREAS`). Each area stands in for a
+  real Hallownest region — Foundations for Dirtmouth, Computer Vision for
+  Greenpath, Generative AI for the City of Tears, AI Security for the Abyss —
+  so its colour and position are not arbitrary. Add a repository and it lands
+  in an area automatically.
+- **Shop wares** are a plain list at the top of `build_shop.py`.
+- **Bloom** is the thing that makes it read as in-game: `caps(glow=True)` picks
+  a blur radius from the type size, because blurring 12px text like a 46px
+  title turns it into a highlighter box rather than light.
 
 ## A deliberate omission
 

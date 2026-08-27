@@ -13,7 +13,7 @@ from theme import *
 W, H = 1200, 420
 OUT = Path(__file__).resolve().parent.parent / "assets" / "vessel.svg"
 
-# Mask drawn in a local 220x240 box, then placed. Horns thick at the base,
+# Mask drawn in a local 220x250 box, then placed. Horns thick at the base,
 # sweeping outward before they rise; a shallow dome between them; cheeks
 # tapering to a blunt chin.
 MASK = (
@@ -37,8 +37,8 @@ svg = [head(W, H, extra_defs=f"""
     <stop offset="100%" stop-color="#B9BDC4"/>
   </linearGradient>""")]
 
-# Lantern light behind the shell.
-svg.append('<ellipse cx="978" cy="200" rx="360" ry="270" fill="url(#lantern)"/>')
+# A second light source behind the shell itself.
+svg.append('<ellipse cx="978" cy="200" rx="330" ry="250" fill="url(#lantern)"/>')
 
 svg.append('<g transform="translate(846,46) scale(1.24)">')
 svg.append(f'  <path d="{MASK}" fill="{SOUL}" opacity=".2" filter="url(#glowWide)"/>')
@@ -51,12 +51,12 @@ svg.append(f'    <ellipse cx="80" cy="143" rx="16" ry="28" fill="{VOID}" '
            f'transform="rotate(-9 80 143)"/>')
 svg.append(f'    <ellipse cx="140" cy="143" rx="16" ry="28" fill="{VOID}" '
            f'transform="rotate(9 140 143)"/>')
-# Shading down the left cheek so the shell has a side that is turned away.
-svg.append(f'    <path d="M 46 104 C 38 118, 36 136, 39 156 C 42 190, 58 214, 82 224 '
-           f'C 57 202, 47 168, 48 134 Z" fill="#39404E" opacity=".3"/>')
+# Shading down the left cheek, so the shell has a side turned away from us.
+svg.append(f'    <path d="M 34 120 C 32 164, 52 212, 110 236 C 68 206, 47 168, '
+           f'48 128 Z" fill="#39404E" opacity=".3"/>')
 svg.append('  </g>')
 
-# The breach: dark fracture cut first, then the light coming through it.
+# The breach: the dark cut first, then the light coming through it.
 for path, w in ((CRACK, 3.4), (BRANCH_A, 2.2), (BRANCH_B, 2.2)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#2A3040" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round"/>')
@@ -69,38 +69,37 @@ for flt, width, op in (("glowWide", 16, .75), ("glowMed", 7, .95)):
 svg.append('  </g>')
 for path, w in ((CRACK, 2.8), (BRANCH_A, 1.6), (BRANCH_B, 1.6)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#DEFBFF" stroke-width="{w}" '
-               f'stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" '
-               f'class="breathe"/>')
+               f'stroke-linecap="round" stroke-linejoin="round" '
+               f'filter="url(#glow)" class="breathe"/>')
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
 svg.append(motes(965, 120, 70, 240, n=18, seed=11))
 
-# -- Masthead lettering --------------------------------------------------
-svg.append(f'<g filter="url(#glowWide)" opacity=".38">'
-           f'{caps(72, 158, "Muhid Qaiser", size=46, track=9, fill=SOUL)}</g>')
-svg.append(caps(72, 158, "Muhid Qaiser", size=46, track=9, fill=BONE))
-svg.append(f'<path d="M 72 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
+# ── Masthead lettering ────────────────────────────────────────────────────
+svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))
+svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
            f'opacity=".28" filter="url(#ink)"/>')
 
-svg.append(prose(72, 221,
+svg.append(prose(MARGIN, 221,
                  "AI Security Engineer. I red-team large language models "
                  "and the agents built on them.",
                  size=17.5, fill=BONE, italic=False))
-svg.append(prose(72, 253,
+svg.append(prose(MARGIN, 253,
                  "Before this, computer vision — where adversarial examples "
                  "were first found."))
-svg.append(prose(72, 279,
+svg.append(prose(MARGIN, 279,
                  "The method did not change when the input became language."))
 
-svg.append(f'<path d="M 73 315 L 73 351" stroke="{SOUL}" stroke-width="2" opacity=".75"/>')
-svg.append(caps(92, 330, "A vessel is only as good as its seal", size=11.5,
-                track=3.6, fill=SOUL))
-svg.append(prose(92, 351, "Islamabad, Pakistan", size=13, fill=ASH))
+svg.append(f'<path d="M {MARGIN + 1} 315 L {MARGIN + 1} 351" stroke="{SOUL}" '
+           f'stroke-width="2" opacity=".75" filter="url(#bloomSoft)"/>')
+svg.append(caps(MARGIN + 20, 330, "A vessel is only as good as its seal",
+                size=11.5, track=3.6, fill=SOUL, glow=True))
+svg.append(prose(MARGIN + 20, 351, "Islamabad, Pakistan", size=13))
 
 svg.append(vignette(W, H))
 svg.append(tail())
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text("\n".join(svg), encoding="utf-8")
-print(f"wrote {OUT}")
+print(f"wrote {OUT} ({W}x{H})")

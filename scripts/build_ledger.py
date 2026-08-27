@@ -23,7 +23,7 @@ years = (date.today() - since).days // 365
 COUNTS = [
     (stats["repos"],          "Repositories"),
     (stats["commits"],        "Commits"),
-    (stats["scratch_builds"], "Rebuilt from scratch"),
+    (stats["scratch_builds"], "From scratch"),
     (len(stats["regions"]),   "Regions mapped"),
     (years,                   "Years on record"),
 ]
@@ -32,19 +32,11 @@ hours = stats["hours"]
 peak = hours.index(max(hours))
 
 svg = [head(W, H)]
-svg.append('<ellipse cx="600" cy="150" rx="640" ry="330" fill="url(#lantern)" '
-           'opacity=".5"/>')
-
-svg.append(caps(72, 66, "The Ledger", size=23, track=6.5))
-svg.append(prose(72, 96, "What is actually here, counted honestly."))
-svg.append(f'<path d="M 72 118 L 1128 118" stroke="{BONE}" stroke-width="1.2" '
-           f'opacity=".2" filter="url(#ink)"/>')
+svg.append(section("The Ledger", "What is actually here, counted honestly."))
 
 # ── Counters ──────────────────────────────────────────────────────────────
 for i, (value, label) in enumerate(COUNTS):
     x = 72 + i * 216
-    svg.append(f'<g filter="url(#glowWide)" opacity=".3">'
-               f'{numeral(x, 178, commas(value), size=46, fill=SOUL)}</g>')
     svg.append(numeral(x, 178, commas(value), size=46))
     svg.append(caps(x, 202, label, size=10.5, track=2.8, fill=ASH))
     if i:
@@ -55,7 +47,7 @@ for i, (value, label) in enumerate(COUNTS):
 BASE, TALL, SLOT = 322, 58, 44
 svg.append(caps(72, 250, "Every commit, by hour", size=10.5, track=2.8, fill=ASH))
 svg.append(caps(1128, 250, f"busiest at {peak:02d}:00", size=10.5, track=2.8,
-                fill=SOUL, anchor="end"))
+                fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
 svg.append('<g filter="url(#ink)">')
