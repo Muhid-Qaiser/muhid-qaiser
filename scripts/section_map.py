@@ -71,7 +71,7 @@ AREAS = {
         "poly": [(1030, 340), (1070, 340), (1070, 312), (1150, 312),
                  (1150, 420), (1122, 420), (1122, 460), (1150, 460),
                  (1150, 520), (1080, 520), (1080, 488), (1030, 488)],
-        "colour": "#AFBCCC", "label": (1090, 360), "lines": ["Parallel", "Compute"],
+        "colour": "#E8874A", "label": (1090, 360), "lines": ["Parallel", "Compute"],
         "size": 11,
     },
 }
@@ -201,10 +201,9 @@ svg.append(f'<g clip-path="url(#clip{len(AREAS)})"><rect x="{ax0}" y="{ay0}" '
            f'opacity=".1"/></g>')
 svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="170" ry="56" '
            f'fill="{SOUL}" opacity=".08" filter="url(#glowWide)"/>')
-svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="6" '
-           f'opacity=".16" filter="url(#glowMed)"/>')
-svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="1.7" '
-           f'opacity=".5" stroke-dasharray="5 9" filter="url(#ink)"/>')
+ABYSS_EDGE = "#243247"
+svg.append(f'<path d="{d}" fill="none" stroke="{ABYSS_EDGE}" stroke-width="2.4" '
+           f'opacity=".95" stroke-dasharray="5 9" filter="url(#ink)"/>')
 # What the Abyss actually looks like: a floor of dead vessels, so the dark
 # is full of small pale eyes looking back up out of it. Rejection-sampled so
 # no pair straddles a wall, and kept clear of the caption.
