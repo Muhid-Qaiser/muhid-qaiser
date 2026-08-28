@@ -155,35 +155,25 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
 
 
 def spider(cx, cy, s=1.0):
-    """Hornet's mask, redrawn from the high-resolution art.
+    """Hornet's mask, traced from the same line-art reference as the shell.
 
-    It is not the symmetric leaf I first made it. Measured off the art: the
-    box is 540 x 613 (h/w 1.14), the notch stays open from 5% to 60% of the
-    height, and the silhouette leans hard — the left edge runs from 72% of the
-    width at the top down to 0% at the bulb. So it is a rounded head sitting
-    low and left, with two long blade horns sweeping up and to the right, the
-    right one reaching highest, split by a narrow slot. The eyes sit low in the
-    bulb and are not a pair: the left is small and round, the right larger and
-    drawn out.
+    Measured off it: 231 x 374, so h/w 1.62 — much taller and narrower than my
+    earlier passes — symmetric rather than leaning, with the notch between the
+    horns closing halfway down at y=81.8. The eyes are angled almonds set low,
+    their long axes at about 52 and 128 degrees.
+
+    Box is 100 x 162, scaled to the caller.
     """
-    k = s * 0.40
-    tx, ty = cx - 46 * k, cy - 62 * k
-    mask = ("M 30 113 C 8 108, 0 84, 10 62 "
-            "C 22 40, 40 16, 56 3 "
-            "C 52 24, 44 44, 40 58 "
-            "C 52 42, 70 20, 92 2 "
-            "C 84 28, 68 60, 56 84 "
-            "C 50 100, 42 112, 30 113 Z")
+    k = s * 0.26
+    tx, ty = cx - 50 * k, cy - 81 * k
+    mask = "M 31.6 0.4 L 26 5.2 L 19.9 14.7 L 7.8 40.7 L 0.9 68.8 L 0 95.2 L 1.7 106.9 L 5.2 119.5 L 14.3 137.2 L 22.9 147.2 L 30.7 153.7 L 39.8 158.9 L 47.6 161.5 L 56.3 160.2 L 70.1 152.4 L 80.5 142.9 L 86.6 134.6 L 92.2 123.8 L 97 109.1 L 99.1 94.4 L 99.1 76.2 L 95.2 53.2 L 87.4 30.7 L 80.1 16 L 72.3 3.9 L 69.3 1.3 L 65.4 0 L 61 2.6 L 59.7 7.4 L 64.1 25.5 L 65.8 40.3 L 65.4 56.3 L 63.6 65.4 L 59.7 74.9 L 53.2 81.4 L 47.2 81.8 L 41.6 77.9 L 36.8 69.3 L 33.8 55.8 L 34.2 31.2 L 39.4 8.7 L 39 4.3 L 35.5 0.4 Z"
     out = [f'<g transform="translate({tx:.1f},{ty:.1f}) scale({k:.3f})">',
            f'  <path d="{mask}" fill="{SOUL}" opacity=".3" filter="url(#glowMed)"/>',
-           f'  <path d="{mask}" fill="{LUMEN}"/>',
-           f'  <path d="{mask}" fill="none" stroke="#0A0D14" stroke-width="2.6" '
-           f'opacity=".5"/>',
-           f'  <ellipse cx="17" cy="92" rx="5.4" ry="6.6" fill="#0A0D14" '
-           f'transform="rotate(-14 17 92)"/>',
-           f'  <ellipse cx="35" cy="87" rx="7.6" ry="9.2" fill="#0A0D14" '
-           f'transform="rotate(-20 35 87)"/>',
-           '</g>']
+           f'  <path d="{mask}" fill="{LUMEN}"/>']
+    for ex, rot in ((31.4, -38), (68.2, 38)):
+        out.append(f'  <ellipse cx="{ex}" cy="134.4" rx="7.6" ry="12.4" '
+                   f'fill="#0A0D14" transform="rotate({rot} {ex} 134.4)"/>')
+    out.append('</g>')
     return "".join(out)
 
 

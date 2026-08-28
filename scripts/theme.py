@@ -132,7 +132,7 @@ _STYLE = f"""<style>
     0%   {{ transform: translateY(0) scale(.35); opacity: 0; }}
     22%  {{ transform: translateY(2px) scale(1);  opacity: .95; }}
     38%  {{ transform: translateY(6px) scale(1);  opacity: .95; }}
-    100% {{ transform: translateY(74px) scale(.5); opacity: 0; }}
+    100% {{ transform: translateY(var(--fall, 74px)) scale(.5); opacity: 0; }}
   }}
   /* A lantern carried past: areas take the light in turn, never all at once. */
   .lit {{ animation: lit 14s ease-in-out infinite; }}

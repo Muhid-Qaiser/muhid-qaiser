@@ -12,37 +12,30 @@ from theme import *
 
 W, H = 1200, 420
 
-# Redrawn from the game's The_Knight_Front sprite rather than from memory.
-# Measured off it: the head is a rounded rectangle wider than it is tall
-# (47x38, aspect 1.24) — not the tapering oval this used to be — the horns
-# span 1.45x the head's width and take the top half of the silhouette, and the
-# eyes are large circles at ±0.65 of the head's half-width, 0.71 of the way
-# down, each 0.35 of the head's width.
+# Traced from the line-art reference rather than estimated from it.
 #
-# Local box is 290 x 318, head centred on x=145.
-HEAD = (
-    "M 45 212 "
-    "C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 "
-    "C 245 256, 238 300, 216 326 C 200 341, 176 347, 145 347 "
-    "C 114 347, 90 341, 74 326 C 52 300, 45 256, 45 212 Z"
-)
-# Two crescents: out and up from the head's shoulders, tips curling back in.
-HORN_L = ("M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 "
-          "C 41 96, 75 136, 110 154 Z")
-HORN_R = ("M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 "
-          "C 249 96, 215 136, 180 154 Z")
-MASK = HEAD + " " + HORN_L + " " + HORN_R
+# Reading proportions off a row profile got me close twice and wrong twice, so
+# this outline is the reference's own: every row of the drawing scanned for
+# where its ink starts and ends, the boundary walked as one loop — down the
+# outer left, round the bottom, up the outer right, then down into the notch
+# and back — and simplified. It is a single closed path, which also settles
+# the fill-rule holes that separate head and horn shapes used to punch.
+#
+# Box is 100 x 109.5 (h/w 1.10); the notch floor sits at y=44.6; the eyes are
+# circles of r 9.45 at x 32.1 and 67.3, y 84, measured off the same drawing.
+MASK = ("M 25.5 1 L 15 4.4 L 4.8 14.3 L 0.3 25.9 L 0.3 38.4 L 4.8 50.7 L 9.2 55.8 L 13.6 58.8 L 13.6 84.4 L 17.3 95.6 L 21.1 100.7 L 27.6 105.8 L 40.5 109.2 L 58.5 108.8 L 67.3 107.1 L 75.5 103.1 L 80.3 98.3 L 84 91.2 L 85.7 84 L 85.4 58.5 L 92.2 52.4 L 97.6 44.2 L 99.7 36.1 L 99.7 28.2 L 97.3 18.4 L 93.5 11.6 L 89.1 6.8 L 78.9 1.4 L 71.1 0 L 66.7 0.3 L 65 1.7 L 64.6 4.4 L 72.4 11.2 L 70.4 13.3 L 70.4 15.6 L 76.9 21.4 L 80.3 28.9 L 79.9 35 L 76.5 41.5 L 72.8 44.6 L 24.5 44.2 L 20.1 37.4 L 19 31.3 L 21.4 24.1 L 29.3 17.7 L 28.9 15 L 24.5 11.9 L 28.6 5.4 L 28.6 3.1 L 25.9 1 Z")
 
-EYE_R, EYE_DX, EYE_CY = 32, 60, 262
+EYE_R, EYE_DX, EYE_CY = 9.45, 17.6, 84
+EYE_CX = 49.7
 
 # The failed seal, running the centre line between the eyes.
-CRACK = "M 145 155 L 137 188 L 152 220 L 139 254 L 151 290 L 145 332"
-BRANCH_A = "M 137 188 L 116 180"
-BRANCH_B = "M 139 250 L 120 262"
+CRACK = "M 49 45 L 45 57 L 52 69 L 46 80 L 52 92 L 48 106"
+BRANCH_A = "M 45 57 L 37 54"
+BRANCH_B = "M 46 80 L 38 86"
 
 DEFS = f"""
   <linearGradient id="shell" gradientUnits="userSpaceOnUse"
-                  x1="40" y1="0" x2="210" y2="318">
+                  x1="12" y1="40" x2="76" y2="115">
     <stop offset="0%" stop-color="#FFFDF6"/>
     <stop offset="55%" stop-color="{BONE}"/>
     <stop offset="100%" stop-color="#B9BDC4"/>
@@ -52,30 +45,29 @@ svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=1020, cy=206, rx=340, ry=258))
 
-svg.append('<g transform="translate(890,10) scale(1.02)">')
+svg.append('<g transform="translate(892,54) scale(2.68)">')
 svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
-svg.append('  <g filter="url(#inkSoft)">')
+svg.append('  <g>')
 # Horns first, so the head's edge sits over their bases and the join is clean.
-for piece in (HORN_L, HORN_R, HEAD):
-    svg.append(f'    <path d="{piece}" fill="url(#shell)"/>')
+svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
 # Eye voids. Nothing looks back out.
 for sx in (-1, 1):
-    svg.append(f'    <circle cx="{145 + sx*EYE_DX}" cy="{EYE_CY}" r="{EYE_R}" '
+    svg.append(f'    <circle cx="{EYE_CX + sx*EYE_DX}" cy="{EYE_CY}" r="{EYE_R}" '
                f'fill="{VOID}"/>')
 svg.append('  </g>')
 
 # The breach: the dark cut first, then the light coming through it.
-for path, w in ((CRACK, 3.4), (BRANCH_A, 2.2), (BRANCH_B, 2.2)):
+for path, w in ((CRACK, 0.7), (BRANCH_A, 0.45), (BRANCH_B, 0.45)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#2A3040" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round"/>')
 svg.append('  <g style="mix-blend-mode:screen">')
-for flt, width, op in (("glowWide", 16, .75), ("glowMed", 7, .95)):
+for flt, width, op in (("glowWide", 7, .8), ("glowMed", 3.2, 1)):
     for path in (CRACK, BRANCH_A, BRANCH_B):
         svg.append(f'    <path d="{path}" fill="none" stroke="{INFECT}" '
                    f'stroke-width="{width}" stroke-linecap="round" '
                    f'stroke-linejoin="round" opacity="{op}" filter="url(#{flt})"/>')
 svg.append('  </g>')
-for path, w in ((CRACK, 2.8), (BRANCH_A, 1.6), (BRANCH_B, 1.6)):
+for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8), (BRANCH_B, 0.8)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round" '
                f'filter="url(#glow)" class="breathe"/>')
@@ -85,16 +77,16 @@ svg.append('</g>')
 # What got out. Amber is the profile's breach colour and this is the only
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
-LEAK = [(146, 206), (140, 244), (150, 278), (143, 310), (146, 336)]
-svg.append('<g transform="translate(890,10) scale(1.02)">')
+LEAK = [(49, 66), (46, 78), (51, 90), (47, 100), (49, 108)]
+svg.append('<g transform="translate(892,54) scale(2.68)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
-    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
+    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="1.1" ry="1.55" '
                f'fill="{INFECT}" filter="url(#glowMed)" opacity="0" '
-               f'style="animation-delay:{delay:.2f}s"/>')
-    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="1.7" ry="2.6" '
+               f'style="--fall:26px;animation-delay:{delay:.2f}s"/>')
+    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="0.6" ry="0.95" '
                f'fill="#FFD98A" opacity="0" '
-               f'style="animation-delay:{delay:.2f}s"/>')
+               f'style="--fall:26px;animation-delay:{delay:.2f}s"/>')
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
