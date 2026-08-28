@@ -243,6 +243,18 @@ stats = {
     "repo_list": repos,
 }
 
+MONOTONIC = ("pull_requests", "pull_requests_merged", "issues")
+if OUT.exists():
+    try:
+        prior = json.loads(OUT.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        prior = {}
+    for key in MONOTONIC:
+        was, now = prior.get(key, 0), stats.get(key, 0)
+        if was > now:
+            print(f"  · {key}: keeping {was} (this token only sees {now})")
+            stats[key] = was
+
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(json.dumps(stats, indent=2), encoding="utf-8")
 print(f"\nwrote {OUT}")

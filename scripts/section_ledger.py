@@ -53,11 +53,11 @@ ORB_MASK = (
     "C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z"
 )
 
-COUNTS = [
-    (stats["repos"],          "Repositories"),
-    (stats["pull_requests"],  "Pull requests"),
+COUNTS = [(v, k) for v, k in (
+    (stats["repos"],              "Repositories"),
+    (stats["pull_requests"],      "Pull requests"),
     (stats["contributions_year"], "Last 12 months"),
-]
+) if v > 0]
 
 # Six account-wide figures, largest first, clockwise from the top.
 # Issues, gists and reviews are all zero on this account, so they are left
