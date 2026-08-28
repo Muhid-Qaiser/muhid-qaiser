@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 800
+W, H = 1200, 880
 DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -155,28 +155,35 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
 
 
 def spider(cx, cy, s=1.0):
-    """Hornet's mask, from her idle sprite.
+    """Hornet's mask, redrawn from the high-resolution art.
 
-    Measured off it: a tall leaf roughly 81 wide by 94 high, with a V-notch
-    cut more than halfway down the top that splits it into two horns — the
-    right one markedly taller — and two small angled slits low on the face.
-    Drawn in a 60x92 box and scaled to the caller.
+    It is not the symmetric leaf I first made it. Measured off the art: the
+    box is 540 x 613 (h/w 1.14), the notch stays open from 5% to 60% of the
+    height, and the silhouette leans hard — the left edge runs from 72% of the
+    width at the top down to 0% at the bulb. So it is a rounded head sitting
+    low and left, with two long blade horns sweeping up and to the right, the
+    right one reaching highest, split by a narrow slot. The eyes sit low in the
+    bulb and are not a pair: the left is small and round, the right larger and
+    drawn out.
     """
-    k = s * 0.42
-    tx, ty = cx - 30 * k, cy - 46 * k
-    mask = ("M 26 91 C 9 77, 1 52, 6 32 L 16 13 "
-            "C 20 30, 25 41, 30 48 C 35 30, 43 12, 52 0 "
-            "C 53 29, 46 62, 26 91 Z")
+    k = s * 0.40
+    tx, ty = cx - 46 * k, cy - 62 * k
+    mask = ("M 30 113 C 8 108, 0 84, 10 62 "
+            "C 22 40, 40 16, 56 3 "
+            "C 52 24, 44 44, 40 58 "
+            "C 52 42, 70 20, 92 2 "
+            "C 84 28, 68 60, 56 84 "
+            "C 50 100, 42 112, 30 113 Z")
     out = [f'<g transform="translate({tx:.1f},{ty:.1f}) scale({k:.3f})">',
-           f'  <path d="{mask}" fill="{SOUL}" opacity=".35" '
-           f'filter="url(#glowMed)"/>',
+           f'  <path d="{mask}" fill="{SOUL}" opacity=".3" filter="url(#glowMed)"/>',
            f'  <path d="{mask}" fill="{LUMEN}"/>',
-           f'  <path d="{mask}" fill="none" stroke="#0A0D14" '
-           f'stroke-width="2.4" opacity=".55"/>']
-    for ex, ey, rot in ((18.5, 66, -24), (31.5, 62, -30)):
-        out.append(f'  <ellipse cx="{ex}" cy="{ey}" rx="3.3" ry="6.4" '
-                   f'fill="#0A0D14" transform="rotate({rot} {ex} {ey})"/>')
-    out.append('</g>')
+           f'  <path d="{mask}" fill="none" stroke="#0A0D14" stroke-width="2.6" '
+           f'opacity=".5"/>',
+           f'  <ellipse cx="17" cy="92" rx="5.4" ry="6.6" fill="#0A0D14" '
+           f'transform="rotate(-14 17 92)"/>',
+           f'  <ellipse cx="35" cy="87" rx="7.6" ry="9.2" fill="#0A0D14" '
+           f'transform="rotate(-20 35 87)"/>',
+           '</g>']
     return "".join(out)
 
 
@@ -244,35 +251,35 @@ def web(cx, cy, R):
 svg = [lantern(W, H)]
 svg.append(section("The Ledger"))
 
-# ── Counters ──────────────────────────────────────────────────────────────
+# ── Three figures across the top, centred ─────────────────────────────────
 for i, (value, label) in enumerate(COUNTS):
-    x = 72 + i * 214
-    svg.append(numeral(x, 202, commas(value), size=58))
-    svg.append(caps(x, 230, label, size=17, track=2.1, fill=ASH))
-    if i:
-        svg.append(f'<path d="M {x - 30} 158 L {x - 30} 214" stroke="{BONE}" '
-                   f'stroke-width="1" opacity=".13"/>')
+    x = 300 + i * 300
+    svg.append(numeral(x, 186, commas(value), size=58, anchor="middle"))
+    svg.append(caps(x, 216, label, size=17, track=2.1, fill=ASH, anchor="middle"))
+for x in (450, 750):
+    svg.append(f'<path d="M {x} 146 L {x} 200" stroke="{BONE}" stroke-width="1" '
+               f'opacity=".13"/>')
 
-# ── The vessel, and one smaller vessel per year ───────────────────────────
-svg.append(vessel(168, 372, 68, 1.0, 0, drain=True))
-svg.append(numeral(168, 490, commas(stats["commits"]), size=44, anchor="middle"))
-svg.append(caps(168, 516, "commits gathered", size=16, track=2.1, fill=ASH,
+# ── The vessel, left ──────────────────────────────────────────────────────
+svg.append(vessel(272, 470, 68, 1.0, 0, drain=True))
+svg.append(numeral(272, 596, commas(stats["commits"]), size=44, anchor="middle"))
+svg.append(caps(272, 624, "commits gathered", size=16, track=2.1, fill=ASH,
                 anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 320 + i * 56
-    svg.append(vessel(290, cy, 18, n / best, 10 + i, eyes=False))
-    svg.append(caps(322, cy - 4, year, size=16, track=1.7, opacity=.95))
-    svg.append(prose(322, cy + 17, f"{n} commits", size=17, opacity=.9))
+    cy = 420 + i * 54
+    svg.append(vessel(404, cy, 19, n / best, 10 + i, eyes=False))
+    svg.append(caps(436, cy - 4, year, size=16, track=1.7, opacity=.95))
+    svg.append(prose(436, cy + 17, f"{n} commits", size=17, opacity=.9))
 
-# ── The web ───────────────────────────────────────────────────────────────
-svg.append(web(856, 382, 126))
+# ── The web, right ────────────────────────────────────────────────────────
+svg.append(web(884, 470, 130))
 
-# ── Commits by hour ───────────────────────────────────────────────────────
-BASE, TALL, X0, SPAN = 706, 60, 72, 1056
+# ── Commits by hour, across the foot ──────────────────────────────────────
+BASE, TALL, X0, SPAN = 782, 62, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 636, "Every commit, by hour", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 636, f"busiest at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 712, "Every commit, by hour", size=17, track=2.3, fill=ASH))
+svg.append(caps(1128, 712, f"busiest at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
@@ -292,7 +299,7 @@ svg.append('</g>')
 svg.append(f'<path d="M {X0} {BASE+1} L {X0+SPAN} {BASE+1}" stroke="{BONE}" '
            f'stroke-width="1" opacity=".22"/>')
 for h in (0, 6, 12, 18):
-    svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 19, f"{h:02d}", size=17,
+    svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 22, f"{h:02d}", size=17,
                      anchor="middle", opacity=.75))
 
-svg.append(motes(90, 150, 1030, 460, n=18, seed=17))
+svg.append(motes(90, 150, 1030, 540, n=20, seed=17))
