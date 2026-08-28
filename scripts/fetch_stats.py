@@ -79,6 +79,13 @@ query($login:String!) {
   user(login:$login) {
     createdAt
     followers { totalCount }
+    following { totalCount }
+    gists(privacy:PUBLIC) { totalCount }
+    starredRepositories { totalCount }
+    pullRequests { totalCount }
+    issues { totalCount }
+    repositoriesContributedTo(
+      contributionTypes:[COMMIT,ISSUE,PULL_REQUEST,REPOSITORY]) { totalCount }
     repositories(ownerAffiliations:OWNER, privacy:PUBLIC) { totalCount }
     repos: repositories(first:100, ownerAffiliations:OWNER, isFork:false,
                         privacy:PUBLIC, orderBy:{field:PUSHED_AT,direction:DESC}) {
@@ -91,6 +98,12 @@ query($login:String!) {
       }
     }
     contributionsCollection {
+      totalCommitContributions
+      totalPullRequestContributions
+      totalIssueContributions
+      totalPullRequestReviewContributions
+      totalRepositoryContributions
+      restrictedContributionsCount
       contributionCalendar { totalContributions }
     }
   }
@@ -162,6 +175,20 @@ stats = {
     "stars": sum(r["stars"] for r in repos),
     "commits": total_commits,
     "contributions_year": user["contributionsCollection"]["contributionCalendar"]["totalContributions"],
+    "pull_requests": user["pullRequests"]["totalCount"],
+    "issues": user["issues"]["totalCount"],
+    "gists": user["gists"]["totalCount"],
+    "starred": user["starredRepositories"]["totalCount"],
+    "following": user["following"]["totalCount"],
+    "contributed_to": user["repositoriesContributedTo"]["totalCount"],
+    "year": {k: user["contributionsCollection"][v] for k, v in (
+        ("commits", "totalCommitContributions"),
+        ("pull_requests", "totalPullRequestContributions"),
+        ("issues", "totalIssueContributions"),
+        ("reviews", "totalPullRequestReviewContributions"),
+        ("repositories", "totalRepositoryContributions"),
+        ("private", "restrictedContributionsCount"),
+    )},
     "scratch_builds": sum(1 for r in repos if r["scratch"]),
     "regions": [{"name": n, "count": c} for n, c in
                 sorted(by_region.items(), key=lambda x: -x[1])],

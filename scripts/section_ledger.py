@@ -25,7 +25,6 @@ notebooks, whose committed JSON carries base64 image output, so an additions
 figure would measure the file format rather than the work.
 """
 import json, math, sys
-from collections import Counter
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
@@ -43,7 +42,7 @@ best = max(years.values()) if years else 1
 now = max(years) if years else "—"
 
 # Soul in the HUD is near-white with only a breath of cold in it.
-LIQUID = "#E4F6FA"
+LIQUID = "#F3ECEC"
 
 # The same shell drawn in the masthead, in its own 220x250 box.
 ORB_MASK = (
@@ -56,54 +55,79 @@ ORB_MASK = (
 
 COUNTS = [
     (stats["repos"],          "Repositories"),
-    (stats["commits"],        "Commits"),
+    (stats["pull_requests"],  "Pull requests"),
     (stats["scratch_builds"], "From scratch"),
 ]
 
-# Clockwise from the top, in the order these areas sit on the map above.
-AXES = ["FOUNDATIONS", "AGENTIC AI", "PARALLEL COMPUTE",
-        "GENERATIVE AI", "MACHINE LEARNING", "COMPUTER VISION"]
+# Six account-wide figures, largest first, clockwise from the top.
+# Issues, gists and reviews are all zero on this account, so they are left
+# off: three flat spokes would read as inactivity rather than as absence.
+METRICS = [
+    ("COMMITS",       stats["commits"]),
+    ("REPOSITORIES",  stats["repos"]),
+    ("REPOS STARRED", stats["starred"]),
+    ("CONTRIBUTIONS", stats["contributions_year"]),
+    ("PULL REQUESTS", stats["pull_requests"]),
+    ("FROM SCRATCH",  stats["scratch_builds"]),
+]
+# These span 241 down to 6. On one linear radius everything but commits
+# collapses to a sliver, so the reach is logarithmic and every spoke prints
+# its exact figure — the shape indexes, the numbers tell the truth.
+_TOP = math.log(1 + max(v for _, v in METRICS))
+reach = lambda v: math.log(1 + v) / _TOP
 
-effort = Counter()
-for repo in stats["repo_list"]:
-    effort[repo["region"]] += repo["commits"]
-peak_effort = max(effort.values()) or 1
+
+def blob(cx, cy, r):
+    """The meter is not a circle. Its silhouette wanders a little, which is
+    most of why the sprite reads as carved rather than drawn."""
+    wob = (1.0, 0.975, 1.025, 0.99, 1.015, 0.97, 1.02, 0.995)
+    pts = []
+    for i, k in enumerate(wob):
+        a = math.radians(i * 45)
+        pts.append((cx + math.cos(a) * r * k, cy + math.sin(a) * r * k))
+    d = [f"M {pts[0][0]:.1f} {pts[0][1]:.1f}"]
+    for i in range(len(pts)):
+        nxt = pts[(i + 1) % len(pts)]
+        a = math.radians(i * 45 + 22.5)
+        cr = r * 1.09
+        d.append(f"Q {cx + math.cos(a) * cr:.1f} {cy + math.sin(a) * cr:.1f} "
+                 f"{nxt[0]:.1f} {nxt[1]:.1f}")
+    return " ".join(d) + " Z"
 
 
 def vessel(cx, cy, r, frac, idx, eyes=True):
-    """The Soul orb. Liquid behind a rough carved rim, with the eye holes cut
-    into the bowl rather than the liquid, so the face reads at any level."""
+    """The Soul meter, after the game's own sprite.
+
+    No rim and no outline — it is a soft mass of near-white with a bloom
+    around it. The eye holes are large, set low and wide, and tilted outward;
+    they are dark slate rather than black, so they read as holes against both
+    the empty bowl and the liquid rising past them.
+    """
     frac = max(0.0, min(1.0, frac))
     level = cy + r - 2 * r * frac
-    out = [f'<clipPath id="lvl{idx}"><rect x="{cx-r}" y="{level:.1f}" '
-           f'width="{2*r}" height="{2*r}"/></clipPath>',
-           f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{SOUL}" opacity=".14" '
+    shape = blob(cx, cy, r)
+    out = [f'<path d="{shape}" fill="{LIQUID}" opacity=".3" '
            f'filter="url(#glowWide)"/>',
-           f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#0A1018"/>',
+           f'<clipPath id="lvl{idx}"><path d="{shape}"/></clipPath>',
+           f'<path d="{shape}" fill="#0B111C"/>',
            f'<g clip-path="url(#lvl{idx})">',
-           f'  <circle cx="{cx}" cy="{cy}" r="{r*0.94:.1f}" fill="{LIQUID}"/>',
+           f'  <rect x="{cx-r*1.2:.1f}" y="{level:.1f}" width="{r*2.4:.1f}" '
+           f'height="{r*2.4:.1f}" fill="{LIQUID}"/>',
+           f'  <rect x="{cx-r*1.2:.1f}" y="{level:.1f}" width="{r*2.4:.1f}" '
+           f'height="3" fill="#FFFFFF" opacity=".55" class="shimmer"/>',
            '</g>']
-    if frac > 0.05:                       # light catching the surface
-        half = (r ** 2 - (level - cy) ** 2) ** 0.5 if abs(level - cy) < r else r * .4
-        out.append(f'<rect class="shimmer" x="{cx-half*.78:.1f}" '
-                   f'y="{level:.1f}" width="{half*1.56:.1f}" height="2.2" '
-                   f'fill="#FFFFFF" opacity=".35"/>')
     if eyes:
-        k = r * 0.0056                    # the shell sits in the bowl, not over it
-        out.append(f'<g transform="translate({cx - 110*k:.1f},{cy - 122*k:.1f}) '
-                   f'scale({k:.4f})">')
-        out.append(f'  <path d="{ORB_MASK}" fill="#05070C"/>')
-        out.append(f'  <path d="{ORB_MASK}" fill="none" stroke="{BONE}" '
-                   f'stroke-width="{4/k:.1f}" stroke-opacity=".35"/>')
-        out.append('</g>')
-
-    # The rim is carved, not drawn — two rough passes rather than one clean one.
-    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" '
-               f'stroke="#05070C" stroke-width="{max(2.6, r*0.10):.1f}" '
-               f'filter="url(#ink)"/>')
-    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{BONE}" '
-               f'stroke-width="{max(1.2, r*0.028):.1f}" opacity=".55" '
-               f'filter="url(#ink)"/>')
+        # Geometry measured off the game's own Soul_Meter sprite: the holes sit
+        # low and wide — at ±0.47r across and +0.43r down, radius ~0.27r — which
+        # is why a part-filled meter still reads as a face rather than as a
+        # pair of eyes floating above a waterline.
+        for sx in (-1, 1):
+            ex, ey = cx + sx * r * .47, cy + r * .43
+            out.append(f'<ellipse cx="{ex:.1f}" cy="{ey:.1f}" rx="{r*.27:.1f}" '
+                       f'ry="{r*.26:.1f}" fill="#232A3C" '
+                       f'transform="rotate({sx*16} {ex:.1f} {ey:.1f})"/>')
+    out.append(f'<path d="{shape}" fill="{LIQUID}" opacity=".16" '
+               f'filter="url(#glowMed)"/>')
     return "".join(out)
 
 
@@ -130,7 +154,7 @@ def spider(cx, cy, s=1.0):
 def web(cx, cy, R):
     """A radar chart is a spider chart, so it is drawn as a web: the rings sag
     inward between anchor threads, the way silk hangs between them."""
-    n = len(AXES)
+    n = len(METRICS)
     ang = [math.radians(-90 + i * 360 / n) for i in range(n)]
     pt = lambda a, r: (cx + math.cos(a) * r, cy + math.sin(a) * r)
     out = []
@@ -159,8 +183,8 @@ def web(cx, cy, R):
         out.append(f'<path d="M {cx} {cy} L {x:.1f} {y:.1f}" stroke="{BONE}" '
                    f'stroke-width="0.55" opacity=".1"/>')
 
-    # What was woven: commits per area.
-    pts = [pt(a, R * effort[name] / peak_effort) for a, name in zip(ang, AXES)]
+    # What was woven: the account's own figures.
+    pts = [pt(a, R * reach(v)) for a, (_, v) in zip(ang, METRICS)]
     shape = " ".join(f"{'M' if not i else 'L'} {x:.1f} {y:.1f}"
                      for i, (x, y) in enumerate(pts)) + " Z"
     out.append(f'<path d="{shape}" fill="{SOUL}" opacity=".13"/>')
@@ -174,20 +198,98 @@ def web(cx, cy, R):
 
     out.append(spider(cx, cy))
 
-    for a, name in zip(ang, AXES):
+    for a, (name, value) in zip(ang, METRICS):
         lx, ly = pt(a, R + 34)
         cosa = math.cos(a)
         anchor = "middle" if abs(cosa) < 0.3 else ("start" if cosa > 0 else "end")
         out.append(caps(lx, ly, name, size=9.5, track=1.8, anchor=anchor,
                         opacity=.85))
-        out.append(prose(lx, ly + 15, f"{effort[name]} commits", size=11,
-                         anchor=anchor, opacity=.68))
+        out.append(numeral(lx, ly + 23, commas(value), size=20, anchor=anchor,
+                           glow=False))
+    return "".join(out)
+
+
+def spider(cx, cy, s=1.0):
+    """The weaver, small, where a web's owner sits."""
+    out = [f'<g stroke="{BONE}" stroke-width="{1.1*s:.1f}" fill="none" '
+           f'stroke-linecap="round" opacity=".7">']
+    for sx in (-1, 1):
+        for dx, dy, bx, by in ((7, -6, 13, -12), (8, -1, 15, -3),
+                               (8, 4, 14, 8), (6, 8, 10, 15)):
+            out.append(f'<path d="M {cx+sx*2*s:.1f} {cy:.1f} '
+                       f'Q {cx+sx*dx*s:.1f} {cy+dy*s:.1f} '
+                       f'{cx+sx*bx*s:.1f} {cy+by*s:.1f}"/>')
+    out.append('</g>')
+    out.append(f'<ellipse cx="{cx:.1f}" cy="{cy+4*s:.1f}" rx="{5.2*s:.1f}" '
+               f'ry="{6.4*s:.1f}" fill="#05070C" stroke="{BONE}" '
+               f'stroke-width="{1*s:.1f}" stroke-opacity=".55"/>')
+    out.append(f'<ellipse cx="{cx:.1f}" cy="{cy-4.5*s:.1f}" rx="{3.4*s:.1f}" '
+               f'ry="{3.2*s:.1f}" fill="#05070C" stroke="{BONE}" '
+               f'stroke-width="{1*s:.1f}" stroke-opacity=".55"/>')
+    return "".join(out)
+
+
+def web(cx, cy, R):
+    """A radar chart is a spider chart, so it is drawn as a web: the rings sag
+    inward between anchor threads, the way silk hangs between them."""
+    n = len(METRICS)
+    ang = [math.radians(-90 + i * 360 / n) for i in range(n)]
+    pt = lambda a, r: (cx + math.cos(a) * r, cy + math.sin(a) * r)
+    out = []
+
+    # A web is not a hexagon. The rings sag between *every* spoke, and there
+    # are far more spokes than data axes, so the silk scallops finely instead
+    # of reading as a wireframe box.
+    spokes = [math.radians(-90 + i * 360 / (n * 4)) for i in range(n * 4)]
+    for ring in (0.17, 0.31, 0.45, 0.6, 0.76, 0.92, 1.0):
+        r = R * ring
+        d = []
+        for i, a in enumerate(spokes):
+            b = spokes[(i + 1) % len(spokes)]
+            x1, y1 = pt(a, r)
+            mx, my = pt(a + math.radians(360 / len(spokes) / 2), r * 0.94)
+            x2, y2 = pt(b, r)
+            d.append(f"{'M' if not i else 'L'} {x1:.1f} {y1:.1f} "
+                     f"Q {mx:.1f} {my:.1f} {x2:.1f} {y2:.1f}")
+        out.append(f'<path d="{" ".join(d)} Z" fill="none" stroke="{BONE}" '
+                   f'stroke-width="{0.9 if ring == 1 else 0.6}" '
+                   f'opacity="{.3 if ring == 1 else .13}" filter="url(#ink)"/>')
+
+    # Fine radials first, then the six anchor threads the data hangs from.
+    for a in spokes:
+        x, y = pt(a, R)
+        out.append(f'<path d="M {cx} {cy} L {x:.1f} {y:.1f}" stroke="{BONE}" '
+                   f'stroke-width="0.55" opacity=".1"/>')
+
+    # What was woven: the account's own figures.
+    pts = [pt(a, R * reach(v)) for a, (_, v) in zip(ang, METRICS)]
+    shape = " ".join(f"{'M' if not i else 'L'} {x:.1f} {y:.1f}"
+                     for i, (x, y) in enumerate(pts)) + " Z"
+    out.append(f'<path d="{shape}" fill="{SOUL}" opacity=".13"/>')
+    out.append(f'<path d="{shape}" fill="none" stroke="{SOUL}" stroke-width="6" '
+               f'opacity=".28" filter="url(#glowMed)"/>')
+    out.append(f'<path d="{shape}" fill="none" stroke="{SOUL}" stroke-width="1.9" '
+               f'opacity=".95" filter="url(#bloomSoft)"/>')
+    for x, y in pts:
+        out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.2" fill="{SOUL}" '
+                   f'filter="url(#bloomSoft)"/>')
+
+    out.append(spider(cx, cy))
+
+    for a, (name, value) in zip(ang, METRICS):
+        lx, ly = pt(a, R + 34)
+        cosa = math.cos(a)
+        anchor = "middle" if abs(cosa) < 0.3 else ("start" if cosa > 0 else "end")
+        out.append(caps(lx, ly, name, size=9.5, track=1.8, anchor=anchor,
+                        opacity=.85))
+        out.append(numeral(lx, ly + 23, commas(value), size=20, anchor=anchor,
+                           glow=False))
     return "".join(out)
 
 
 svg = [lantern(W, H)]
 svg.append(section("The Ledger",
-                   "What there is, where the work went, and when it happened."))
+                   "What there is, what it adds up to, and when it happened."))
 
 # ── Counters ──────────────────────────────────────────────────────────────
 for i, (value, label) in enumerate(COUNTS):
@@ -199,21 +301,22 @@ for i, (value, label) in enumerate(COUNTS):
                    f'stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, and one smaller vessel per year ───────────────────────────
-svg.append(vessel(168, 360, 68, years.get(now, 0) / best, 0))
-svg.append(caps(168, 460, f"{now} so far · {years.get(now, 0)} commits",
-                size=10.5, track=2.4, fill=SOUL, anchor="middle", glow=True))
-svg.append(prose(168, 479, f"against {best}, the best year", size=11.5,
-                 anchor="middle", opacity=.7))
+svg.append(vessel(168, 356, 68, 1.0, 0))
+svg.append(numeral(168, 462, commas(stats["commits"]), size=34, anchor="middle"))
+svg.append(caps(168, 484, "commits gathered", size=10, track=2.6, fill=ASH,
+                anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 310 + i * 50
+    cy = 306 + i * 52
     svg.append(vessel(290, cy, 18, n / best, 10 + i, eyes=False))
     svg.append(caps(318, cy - 2, year, size=10.5, track=2.2, opacity=.9))
     svg.append(prose(318, cy + 13, f"{n} commits", size=11, opacity=.72))
 
 # ── The web ───────────────────────────────────────────────────────────────
-svg.append(caps(856, 172, "Where the work went", size=10.5, track=2.8,
+svg.append(caps(856, 164, "The account, counted", size=10.5, track=2.8,
                 fill=ASH, anchor="middle"))
+svg.append(prose(856, 182, "spokes are logarithmic; the figures are exact",
+                 size=10.5, anchor="middle", opacity=.5))
 svg.append(web(856, 360, 126))
 
 # ── Commits by hour ───────────────────────────────────────────────────────

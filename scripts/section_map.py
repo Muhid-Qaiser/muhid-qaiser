@@ -139,14 +139,7 @@ by_area = {}
 for repo in stats["repo_list"]:
     by_area.setdefault(repo["region"], []).append(repo)
 
-SHAFT_DEFS = f"""
-  <linearGradient id="shaft" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%"   stop-color="{SOUL}" stop-opacity=".3"/>
-    <stop offset="55%"  stop-color="{SOUL}" stop-opacity=".1"/>
-    <stop offset="100%" stop-color="{SOUL}" stop-opacity="0"/>
-  </linearGradient>"""
-
-DEFS = SHAFT_DEFS + "".join(
+DEFS = "".join(
     f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
     for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
 
@@ -159,47 +152,6 @@ svg.append(section("The Map", f"{stats['repos']} public repositories, drawn as "
 # empty space — it is the descent. Drawn from above this section's own origin
 # so the beam crosses the gap the masthead leaves, and the spores inside it
 # drift up toward the opening.
-# The Abyss gate. Two solid walls with the light forced up between them —
-# the ribs are texture carved onto the silhouettes, not shapes of their own,
-# which is what makes them read as bone rather than floating arcs.
-GX, TOP, BOT = 620, -175, 168
-
-
-def _wall(side):
-    """One wall of the gate, tapering outward as it descends."""
-    ix_t, ix_b = GX + side * 24, GX + side * 62
-    return (f"M {ix_t + side * 46:.0f} {TOP} L {ix_t:.0f} {TOP} "
-            f"L {ix_b:.0f} {BOT} L {ix_b + side * 52:.0f} {BOT} Z")
-
-
-svg.append(f'<path d="M {GX-24} {TOP} L {GX+24} {TOP} L {GX+62} {BOT} '
-           f'L {GX-62} {BOT} Z" fill="url(#shaft)" filter="url(#glowWide)"/>')
-
-for side in (-1, 1):
-    svg.append(f'<path d="{_wall(side)}" fill="#04060B" filter="url(#ink)"/>')
-    ribs = []
-    for k in range(16):
-        t = k / 15
-        y = TOP + t * (BOT - TOP)
-        inner = GX + side * (24 + t * 38)
-        outer = inner + side * (46 + t * 6)
-        ribs.append(f'<path d="M {outer:.0f} {y:.0f} '
-                    f'Q {(outer+inner)/2:.0f} {y - 11 + t * 4:.0f} '
-                    f'{inner:.0f} {y + 6:.0f}"/>')
-    svg.append(f'<g fill="none" stroke="{BONE}" stroke-width="1.3" '
-               f'stroke-linecap="round" opacity=".3" filter="url(#ink)">'
-               + "".join(ribs) + '</g>')
-    # The lit inner edge, where the wall meets the light.
-    ix_t, ix_b = GX + side * 24, GX + side * 62
-    svg.append(f'<path d="M {ix_t:.0f} {TOP} L {ix_b:.0f} {BOT}" fill="none" '
-               f'stroke="{SOUL}" stroke-width="2" opacity=".45" '
-               f'filter="url(#bloomSoft)"/>')
-
-svg.append(f'<path d="M {GX-12} {TOP+10} L {GX+12} {TOP+10} L {GX+34} {BOT} '
-           f'L {GX-34} {BOT} Z" fill="{SOUL}" opacity=".3" '
-           f'filter="url(#glowWide)"/>')
-svg.append(motes(GX - 46, -140, 92, 296, n=14, seed=41))
-
 for i, (name, area) in enumerate(AREAS.items()):
     poly, colour = area["poly"], area["colour"]
     d = path_of(poly)
