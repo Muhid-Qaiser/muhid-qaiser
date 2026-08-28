@@ -6,7 +6,11 @@
   "followers": 5,
   "stars": 2,
   "commits": 277,
+<<<<<<< HEAD
   "contributions_year": 99,
+=======
+  "contributions_year": 97,
+>>>>>>> origin/master
   "streak_current": 2,
   "streak_best": 9,
   "active_days": 37,
@@ -100,7 +104,11 @@
     },
     {
       "name": "Python",
+<<<<<<< HEAD
       "size": 853919,
+=======
+      "size": 852196,
+>>>>>>> origin/master
       "color": "#3572A5"
     },
     {
