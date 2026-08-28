@@ -256,16 +256,16 @@ for a, b in zip(row_x, row_x[1:]):
                f'stroke="{BONE}" stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, left ──────────────────────────────────────────────────────
-svg.append(vessel(200, 500, 68, 1.0, 0, drain=True))
-svg.append(numeral(200, 630, commas(stats["commits"]), size=44, anchor="middle"))
-svg.append(caps(200, 658, "commits gathered", size=16, track=2.1, fill=ASH,
+svg.append(vessel(214, 500, 68, 1.0, 0, drain=True))
+svg.append(numeral(214, 630, commas(stats["commits"]), size=44, anchor="middle"))
+svg.append(caps(214, 658, "commits gathered", size=16, track=2.1, fill=ASH,
                 anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
     cy = 450 + i * 54
-    svg.append(vessel(332, cy, 19, n / best, 10 + i, eyes=False))
-    svg.append(caps(364, cy - 4, year, size=16, track=1.7, opacity=.95))
-    svg.append(prose(364, cy + 17, f"{n} commits", size=17, opacity=.9))
+    svg.append(vessel(346, cy, 19, n / best, 10 + i, eyes=False))
+    svg.append(caps(378, cy - 4, year, size=16, track=1.7, opacity=.95))
+    svg.append(prose(378, cy + 17, f"{n} commits", size=17, opacity=.9))
 
 # ── The web, right ────────────────────────────────────────────────────────
 svg.append(web(884, 500, 130))
