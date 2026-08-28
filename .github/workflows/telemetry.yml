@@ -35,15 +35,13 @@ jobs:
           PROFILE_LOGIN: Muhid-Qaiser
         run: python scripts/fetch_stats.py
 
-      - name: Redraw the data-driven figures
-        run: |
-          python scripts/build_map.py
-          python scripts/build_ledger.py
+      - name: Redraw the profile
+        run: python scripts/build_profile.py
 
       - name: Commit whatever changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/map.svg assets/ledger.svg data/stats.json
-          git diff --cached --quiet || git commit -m "Redraw the map and the ledger"
+          git add assets/profile.svg data/stats.json
+          git diff --cached --quiet || git commit -m "Redraw the profile"
           git push

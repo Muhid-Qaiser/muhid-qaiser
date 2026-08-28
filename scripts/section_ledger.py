@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""assets/ledger.svg — the counters, and the hours the work actually happened.
+"""The ledger section — the counters, and the hours the work happened.
 
 Deliberately no lines-of-code total. This account is largely Jupyter
 notebooks, whose committed JSON carries base64 image output, so an additions
@@ -13,7 +13,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "assets" / "ledger.svg"
 W, H = 1200, 372
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -31,7 +30,8 @@ COUNTS = [
 hours = stats["hours"]
 peak = hours.index(max(hours))
 
-svg = [head(W, H)]
+DEFS = ""
+svg = [lantern(W, H)]
 svg.append(section("The Ledger", "What is actually here, counted honestly."))
 
 # ── Counters ──────────────────────────────────────────────────────────────
@@ -73,10 +73,3 @@ svg.append(prose(1128, BASE + 20,
                  anchor="end", opacity=.7))
 
 svg.append(motes(90, 130, 1020, 190, n=16, seed=17))
-svg.append(vignette(W, H))
-svg.append(tail())
-
-OUT.write_text("\n".join(svg), encoding="utf-8")
-print(f"wrote {OUT} ({W}x{H})")
-print("  rebuilt from scratch:",
-      ", ".join(r["name"] for r in stats["repo_list"] if r["scratch"]))

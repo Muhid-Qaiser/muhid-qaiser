@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""assets/map.svg — every public repository, drawn as Hallownest.
+"""The map section — every public repository, drawn as Hallownest.
 
 Modelled on the in-game world map rather than on a chart. Each area is one
 continuous rectilinear silhouette with a stepped edge, filled near-black,
@@ -19,7 +19,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "assets" / "map.svg"
 W, H = 1200, 820
 
 # Every outline is orthogonal — Hallownest's areas step, they never slope.
@@ -140,16 +139,11 @@ by_area = {}
 for repo in stats["repo_list"]:
     by_area.setdefault(repo["region"], []).append(repo)
 
-grain = """
-  <filter id="grain" x="0%" y="0%" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="9"/>
-    <feColorMatrix type="saturate" values="0"/>
-  </filter>"""
-clips = "".join(
+DEFS = "".join(
     f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
     for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
 
-svg = [head(W, H, extra_defs=grain + clips, lantern=False)]
+svg = []
 svg.append(section("The Map", "Ninety-two public repositories, drawn as "
                               "Hallownest. Every room is one repository."))
 
@@ -213,10 +207,3 @@ svg.append(footnote("Areas are inferred from repository names and descriptions, 
                     "and placed after Hallownest — Foundations where Dirtmouth "
                     "stands, Computer Vision in Greenpath's place, AI Security "
                     "in the Abyss.", 792))
-svg.append(vignette(W, H))
-svg.append(tail())
-
-OUT.write_text("\n".join(svg), encoding="utf-8")
-print(f"wrote {OUT} ({W}x{H})  "
-      f"{sum(len(v) for v in by_area.values())} repositories, "
-      f"{len(AREAS)} areas")

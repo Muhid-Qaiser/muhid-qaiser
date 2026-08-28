@@ -30,13 +30,8 @@ MARGIN = 72          # every figure indents to the same line
 RULE_Y = 118         # every header rule sits at the same height
 
 
-def head(w, h, extra_defs="", lantern=True):
-    """Open an SVG with the shared filters, ground and motion guard."""
-    ground = (f'<ellipse cx="{w/2}" cy="{h*0.46}" rx="{w*0.62}" ry="{h*0.7}" '
-              f'fill="url(#lantern)"/>') if lantern else ""
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}"
-     viewBox="0 0 {w} {h}" role="img">
-<defs>
+def _defs(extra=""):
+    return f"""<defs>
   <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
     <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3"
                   seed="7" result="n"/>
@@ -70,18 +65,28 @@ def head(w, h, extra_defs="", lantern=True):
   <filter id="glowWide" x="-140%" y="-140%" width="380%" height="380%">
     <feGaussianBlur stdDeviation="14"/>
   </filter>
+  <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="9"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
   <radialGradient id="lantern" cx="50%" cy="46%" r="62%">
     <stop offset="0%" stop-color="#16203A" stop-opacity=".9"/>
     <stop offset="58%" stop-color="#0B1120" stop-opacity=".5"/>
     <stop offset="100%" stop-color="{VOID}" stop-opacity="0"/>
   </radialGradient>
-  <radialGradient id="vignette" cx="50%" cy="50%" r="78%">
-    <stop offset="52%" stop-color="{VOID}" stop-opacity="0"/>
-    <stop offset="100%" stop-color="#000" stop-opacity=".74"/>
-  </radialGradient>
-{extra_defs}
-</defs>
-<style>
+  <linearGradient id="edgeX" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#000" stop-opacity=".7"/>
+    <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="edgeY" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#000" stop-opacity=".7"/>
+    <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+  </linearGradient>
+{extra}
+</defs>"""
+
+
+_STYLE = f"""<style>
   text {{ font-family: {SERIF}; }}
   .mote {{ animation: drift 11s ease-in-out infinite; transform-box: fill-box;
            transform-origin: center; }}
@@ -96,16 +101,52 @@ def head(w, h, extra_defs="", lantern=True):
   @media (prefers-reduced-motion: reduce) {{
     .mote, .breathe {{ animation: none; opacity: .6; }}
   }}
-</style>
-<rect width="{w}" height="{h}" fill="{VOID}"/>{ground}'''
+</style>"""
 
 
-def tail():
-    return "</svg>"
+def lantern(w, h, cx=None, cy=None, rx=None, ry=None):
+    """A pool of light. Sections carry their own, so the ground down the page
+    reads as a cave lit at intervals rather than one flat wash."""
+    cx = w / 2 if cx is None else cx
+    cy = h * 0.46 if cy is None else cy
+    rx = w * 0.62 if rx is None else rx
+    ry = h * 0.7 if ry is None else ry
+    return f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="url(#lantern)"/>'
 
 
-def vignette(w, h):
-    return f'<rect width="{w}" height="{h}" fill="url(#vignette)"/>'
+def edges(w, h, band=170):
+    """One vignette for the whole document — drawn only at the outer edges, so
+    stacked sections never show a dark seam where they meet."""
+    return (f'<rect x="0" y="0" width="{band}" height="{h}" fill="url(#edgeX)"/>'
+            f'<rect x="{w}" y="0" width="{band}" height="{h}" fill="url(#edgeX)" '
+            f'transform="translate({w},0) rotate(180) translate({-w},{-h})"/>'
+            f'<rect x="0" y="0" width="{w}" height="{band*0.7:.0f}" '
+            f'fill="url(#edgeY)"/>'
+            f'<g transform="translate(0,{h}) scale(1,-1)">'
+            f'<rect x="0" y="0" width="{w}" height="{band*0.7:.0f}" '
+            f'fill="url(#edgeY)"/></g>')
+
+
+def document(w, sections, extra_defs=""):
+    """Compose sections into one continuous picture.
+
+    Each section is (height, [elements]) and is translated into place, so a
+    section keeps its own local coordinates and nothing has to be re-measured.
+    """
+    total = sum(h for h, _ in sections)
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{total}" '
+           f'     viewBox="0 0 {w} {total}" role="img">',
+           _defs(extra_defs), _STYLE,
+           f'<rect width="{w}" height="{total}" fill="{VOID}"/>']
+    dy = 0
+    for h, body in sections:
+        out.append(f'<g transform="translate(0,{dy})">')
+        out.extend(body)
+        out.append('</g>')
+        dy += h
+    out.append(edges(w, total))
+    out.append('</svg>')
+    return chr(10).join(out)
 
 
 def section(title, subtitle, w=1200):

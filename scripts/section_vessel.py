@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""assets/vessel.svg — the masthead.
+"""The masthead section — the vessel, and the name.
 
 A vessel is a shell built to hold something that must not get out. The seal on
 this one has failed and the light inside is escaping. That is the whole job
@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 W, H = 1200, 420
-OUT = Path(__file__).resolve().parent.parent / "assets" / "vessel.svg"
 
 # Mask drawn in a local 220x250 box, then placed. Horns thick at the base,
 # sweeping outward before they rise; a shallow dome between them; cheeks
@@ -30,15 +29,16 @@ CRACK = "M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218"
 BRANCH_A = "M 108 104 L 122 99"
 BRANCH_B = "M 107 170 L 92 182"
 
-svg = [head(W, H, extra_defs=f"""
+DEFS = f"""
   <linearGradient id="shell" x1="0" y1="0" x2="0.35" y2="1">
     <stop offset="0%" stop-color="#FFFDF6"/>
     <stop offset="55%" stop-color="{BONE}"/>
     <stop offset="100%" stop-color="#B9BDC4"/>
-  </linearGradient>""")]
+  </linearGradient>"""
 
+svg = [lantern(W, H)]
 # A second light source behind the shell itself.
-svg.append('<ellipse cx="978" cy="200" rx="330" ry="250" fill="url(#lantern)"/>')
+svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
 svg.append('<g transform="translate(846,46) scale(1.24)">')
 svg.append(f'  <path d="{MASK}" fill="{SOUL}" opacity=".2" filter="url(#glowWide)"/>')
@@ -96,10 +96,3 @@ svg.append(f'<path d="M {MARGIN + 1} 315 L {MARGIN + 1} 351" stroke="{SOUL}" '
 svg.append(caps(MARGIN + 20, 330, "A vessel is only as good as its seal",
                 size=11.5, track=3.6, fill=SOUL, glow=True))
 svg.append(prose(MARGIN + 20, 351, "Islamabad, Pakistan", size=13))
-
-svg.append(vignette(W, H))
-svg.append(tail())
-
-OUT.parent.mkdir(parents=True, exist_ok=True)
-OUT.write_text("\n".join(svg), encoding="utf-8")
-print(f"wrote {OUT} ({W}x{H})")

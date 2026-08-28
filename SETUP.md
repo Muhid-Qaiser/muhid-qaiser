@@ -5,17 +5,17 @@ Push the contents of this folder to the root of your profile repository,
 
 ```text
 README.md
-assets/          vessel · map · ledger (all SVG)
+assets/
+  profile.svg    the whole profile as one image — all three sections
 data/
   stats.json     collected from the GitHub API; the figures read from it
 scripts/
-  theme.py         palette, lettering, ink and glow filters — edit here first
-  fetch_stats.py   walks the API and writes data/stats.json
-  build_map.py     redraws assets/map.svg
-  build_ledger.py  redraws assets/ledger.svg
-  build_vessel.py  redraws assets/vessel.svg (hand-authored art)
+  theme.py          palette, lettering, filters, and the document builder
+  fetch_stats.py    walks the API and writes data/stats.json
+  build_profile.py  composes the sections into assets/profile.svg
+  section_vessel.py section_map.py section_ledger.py
 .github/workflows/
-  telemetry.yml  refetches and redraws the map and ledger nightly
+  telemetry.yml  refetches and redraws the profile nightly
 ```
 
 ## After pushing
@@ -32,12 +32,11 @@ allow GitHub Actions to write to the branch.
 ```bash
 export GITHUB_TOKEN=$(gh auth token)
 python scripts/fetch_stats.py     # ~2 min: walks every repository
-python scripts/build_map.py
-python scripts/build_ledger.py
+python scripts/build_profile.py   # instant: redraws assets/profile.svg
 ```
 
-The vessel is hand-authored art and does not depend on the API — rebuild it
-only when you change the copy or the drawing.
+`build_profile.py` alone is enough after any drawing change — only
+`fetch_stats.py` touches the network.
 
 ## Changing things
 
@@ -45,14 +44,21 @@ only when you change the copy or the drawing.
   reserved for a breach and is never used as decoration; keeping that rule is
   what stops the profile turning into generic neon.
 - **Map areas** are keyword rules in `fetch_stats.py` (`REGIONS`), with
-  hand-placed positions in `build_map.py` (`AREAS`). Each area stands in for a
+  hand-placed positions in `section_map.py` (`AREAS`). Each area stands in for a
   real Hallownest region — Foundations for Dirtmouth, Computer Vision for
   Greenpath, Generative AI for the City of Tears, AI Security for the Abyss —
   so its colour and position are not arbitrary. Add a repository and it lands
   in an area automatically.
-- **Bloom** is the thing that makes it read as in-game: `caps(glow=True)` picks
-  a blur radius from the type size, because blurring 12px text like a 46px
-  title turns it into a highlighter box rather than light.
+- **Bloom** is what makes it read as in-game: `caps(glow=True)` picks a blur
+  radius from the type size, because blurring 12px text like a 46px title
+  turns it into a highlighter box rather than light.
+- **One image, not three.** `document()` stacks the sections into a single SVG
+  and translates each into place, so every section keeps its own local
+  coordinates. Three separate images left a band of GitHub's page background
+  between them; one document has no seam. The vignette is therefore drawn only
+  at the outer edges — a per-section vignette would put a dark stripe at every
+  join. To add a section, write a `section_*.py` exposing `H`, `svg` and
+  `DEFS`, and add it to `SECTIONS` in `build_profile.py`.
 
 ## A deliberate omission
 
