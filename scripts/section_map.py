@@ -64,7 +64,7 @@ AREAS = {
         "poly": [(750, 190), (790, 190), (790, 158), (920, 158), (920, 182),
                  (975, 182), (975, 250), (940, 250), (940, 288), (858, 288),
                  (858, 258), (806, 258), (806, 288), (750, 288)],
-        "colour": "#E28FCB", "label": (866, 200), "lines": ["Agentic", "AI"],
+        "colour": "#E28FCB", "label": (866, 192), "lines": ["Agentic", "AI"],
     },
     # Kingdom's Edge: narrow, far out, barely joined to anything.
     "PARALLEL COMPUTE": {
@@ -72,7 +72,7 @@ AREAS = {
                  (1150, 420), (1122, 420), (1122, 460), (1150, 460),
                  (1150, 520), (1080, 520), (1080, 488), (1030, 488)],
         "colour": "#AFBCCC", "label": (1090, 360), "lines": ["Parallel", "Compute"],
-        "size": 13,
+        "size": 11,
     },
 }
 
@@ -186,10 +186,10 @@ for i, (name, area) in enumerate(AREAS.items()):
                f'style="animation-delay:-{i * 2.3:.1f}s"/>')
 
     for j, line in enumerate(lines):
-        svg.append(caps(lx, ly + j * 28, line, size=size + 2, track=2.2,
+        svg.append(caps(lx, ly + j * 33, line, size=size + 5, track=2,
                         anchor="middle", glow=True))
-    svg.append(prose(lx, ly + len(lines) * 26 - 6, f"{len(repos)} repositories",
-                     size=15.5, anchor="middle", opacity=.85))
+    svg.append(prose(lx, ly + len(lines) * 33 - 7, f"{len(repos)} repositories",
+                     size=19, anchor="middle", opacity=.88))
 
 # ── The Abyss ─────────────────────────────────────────────────────────────
 d = path_of(ABYSS["poly"])
@@ -231,6 +231,6 @@ for i, (ex, ey, er) in enumerate(_eyes):
 
 svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=31))
 lx, ly = ABYSS["label"]
-svg.append(caps(lx, ly, "AI Security", size=19, track=2.2, fill=SOUL,
+svg.append(caps(lx, ly, "AI Security", size=25, track=2, fill=SOUL,
                 anchor="middle", glow=True))
 

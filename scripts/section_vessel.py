@@ -101,19 +101,19 @@ svg.append('</g>')
 svg.append(motes(996, 130, 80, 272, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
-svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))
+svg.append(caps(MARGIN, 156, "Muhid Qaiser", size=57, track=9, glow=True))
 svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
            f'opacity=".28" filter="url(#ink)"/>')
 
-svg.append(prose(MARGIN, 224,
+svg.append(prose(MARGIN, 220,
                  "AI Security Engineer | Computer Vision Engineer | "
                  "Generative AI Engineer",
-                 size=18, fill=LUMEN, italic=False))
+                 size=23, fill=LUMEN, italic=False))
 
 # The vessel's own inscription, typed out and repeated. It belongs under a
 # cracked shell more than any line I could write.
-svg.append(typeline(MARGIN, 276,
+svg.append(typeline(MARGIN, 280,
                     "No cost too great. No mind to think. "
                     "No will to break. No voice to cry suffering.",
-                    size=17, cycle=15))
+                    size=24, cycle=15))
 

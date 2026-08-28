@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 650
+W, H = 1200, 700
 DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -222,9 +222,9 @@ def web(cx, cy, R):
         lx, ly = pt(a, R + 34)
         cosa = math.cos(a)
         anchor = "middle" if abs(cosa) < 0.3 else ("start" if cosa > 0 else "end")
-        out.append(caps(lx, ly, name, size=12, track=1.6, anchor=anchor,
+        out.append(caps(lx, ly, name, size=16, track=1.4, anchor=anchor,
                         opacity=.85))
-        out.append(numeral(lx, ly + 26, commas(value), size=23, anchor=anchor,
+        out.append(numeral(lx, ly + 30, commas(value), size=30, anchor=anchor,
                            glow=False))
     return "".join(out)
 
@@ -234,35 +234,35 @@ svg.append(section("The Ledger"))
 
 # ── Counters ──────────────────────────────────────────────────────────────
 for i, (value, label) in enumerate(COUNTS):
-    x = 72 + i * 178
-    svg.append(numeral(x, 194, commas(value), size=46))
-    svg.append(caps(x, 220, label, size=13, track=2.4, fill=ASH))
+    x = 72 + i * 214
+    svg.append(numeral(x, 200, commas(value), size=58))
+    svg.append(caps(x, 228, label, size=17, track=2.2, fill=ASH))
     if i:
         svg.append(f'<path d="M {x - 30} 158 L {x - 30} 214" stroke="{BONE}" '
                    f'stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, and one smaller vessel per year ───────────────────────────
-svg.append(vessel(168, 356, 68, 1.0, 0, drain=True))
-svg.append(numeral(168, 462, commas(stats["commits"]), size=34, anchor="middle"))
-svg.append(caps(168, 486, "commits gathered", size=12.5, track=2.4, fill=ASH,
+svg.append(vessel(168, 350, 68, 1.0, 0, drain=True))
+svg.append(numeral(168, 462, commas(stats["commits"]), size=44, anchor="middle"))
+svg.append(caps(168, 488, "commits gathered", size=16, track=2.2, fill=ASH,
                 anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 306 + i * 52
+    cy = 300 + i * 52
     svg.append(vessel(290, cy, 18, n / best, 10 + i, eyes=False))
-    svg.append(caps(318, cy - 3, year, size=13, track=2, opacity=.92))
-    svg.append(prose(318, cy + 15, f"{n} commits", size=14, opacity=.85))
+    svg.append(caps(322, cy - 4, year, size=16, track=1.8, opacity=.95))
+    svg.append(prose(322, cy + 17, f"{n} commits", size=17, opacity=.88))
 
 # ── The web ───────────────────────────────────────────────────────────────
-svg.append(caps(856, 162, "The account, counted", size=13, track=2.6,
+svg.append(caps(856, 158, "The account, counted", size=17, track=2.4,
                 fill=ASH, anchor="middle"))
-svg.append(web(856, 360, 126))
+svg.append(web(856, 352, 122))
 
 # ── Commits by hour ───────────────────────────────────────────────────────
-BASE, TALL, X0, SPAN = 596, 52, 72, 1056
+BASE, TALL, X0, SPAN = 646, 56, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 534, "Every commit, by hour", size=13, track=2.6, fill=ASH))
-svg.append(caps(1128, 534, f"busiest at {peak:02d}:00", size=13, track=2.6,
+svg.append(caps(X0, 580, "Every commit, by hour", size=17, track=2.4, fill=ASH))
+svg.append(caps(1128, 580, f"busiest at {peak:02d}:00", size=17, track=2.4,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
@@ -283,7 +283,7 @@ svg.append('</g>')
 svg.append(f'<path d="M {X0} {BASE+1} L {X0+SPAN} {BASE+1}" stroke="{BONE}" '
            f'stroke-width="1" opacity=".22"/>')
 for h in (0, 6, 12, 18):
-    svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 19, f"{h:02d}", size=14,
+    svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 19, f"{h:02d}", size=17,
                      anchor="middle", opacity=.75))
 
-svg.append(motes(90, 150, 1030, 330, n=16, seed=17))
+svg.append(motes(90, 150, 1030, 380, n=16, seed=17))

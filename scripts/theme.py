@@ -17,8 +17,8 @@ VOID   = "#080B12"   # deepest ground
 CAVERN = "#111725"   # midground panels and room fill
 STONE  = "#1D2637"   # carved edges
 BONE   = "#E9E6DC"   # the mask; anything carved or written
-LUMEN  = "#EAF3FA"   # display lettering — cold, and lit
-ASH    = "#9AA7BD"   # secondary lettering — cold, and unlit
+LUMEN  = "#F2F9FF"   # display lettering — cold, and lit
+ASH    = "#A9B7CC"   # secondary lettering — cold, and unlit
 SOUL   = "#A9E8F0"   # pale light, still contained
 INFECT = "#F0A93C"   # what leaked out — breach only
 
@@ -228,7 +228,7 @@ def section(title, subtitle="", w=1200):
     its rule. The rule stays at the same height regardless, so the three
     sections still line up.
     """
-    return (caps(MARGIN, 66, title, size=23, track=6.5, glow=True)
+    return (caps(MARGIN, 72, title, size=31, track=6, glow=True)
             + f'<path d="M {MARGIN} {RULE_Y} L {w - MARGIN} {RULE_Y}" '
               f'stroke="{BONE}" stroke-width="1.2" opacity=".2" '
               f'filter="url(#ink)"/>')
@@ -243,11 +243,11 @@ def footnote(text, y, w=1200):
 def _halo(body, txt, size, opacity=1.0):
     """The layers under a lit line of type, largest first."""
     if size >= 30:
-        stack = (("glowWide", .40), ("glowMed", .62))
+        stack = (("glowWide", .50), ("glowMed", .78))
     elif size >= 20:
-        stack = (("glowMed", .55),)
+        stack = (("glowMed", .72),)
     else:
-        stack = (("bloomSoft", .5),)
+        stack = (("bloomSoft", .66),)
     return "".join(
         f'<text class="d" {body} fill="{SOUL}" opacity="{op * opacity:.2f}" '
         f'filter="url(#{flt})">{txt}</text>' for flt, op in stack)
@@ -314,12 +314,17 @@ def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
         f'<clipPath id="tw{uid}"><rect class="typeline" x="{x - w:.1f}" '
         f'y="{y - size * 1.15:.1f}" width="{w:.1f}" height="{size * 1.6:.1f}" '
         f'style="--w:{w:.1f}px;{anim}"/></clipPath>'
-        f'<g clip-path="url(#tw{uid})"><text x="{x}" y="{y}" font-size="{size}" '
-        f'fill="{fill}"{style} textLength="{w:.1f}" lengthAdjust="spacing">'
-        f'{esc(text)}</text></g>'
+        # Halo and core are both inside the clip, so they reveal together.
+        f'<g clip-path="url(#tw{uid})">'
+        f'<text x="{x}" y="{y}" font-size="{size}" fill="{SOUL}" opacity=".7"{style} '
+        f'filter="url(#glowMed)" textLength="{w:.1f}" lengthAdjust="spacing">'
+        f'{esc(text)}</text>'
+        f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}"{style} '
+        f'textLength="{w:.1f}" lengthAdjust="spacing">{esc(text)}</text></g>'
         f'<rect class="typeline caret" x="{x - 1.4:.1f}" '
         f'y="{y - size * 0.95:.1f}" width="1.9" height="{size * 1.18:.1f}" '
-        f'fill="{fill}" style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
+        f'fill="{fill}" filter="url(#bloomSoft)" '
+        f'style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
     )
 
 
