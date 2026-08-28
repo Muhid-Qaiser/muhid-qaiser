@@ -102,12 +102,11 @@ svg.append(motes(996, 130, 80, 272, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
 svg.append(caps(MARGIN, 150, "Muhid Qaiser", size=64, track=9, glow=True))
-svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
+svg.append(f'<path d="M {MARGIN} 182 L 660 182" stroke="{BONE}" stroke-width="1.4" '
            f'opacity=".28" filter="url(#ink)"/>')
 
 svg.append(prose(MARGIN, 222,
-                 "AI Security Engineer | Computer Vision Engineer | "
-                 "Generative AI Engineer",
+                 "AI Security  |  Computer Vision  |  Gen AI  |  Agentic AI",
                  size=24, fill=LUMEN, italic=False))
 
 # The vessel's own inscription, typed out and repeated. It belongs under a

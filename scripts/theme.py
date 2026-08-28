@@ -191,10 +191,10 @@ def edges(w, h, band=170):
     return (f'<rect x="0" y="0" width="{band}" height="{h}" fill="url(#edgeX)"/>'
             f'<rect x="{w}" y="0" width="{band}" height="{h}" fill="url(#edgeX)" '
             f'transform="translate({w},0) rotate(180) translate({-w},{-h})"/>'
-            f'<rect x="0" y="0" width="{w}" height="{band*0.7:.0f}" '
+            f'<rect x="0" y="0" width="{w}" height="{band*0.62:.0f}" '
             f'fill="url(#edgeY)"/>'
             f'<g transform="translate(0,{h}) scale(1,-1)">'
-            f'<rect x="0" y="0" width="{w}" height="{band*0.7:.0f}" '
+            f'<rect x="0" y="0" width="{w}" height="{band*0.36:.0f}" '
             f'fill="url(#edgeY)"/></g>')
 
 

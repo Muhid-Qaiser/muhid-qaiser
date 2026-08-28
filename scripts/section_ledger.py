@@ -155,22 +155,38 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
 
 
 def spider(cx, cy, s=1.0):
-    """The weaver, small, where a web's owner sits."""
-    out = [f'<g stroke="{BONE}" stroke-width="{1.1*s:.1f}" fill="none" '
-           f'stroke-linecap="round" opacity=".7">']
+    """A Weaver, after the Deepnest sprites: a big round dark abdomen with a
+    seam of light down it, a pale mask beneath carrying the six eyes, and thin
+    legs splayed out from between the two. Drawn large enough that the mask
+    still reads at the size the web renders it."""
+    out = []
+    # Legs first, so the body sits over where they join.
+    out.append(f'<g fill="none" stroke="{BONE}" stroke-width="{1.15*s:.2f}" '
+               f'stroke-linecap="round" opacity=".8">')
     for sx in (-1, 1):
-        for dx, dy, bx, by in ((7, -6, 13, -12), (8, -1, 15, -3),
-                               (8, 4, 14, 8), (6, 8, 10, 15)):
-            out.append(f'<path d="M {cx+sx*2*s:.1f} {cy:.1f} '
-                       f'Q {cx+sx*dx*s:.1f} {cy+dy*s:.1f} '
-                       f'{cx+sx*bx*s:.1f} {cy+by*s:.1f}"/>')
+        for reach, drop, tip in ((13, -5, -9), (15, 2, 3), (12, 8, 14)):
+            out.append(f'<path d="M {cx + sx*2*s:.1f} {cy + 2*s:.1f} '
+                       f'Q {cx + sx*reach*s:.1f} {cy + drop*s:.1f} '
+                       f'{cx + sx*(reach-2)*s:.1f} {cy + tip*s:.1f}"/>')
     out.append('</g>')
-    out.append(f'<ellipse cx="{cx:.1f}" cy="{cy+4*s:.1f}" rx="{5.2*s:.1f}" '
-               f'ry="{6.4*s:.1f}" fill="#05070C" stroke="{BONE}" '
-               f'stroke-width="{1*s:.1f}" stroke-opacity=".55"/>')
-    out.append(f'<ellipse cx="{cx:.1f}" cy="{cy-4.5*s:.1f}" rx="{3.4*s:.1f}" '
-               f'ry="{3.2*s:.1f}" fill="#05070C" stroke="{BONE}" '
-               f'stroke-width="{1*s:.1f}" stroke-opacity=".55"/>')
+    # Abdomen.
+    out.append(f'<circle cx="{cx:.1f}" cy="{cy - 5*s:.1f}" r="{8.5*s:.1f}" '
+               f'fill="#080B12" stroke="{BONE}" stroke-width="{0.9*s:.2f}" '
+               f'stroke-opacity=".5"/>')
+    out.append(f'<path d="M {cx - 3.5*s:.1f} {cy - 12.5*s:.1f} '
+               f'Q {cx + 1.5*s:.1f} {cy - 5*s:.1f} {cx - 2*s:.1f} {cy + 2*s:.1f}" '
+               f'fill="none" stroke="{BONE}" stroke-width="{0.8*s:.2f}" '
+               f'opacity=".38"/>')
+    # Mask, with the Weavers' six eyes.
+    out.append(f'<path d="M {cx - 4.6*s:.1f} {cy + 3*s:.1f} '
+               f'Q {cx:.1f} {cy + 1*s:.1f} {cx + 4.6*s:.1f} {cy + 3*s:.1f} '
+               f'Q {cx + 3.4*s:.1f} {cy + 11*s:.1f} {cx:.1f} {cy + 12.4*s:.1f} '
+               f'Q {cx - 3.4*s:.1f} {cy + 11*s:.1f} {cx - 4.6*s:.1f} {cy + 3*s:.1f} Z" '
+               f'fill="{LUMEN}" opacity=".92"/>')
+    for sx in (-1, 1):
+        for dx, dy in ((1.1, 5.4), (2.6, 6.2), (1.8, 8.4)):
+            out.append(f'<ellipse cx="{cx + sx*dx*s:.1f}" cy="{cy + dy*s:.1f}" '
+                       f'rx="{0.62*s:.2f}" ry="{1.05*s:.2f}" fill="#0A0D14"/>')
     return "".join(out)
 
 
@@ -219,25 +235,19 @@ def web(cx, cy, R):
         out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.2" fill="{SOUL}" '
                    f'filter="url(#bloomSoft)"/>')
 
-    out.append(spider(cx, cy))
+    out.append(spider(cx, cy, 1.45))
 
     for a, (name, value) in zip(ang, METRICS):
-        lx, ly = pt(a, R + 34)
+        # One order everywhere: name above, figure below. Straight up that
+        # needs extra clearance, because the figure hangs 30px down and the
+        # polygon reaches full radius on that spoke.
+        lx, ly = pt(a, R + (58 if math.sin(a) < -0.5 else 34))
         cosa = math.cos(a)
         anchor = "middle" if abs(cosa) < 0.3 else ("start" if cosa > 0 else "end")
-        # Below the centre the figure hangs under its name, away from the
-        # web. Straight up it cannot: dropping it 30px puts it back on the
-        # chart's top vertex, so up there the order flips.
-        if math.sin(a) < -0.5:
-            out.append(numeral(lx, ly - 6, commas(value), size=30,
-                               anchor=anchor, glow=False))
-            out.append(caps(lx, ly + 20, name, size=16, track=1.3,
-                            anchor=anchor, opacity=.85))
-        else:
-            out.append(caps(lx, ly, name, size=16, track=1.3, anchor=anchor,
-                            opacity=.85))
-            out.append(numeral(lx, ly + 30, commas(value), size=30,
-                               anchor=anchor, glow=False))
+        out.append(caps(lx, ly, name, size=16, track=1.3, anchor=anchor,
+                        opacity=.85))
+        out.append(numeral(lx, ly + 30, commas(value), size=30, anchor=anchor,
+                           glow=False))
     return "".join(out)
 
 
@@ -266,19 +276,17 @@ for i, (year, n) in enumerate(sorted(years.items())):
     svg.append(prose(322, cy + 17, f"{n} commits", size=17, opacity=.9))
 
 # ── The web ───────────────────────────────────────────────────────────────
-svg.append(caps(856, 156, "The account, counted", size=17, track=2.3,
-                fill=ASH, anchor="middle"))
 svg.append(web(856, 352, 122))
 
 # ── Commits by hour ───────────────────────────────────────────────────────
-BASE, TALL, X0, SPAN = 646, 56, 72, 1056
+BASE, TALL, X0, SPAN = 618, 56, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 580, "Every commit, by hour", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 580, f"busiest at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 552, "Every commit, by hour", size=17, track=2.3, fill=ASH))
+svg.append(caps(1128, 552, f"busiest at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
-svg.append('<g filter="url(#ink)">')
+svg.append('<g filter="url(#bloomSoft)">')
 for h, count in enumerate(hours):
     x = X0 + h * SLOT
     height = max(2.5, count / top * TALL)
@@ -289,7 +297,7 @@ for h, count in enumerate(hours):
                    f'opacity=".75" filter="url(#glowMed)"/>')
     svg.append(f'  <rect x="{x:.1f}" y="{BASE - height:.1f}" '
                f'width="{SLOT*0.68:.1f}" height="{height:.1f}" '
-               f'fill="{LUMEN}" opacity="{1 if lit else 0.94}"/>')
+               f'fill="#FFFFFF" opacity="1"/>')
 svg.append('</g>')
 svg.append(f'<path d="M {X0} {BASE+1} L {X0+SPAN} {BASE+1}" stroke="{BONE}" '
            f'stroke-width="1" opacity=".22"/>')
