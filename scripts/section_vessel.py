@@ -27,10 +27,10 @@ HEAD = (
     "C 66 316, 45 292, 45 250 Z"
 )
 # Two crescents: out and up from the head's shoulders, tips curling back in.
-HORN_L = ("M 64 176 C 34 142, 3 98, 2 50 C 1 22, 11 0, 23 7 "
-          "C 34 64, 70 126, 108 152 Z")
-HORN_R = ("M 226 176 C 256 142, 287 98, 288 50 C 289 22, 279 0, 267 7 "
-          "C 256 64, 220 126, 182 152 Z")
+HORN_L = ("M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 "
+          "C 41 96, 75 136, 110 154 Z")
+HORN_R = ("M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 "
+          "C 249 96, 215 136, 180 154 Z")
 MASK = HEAD + " " + HORN_L + " " + HORN_R
 
 EYE_R, EYE_DX, EYE_CY = 32, 60, 262
@@ -41,7 +41,8 @@ BRANCH_A = "M 137 188 L 116 180"
 BRANCH_B = "M 139 250 L 120 262"
 
 DEFS = f"""
-  <linearGradient id="shell" x1="0" y1="0" x2="0.35" y2="1">
+  <linearGradient id="shell" gradientUnits="userSpaceOnUse"
+                  x1="40" y1="0" x2="210" y2="318">
     <stop offset="0%" stop-color="#FFFDF6"/>
     <stop offset="55%" stop-color="{BONE}"/>
     <stop offset="100%" stop-color="#B9BDC4"/>
@@ -51,12 +52,12 @@ svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
-svg.append('<g transform="translate(866,36) scale(0.96)">')
+svg.append('<g transform="translate(858,8) scale(1.10)">')
 svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
-svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
-svg.append(f'    <path d="{MASK}" fill="none" stroke="#6E7686" stroke-width="1.2" '
-           f'opacity=".16"/>')
+# Horns first, so the head's edge sits over their bases and the join is clean.
+for piece in (HORN_L, HORN_R, HEAD):
+    svg.append(f'    <path d="{piece}" fill="url(#shell)"/>')
 # Eye voids. Nothing looks back out.
 for sx in (-1, 1):
     svg.append(f'    <circle cx="{145 + sx*EYE_DX}" cy="{EYE_CY}" r="{EYE_R}" '
@@ -85,7 +86,7 @@ svg.append('</g>')
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
 LEAK = [(146, 206), (140, 244), (150, 274), (143, 300), (147, 316)]
-svg.append('<g transform="translate(866,36) scale(0.96)">')
+svg.append('<g transform="translate(858,8) scale(1.10)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
     svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
