@@ -105,18 +105,15 @@ svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))
 svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
            f'opacity=".28" filter="url(#ink)"/>')
 
-svg.append(prose(MARGIN, 221,
-                 "AI Security Engineer. I red-team large language models "
-                 "and the agents built on them.",
-                 size=19, fill=BONE, italic=False))
-svg.append(prose(MARGIN, 253,
-                 "Before this, computer vision — where adversarial examples "
-                 "were first found.", size=17))
-svg.append(prose(MARGIN, 279,
-                 "The method did not change when the input became language.", size=17))
+svg.append(prose(MARGIN, 224,
+                 "AI Security Engineer | Computer Vision Engineer | "
+                 "Generative AI Engineer",
+                 size=18, fill=LUMEN, italic=False))
 
-svg.append(f'<path d="M {MARGIN + 1} 315 L {MARGIN + 1} 351" stroke="{SOUL}" '
-           f'stroke-width="2" opacity=".75" filter="url(#bloomSoft)"/>')
-svg.append(caps(MARGIN + 20, 330, "A vessel is only as good as its seal",
-                size=13.5, track=3, fill=SOUL, glow=True))
-svg.append(prose(MARGIN + 20, 353, "Islamabad, Pakistan", size=15))
+# The vessel's own inscription, typed out and repeated. It belongs under a
+# cracked shell more than any line I could write.
+svg.append(typeline(MARGIN, 276,
+                    "No cost too great. No mind to think. "
+                    "No will to break. No voice to cry suffering.",
+                    size=17, cycle=15))
+

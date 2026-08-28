@@ -152,6 +152,21 @@ _STYLE = f"""<style>
     45%, 62% {{ transform: translateY(0px); }}
   }}
 
+  /* A line typed one character at a time: a clip slid right in steps, one
+     step per character, with the caret riding the same timing. */
+  @keyframes typeline {{
+    0%        {{ transform: translateX(0); }}
+    62%, 100% {{ transform: translateX(var(--w, 0)); }}
+  }}
+  @keyframes caret {{ 0%,49% {{ opacity: 1 }} 50%,100% {{ opacity: 0 }} }}
+
+  @media (prefers-reduced-motion: reduce) {{
+    /* Stopping the reveal mid-way would leave the line half-invisible, so it
+       jumps to fully typed and the caret goes away. */
+    .typeline {{ animation: none !important;
+                 transform: translateX(var(--w, 0)) !important; }}
+    .caret {{ display: none; }}
+  }}
   @media (prefers-reduced-motion: reduce) {{
     .mote, .breathe, .drip, .lit, .shimmer, .tide, .rise {{
       animation: none; opacity: .7;
@@ -275,6 +290,37 @@ def numeral(x, y, s, size=40, fill=None, anchor="start", glow=True):
         return f'<text class="d" {body} fill="{fill}">{txt}</text>'
     return (_halo(body, txt, size)
             + f'<text class="d" {body} fill="{fill}">{txt}</text>')
+
+
+def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
+             em=0.397):
+    """One line, typed out a character at a time, then held and repeated.
+
+    The reveal is a clip rectangle slid right in steps() — one step per
+    character — and the caret runs the same animation so it always sits at the
+    reveal edge. textLength pins the line to the width the steps were computed
+    from, so the caret lands exactly on the final glyph instead of drifting
+    past it. `em` is the measured average advance for the face: 0.397 for
+    Palatino italic, 0.464 upright.
+    """
+    import zlib
+    fill = SOUL if fill is None else fill
+    n = len(text)
+    w = size * em * n
+    uid = zlib.crc32(text.encode()) % 100000     # stable across runs
+    anim = f"animation:typeline {cycle}s steps({n},end) infinite"
+    style = ' font-style="italic"' if italic else ""
+    return (
+        f'<clipPath id="tw{uid}"><rect class="typeline" x="{x - w:.1f}" '
+        f'y="{y - size * 1.15:.1f}" width="{w:.1f}" height="{size * 1.6:.1f}" '
+        f'style="--w:{w:.1f}px;{anim}"/></clipPath>'
+        f'<g clip-path="url(#tw{uid})"><text x="{x}" y="{y}" font-size="{size}" '
+        f'fill="{fill}"{style} textLength="{w:.1f}" lengthAdjust="spacing">'
+        f'{esc(text)}</text></g>'
+        f'<rect class="typeline caret" x="{x - 1.4:.1f}" '
+        f'y="{y - size * 0.95:.1f}" width="1.9" height="{size * 1.18:.1f}" '
+        f'fill="{fill}" style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
+    )
 
 
 def motes(x, y, w, h, n=14, seed=3, fill=SOUL):
