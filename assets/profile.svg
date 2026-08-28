@@ -109,26 +109,26 @@
 <ellipse cx="600.0" cy="193.20000000000002" rx="744.0" ry="294.0" fill="url(#lantern)"/>
 <ellipse cx="978" cy="200" rx="330" ry="250" fill="url(#lantern)"/>
 <g transform="translate(858,8) scale(1.10)">
-  <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 C 246 256, 234 298, 200 318 C 184 326, 106 326, 90 318 C 56 298, 44 256, 45 212 Z M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="#F0A93C" opacity=".16" filter="url(#glowWide)"/>
+  <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 L 245 296 C 245 316, 236 330, 218 333 C 196 337, 94 337, 72 333 C 54 330, 45 316, 45 296 Z M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="#F0A93C" opacity=".16" filter="url(#glowWide)"/>
   <g filter="url(#inkSoft)">
     <path d="M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z" fill="url(#shell)"/>
     <path d="M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="url(#shell)"/>
-    <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 C 246 256, 234 298, 200 318 C 184 326, 106 326, 90 318 C 56 298, 44 256, 45 212 Z" fill="url(#shell)"/>
+    <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 L 245 296 C 245 316, 236 330, 218 333 C 196 337, 94 337, 72 333 C 54 330, 45 316, 45 296 Z" fill="url(#shell)"/>
     <circle cx="85" cy="262" r="32" fill="#080B12"/>
     <circle cx="205" cy="262" r="32" fill="#080B12"/>
   </g>
-  <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 280 L 145 310" fill="none" stroke="#2A3040" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 282 L 145 320" fill="none" stroke="#2A3040" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M 137 188 L 116 180" fill="none" stroke="#2A3040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M 139 250 L 120 262" fill="none" stroke="#2A3040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   <g style="mix-blend-mode:screen">
-    <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 280 L 145 310" fill="none" stroke="#F0A93C" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
+    <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 282 L 145 320" fill="none" stroke="#F0A93C" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
     <path d="M 137 188 L 116 180" fill="none" stroke="#F0A93C" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
     <path d="M 139 250 L 120 262" fill="none" stroke="#F0A93C" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" filter="url(#glowWide)"/>
-    <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 280 L 145 310" fill="none" stroke="#F0A93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
+    <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 282 L 145 320" fill="none" stroke="#F0A93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
     <path d="M 137 188 L 116 180" fill="none" stroke="#F0A93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
     <path d="M 139 250 L 120 262" fill="none" stroke="#F0A93C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" filter="url(#glowMed)"/>
   </g>
-  <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 280 L 145 310" fill="none" stroke="#FFD98A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
+  <path d="M 145 155 L 137 187 L 152 217 L 139 249 L 151 282 L 145 320" fill="none" stroke="#FFD98A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
   <path d="M 137 188 L 116 180" fill="none" stroke="#FFD98A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
   <path d="M 139 250 L 120 262" fill="none" stroke="#FFD98A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
 </g>
@@ -137,12 +137,12 @@
   <ellipse class="drip" cx="146" cy="204" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:0.00s"/>
   <ellipse class="drip" cx="140" cy="240" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-1.45s"/>
   <ellipse class="drip" cx="140" cy="240" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-1.45s"/>
-  <ellipse class="drip" cx="150" cy="270" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-2.90s"/>
-  <ellipse class="drip" cx="150" cy="270" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-2.90s"/>
-  <ellipse class="drip" cx="143" cy="296" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-4.35s"/>
-  <ellipse class="drip" cx="143" cy="296" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-4.35s"/>
-  <ellipse class="drip" cx="146" cy="316" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-5.80s"/>
-  <ellipse class="drip" cx="146" cy="316" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-5.80s"/>
+  <ellipse class="drip" cx="150" cy="272" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-2.90s"/>
+  <ellipse class="drip" cx="150" cy="272" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-2.90s"/>
+  <ellipse class="drip" cx="143" cy="300" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-4.35s"/>
+  <ellipse class="drip" cx="143" cy="300" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-4.35s"/>
+  <ellipse class="drip" cx="146" cy="324" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-5.80s"/>
+  <ellipse class="drip" cx="146" cy="324" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:-5.80s"/>
 </g>
 <circle class="mote" cx="1032.2" cy="282.3" r="2.00" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-6.2s;animation-duration:12.3s"/><circle class="mote" cx="1043.0" cy="180.2" r="1.47" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-10.6s;animation-duration:13.4s"/><circle class="mote" cx="1003.5" cy="212.5" r="0.92" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-10.2s;animation-duration:14.7s"/><circle class="mote" cx="999.4" cy="397.2" r="2.05" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-8.4s;animation-duration:13.6s"/><circle class="mote" cx="1008.6" cy="134.1" r="1.49" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-1.8s;animation-duration:9.4s"/><circle class="mote" cx="1015.4" cy="138.2" r="1.40" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-10.2s;animation-duration:12.1s"/><circle class="mote" cx="1037.5" cy="304.2" r="1.45" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-6.2s;animation-duration:13.6s"/><circle class="mote" cx="1018.3" cy="401.4" r="2.09" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-10.5s;animation-duration:14.9s"/><circle class="mote" cx="1021.2" cy="192.5" r="1.18" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-7.3s;animation-duration:9.5s"/><circle class="mote" cx="1028.0" cy="360.3" r="1.30" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-13.3s;animation-duration:15.7s"/><circle class="mote" cx="996.0" cy="187.0" r="1.98" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-12.0s;animation-duration:12.3s"/><circle class="mote" cx="1027.8" cy="149.9" r="1.62" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-3.9s;animation-duration:14.4s"/><circle class="mote" cx="1003.0" cy="220.5" r="2.05" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-1.7s;animation-duration:14.3s"/><circle class="mote" cx="1015.7" cy="157.5" r="0.88" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-2.6s;animation-duration:14.6s"/><circle class="mote" cx="1040.7" cy="251.7" r="1.05" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-1.8s;animation-duration:14.1s"/><circle class="mote" cx="1047.5" cy="161.7" r="1.35" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-2.8s;animation-duration:10.5s"/><circle class="mote" cx="1073.7" cy="348.5" r="1.20" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-3.2s;animation-duration:15.2s"/><circle class="mote" cx="1027.5" cy="362.4" r="1.63" fill="#F0A93C" opacity="0" filter="url(#bloomSoft)" style="animation-delay:-9.6s;animation-duration:9.7s"/>
 <text x="72" y="158" font-size="46" fill="#E9E6DC" letter-spacing="9" font-weight="normal" text-anchor="start" opacity="1" filter="url(#bloom)">MUHID QAISER</text>

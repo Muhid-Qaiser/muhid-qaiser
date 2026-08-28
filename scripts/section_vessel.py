@@ -23,8 +23,8 @@ W, H = 1200, 420
 HEAD = (
     "M 45 212 "
     "C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 "
-    "C 246 256, 234 298, 200 318 C 184 326, 106 326, 90 318 "
-    "C 56 298, 44 256, 45 212 Z"
+    "L 245 296 C 245 316, 236 330, 218 333 C 196 337, 94 337, 72 333 "
+    "C 54 330, 45 316, 45 296 Z"
 )
 # Two crescents: out and up from the head's shoulders, tips curling back in.
 HORN_L = ("M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 "
@@ -36,7 +36,7 @@ MASK = HEAD + " " + HORN_L + " " + HORN_R
 EYE_R, EYE_DX, EYE_CY = 32, 60, 262
 
 # The failed seal, running the centre line between the eyes.
-CRACK = "M 145 155 L 137 187 L 152 217 L 139 249 L 151 280 L 145 310"
+CRACK = "M 145 155 L 137 187 L 152 217 L 139 249 L 151 282 L 145 320"
 BRANCH_A = "M 137 188 L 116 180"
 BRANCH_B = "M 139 250 L 120 262"
 
@@ -85,7 +85,7 @@ svg.append('</g>')
 # What got out. Amber is the profile's breach colour and this is the only
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
-LEAK = [(146, 204), (140, 240), (150, 270), (143, 296), (146, 316)]
+LEAK = [(146, 204), (140, 240), (150, 272), (143, 300), (146, 324)]
 svg.append('<g transform="translate(858,8) scale(1.10)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
