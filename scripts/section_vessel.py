@@ -108,15 +108,15 @@ svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.
 svg.append(prose(MARGIN, 221,
                  "AI Security Engineer. I red-team large language models "
                  "and the agents built on them.",
-                 size=17.5, fill=BONE, italic=False))
+                 size=19, fill=BONE, italic=False))
 svg.append(prose(MARGIN, 253,
                  "Before this, computer vision — where adversarial examples "
-                 "were first found."))
+                 "were first found.", size=17))
 svg.append(prose(MARGIN, 279,
-                 "The method did not change when the input became language."))
+                 "The method did not change when the input became language.", size=17))
 
 svg.append(f'<path d="M {MARGIN + 1} 315 L {MARGIN + 1} 351" stroke="{SOUL}" '
            f'stroke-width="2" opacity=".75" filter="url(#bloomSoft)"/>')
 svg.append(caps(MARGIN + 20, 330, "A vessel is only as good as its seal",
-                size=11.5, track=3.6, fill=SOUL, glow=True))
-svg.append(prose(MARGIN + 20, 351, "Islamabad, Pakistan", size=13))
+                size=13.5, track=3, fill=SOUL, glow=True))
+svg.append(prose(MARGIN + 20, 353, "Islamabad, Pakistan", size=15))

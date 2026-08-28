@@ -145,8 +145,7 @@ DEFS = "".join(
 
 svg = []
 # Read from the data, never spelled out — the total moves on its own.
-svg.append(section("The Map", f"{stats['repos']} public repositories, drawn as "
-                              f"Hallownest. Every room is one repository."))
+svg.append(section("The Map"))
 
 # The way down from Dirtmouth is a well, so the band above Foundations is not
 # empty space — it is the descent. Drawn from above this section's own origin
@@ -187,10 +186,10 @@ for i, (name, area) in enumerate(AREAS.items()):
                f'style="animation-delay:-{i * 2.3:.1f}s"/>')
 
     for j, line in enumerate(lines):
-        svg.append(caps(lx, ly + j * 26, line, size=size, track=2.4,
+        svg.append(caps(lx, ly + j * 28, line, size=size + 2, track=2.2,
                         anchor="middle", glow=True))
     svg.append(prose(lx, ly + len(lines) * 26 - 6, f"{len(repos)} repositories",
-                     size=12.5, anchor="middle", opacity=.72))
+                     size=15.5, anchor="middle", opacity=.85))
 
 # ── The Abyss ─────────────────────────────────────────────────────────────
 d = path_of(ABYSS["poly"])
@@ -232,12 +231,6 @@ for i, (ex, ey, er) in enumerate(_eyes):
 
 svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=31))
 lx, ly = ABYSS["label"]
-svg.append(caps(lx, ly, "AI Security", size=17, track=2.4, fill=SOUL,
+svg.append(caps(lx, ly, "AI Security", size=19, track=2.2, fill=SOUL,
                 anchor="middle", glow=True))
-svg.append(prose(lx, ly + 24, "unmapped — the work is private", size=12.5,
-                 anchor="middle", opacity=.8))
 
-svg.append(footnote("Areas are inferred from repository names and descriptions, "
-                    "and placed after Hallownest — Foundations where Dirtmouth "
-                    "stands, Computer Vision in Greenpath's place, AI Security "
-                    "in the Abyss.", 792))

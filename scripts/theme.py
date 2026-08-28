@@ -11,6 +11,7 @@ Three rules hold it together:
 3. Every figure uses the same ground, the same 72px margin and the same header
    block, so scrolling the README feels like walking, not like changing tabs.
 """
+from pathlib import Path
 
 VOID   = "#080B12"   # deepest ground
 CAVERN = "#111725"   # midground panels and room fill
@@ -25,6 +26,28 @@ INFECT = "#F0A93C"   # what leaked out — breach only
 # Windows and macOS, so it survives GitHub's img sandbox where a webfont would
 # not load at all.
 SERIF = "'Palatino Linotype','Book Antiqua',Palatino,'URW Palladio L','Times New Roman',serif"
+
+# Hollow Knight sets its titles in Trajan, an inscriptional Roman capital.
+# Cinzel is the standard free cut of the same letterforms (SIL OFL — see
+# scripts/CINZEL-OFL.txt), subset here to just the caps, digits and marks the
+# display faces actually set: 7.5 KB, about 10 KB once base64'd in.
+#
+# It is embedded as a data URI rather than linked, because GitHub renders
+# README images through <img>, where any external request is blocked. Verified
+# it applies in that mode before committing to it. Palatino stays behind it in
+# the stack as the fallback, and keeps the body text, where it has real
+# italics and reads better small.
+def _display_face():
+    import base64
+    woff = Path(__file__).resolve().parent / "cinzel-caps.woff2"
+    if not woff.exists():
+        return ""
+    b64 = base64.b64encode(woff.read_bytes()).decode()
+    return ("@font-face{font-family:'Hallow';font-style:normal;font-weight:400;"
+            f"src:url(data:font/woff2;base64,{b64}) format('woff2');}}")
+
+
+DISPLAY = "'Hallow'," + SERIF
 
 MARGIN = 72          # every figure indents to the same line
 RULE_Y = 118         # every header rule sits at the same height
@@ -87,7 +110,9 @@ def _defs(extra=""):
 
 
 _STYLE = f"""<style>
+  {_display_face()}
   text {{ font-family: {SERIF}; }}
+  .d {{ font-family: {DISPLAY}; }}
   .mote {{ animation: drift 11s ease-in-out infinite; transform-box: fill-box;
            transform-origin: center; }}
   @keyframes drift {{
@@ -179,10 +204,15 @@ def document(w, sections, extra_defs=""):
     return chr(10).join(out)
 
 
-def section(title, subtitle, w=1200):
-    """The one header block. Same place, same sizes, in every figure."""
+def section(title, subtitle="", w=1200):
+    """The one header block. Same place, same sizes, in every figure.
+
+    Subtitles are gone: at this width they rendered around 11px in the browser
+    and nobody reads an 11px caption on a profile. A section is its title and
+    its rule. The rule stays at the same height regardless, so the three
+    sections still line up.
+    """
     return (caps(MARGIN, 66, title, size=23, track=6.5, glow=True)
-            + prose(MARGIN, 96, subtitle)
             + f'<path d="M {MARGIN} {RULE_Y} L {w - MARGIN} {RULE_Y}" '
               f'stroke="{BONE}" stroke-width="1.2" opacity=".2" '
               f'filter="url(#ink)"/>')
@@ -199,7 +229,7 @@ def caps(x, y, s, size=13, fill=BONE, track=4.2, weight="normal",
     """Inscriptional caps — the house voice for anything that names a thing."""
     f = (f' filter="url(#{"bloom" if size >= 16 else "bloomSoft"})"'
          if glow else "")
-    return (f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
+    return (f'<text class="d" x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
             f'letter-spacing="{track}" font-weight="{weight}" '
             f'text-anchor="{anchor}" opacity="{opacity}"{f}>{esc(s.upper())}</text>')
 
@@ -213,7 +243,7 @@ def prose(x, y, s, size=15, fill=ASH, italic=True, anchor="start", opacity=1):
 
 def numeral(x, y, s, size=40, fill=BONE, anchor="start", glow=True):
     f = ' filter="url(#bloom)"' if glow else ""
-    return (f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
+    return (f'<text class="d" x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
             f'letter-spacing="1.5" text-anchor="{anchor}"{f}>{esc(s)}</text>')
 
 
