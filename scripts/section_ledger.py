@@ -242,14 +242,18 @@ def web(cx, cy, R):
 svg = [lantern(W, H)]
 svg.append(section("The Ledger"))
 
-# ── Three figures across the top, centred ─────────────────────────────────
-for i, (value, label) in enumerate(COUNTS):
-    x = 210 + i * 260
+# ── The figures across the top, centred ───────────────────────────────────
+# Positions and dividers both come from how many figures survived the
+# zero-guard, so a dropped stat cannot leave a divider standing alone or
+# pull the row off centre.
+STEP = 260
+row_x = [600 + (i - (len(COUNTS) - 1) / 2) * STEP for i in range(len(COUNTS))]
+for x, (value, label) in zip(row_x, COUNTS):
     svg.append(numeral(x, 190, commas(value), size=58, anchor="middle"))
     svg.append(caps(x, 220, label, size=17, track=2.1, fill=ASH, anchor="middle"))
-for x in (340, 600, 860):
-    svg.append(f'<path d="M {x} 150 L {x} 204" stroke="{BONE}" stroke-width="1" '
-               f'opacity=".13"/>')
+for a, b in zip(row_x, row_x[1:]):
+    svg.append(f'<path d="M {(a+b)/2:.0f} 150 L {(a+b)/2:.0f} 204" '
+               f'stroke="{BONE}" stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, left ──────────────────────────────────────────────────────
 svg.append(vessel(272, 500, 68, 1.0, 0, drain=True))
