@@ -108,12 +108,12 @@
 <g transform="translate(0,0)">
 <ellipse cx="600.0" cy="193.20000000000002" rx="744.0" ry="294.0" fill="url(#lantern)"/>
 <ellipse cx="978" cy="200" rx="330" ry="250" fill="url(#lantern)"/>
-<g transform="translate(858,8) scale(1.10)">
-  <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 L 245 290 C 245 320, 226 342, 196 344 C 180 346, 110 346, 94 344 C 64 342, 45 320, 45 290 Z M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="#F0A93C" opacity=".16" filter="url(#glowWide)"/>
+<g transform="translate(862,6) scale(1.06)">
+  <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 C 245 256, 238 300, 216 326 C 200 341, 176 347, 145 347 C 114 347, 90 341, 74 326 C 52 300, 45 256, 45 212 Z M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="#F0A93C" opacity=".16" filter="url(#glowWide)"/>
   <g filter="url(#inkSoft)">
     <path d="M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 C 41 96, 75 136, 110 154 Z" fill="url(#shell)"/>
     <path d="M 222 178 C 252 152, 282 120, 284 82 C 285 56, 273 42, 259 52 C 249 96, 215 136, 180 154 Z" fill="url(#shell)"/>
-    <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 L 245 290 C 245 320, 226 342, 196 344 C 180 346, 110 346, 94 344 C 64 342, 45 320, 45 290 Z" fill="url(#shell)"/>
+    <path d="M 45 212 C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 C 245 256, 238 300, 216 326 C 200 341, 176 347, 145 347 C 114 347, 90 341, 74 326 C 52 300, 45 256, 45 212 Z" fill="url(#shell)"/>
     <circle cx="85" cy="262" r="32" fill="#080B12"/>
     <circle cx="205" cy="262" r="32" fill="#080B12"/>
   </g>
@@ -132,7 +132,7 @@
   <path d="M 137 188 L 116 180" fill="none" stroke="#FFD98A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
   <path d="M 139 250 L 120 262" fill="none" stroke="#FFD98A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" class="breathe"/>
 </g>
-<g transform="translate(858,8) scale(1.10)">
+<g transform="translate(862,6) scale(1.06)">
   <ellipse class="drip" cx="146" cy="206" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:0.00s"/>
   <ellipse class="drip" cx="146" cy="206" rx="1.7" ry="2.6" fill="#FFD98A" opacity="0" style="animation-delay:0.00s"/>
   <ellipse class="drip" cx="140" cy="244" rx="3.1" ry="4.3" fill="#F0A93C" filter="url(#glowMed)" opacity="0" style="animation-delay:-1.45s"/>

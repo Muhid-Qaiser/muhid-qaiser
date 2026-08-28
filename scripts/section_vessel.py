@@ -23,8 +23,8 @@ W, H = 1200, 420
 HEAD = (
     "M 45 212 "
     "C 45 176, 63 155, 103 153 L 187 153 C 227 155, 245 176, 245 212 "
-    "L 245 290 C 245 320, 226 342, 196 344 "
-    "C 180 346, 110 346, 94 344 C 64 342, 45 320, 45 290 Z"
+    "C 245 256, 238 300, 216 326 C 200 341, 176 347, 145 347 "
+    "C 114 347, 90 341, 74 326 C 52 300, 45 256, 45 212 Z"
 )
 # Two crescents: out and up from the head's shoulders, tips curling back in.
 HORN_L = ("M 68 178 C 38 152, 8 120, 6 82 C 5 56, 17 42, 31 52 "
@@ -52,7 +52,7 @@ svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
-svg.append('<g transform="translate(858,8) scale(1.10)">')
+svg.append('<g transform="translate(862,6) scale(1.06)">')
 svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
 # Horns first, so the head's edge sits over their bases and the join is clean.
@@ -86,7 +86,7 @@ svg.append('</g>')
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
 LEAK = [(146, 206), (140, 244), (150, 278), (143, 310), (146, 336)]
-svg.append('<g transform="translate(858,8) scale(1.10)">')
+svg.append('<g transform="translate(862,6) scale(1.06)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
     svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
