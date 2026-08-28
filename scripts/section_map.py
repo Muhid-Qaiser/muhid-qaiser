@@ -188,7 +188,7 @@ for i, (name, area) in enumerate(AREAS.items()):
     for j, line in enumerate(lines):
         svg.append(caps(lx, ly + j * 37, line, size=size + 7, track=1.8,
                         anchor="middle", glow=True))
-    svg.append(prose(lx, ly + len(lines) * 37 - 8, f"{len(repos)} repositories",
+    svg.append(prose(lx, ly + len(lines) * 37 - 8, f"{len(repos)} repos",
                      size=21 if "size" not in area else 15,
                      anchor="middle", opacity=.9))
 

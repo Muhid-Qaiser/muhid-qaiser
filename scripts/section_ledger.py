@@ -54,7 +54,7 @@ ORB_MASK = (
 )
 
 COUNTS = [(v, k) for v, k in (
-    (stats["repos"],              "Repositories"),
+    (stats["repos"],              "Repos"),
     (stats["pull_requests"],      "Pull requests"),
     (stats["streak_best"],        "Longest streak"),
     (stats["contributions_year"], "Last 12 months"),
@@ -65,7 +65,7 @@ COUNTS = [(v, k) for v, k in (
 # off: three flat spokes would read as inactivity rather than as absence.
 METRICS = [
     ("COMMITS",       stats["commits"]),
-    ("REPOSITORIES",  stats["repos"]),
+    ("REPOS",         stats["repos"]),
     ("REPOS STARRED", stats["starred"]),
     ("LAST 12 MONTHS", stats["contributions_year"]),
     ("PULL REQUESTS", stats["pull_requests"]),
