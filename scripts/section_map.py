@@ -144,8 +144,9 @@ DEFS = "".join(
     for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
 
 svg = []
-svg.append(section("The Map", "Ninety-two public repositories, drawn as "
-                              "Hallownest. Every room is one repository."))
+# Read from the data, never spelled out — the total moves on its own.
+svg.append(section("The Map", f"{stats['repos']} public repositories, drawn as "
+                              f"Hallownest. Every room is one repository."))
 
 for i, (name, area) in enumerate(AREAS.items()):
     poly, colour = area["poly"], area["colour"]
