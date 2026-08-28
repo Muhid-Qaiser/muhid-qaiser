@@ -122,6 +122,17 @@ _STYLE = f"""<style>
     72%  {{ opacity: .5; }}
     100% {{ transform: translate(5px,-30px); opacity: 0; }}
   }}
+  /* One field across the whole document rather than a field per section, so
+     a spore can leave the masthead and arrive in the map. Distance, duration
+     and brightness ride on each particle as variables. */
+  .dust {{ animation: dust var(--t, 40s) linear infinite;
+           transform-box: fill-box; transform-origin: center; }}
+  @keyframes dust {{
+    0%        {{ transform: translate(0,0);                    opacity: 0; }}
+    12%, 84%  {{ opacity: var(--o, .3); }}
+    100%      {{ transform: translate(var(--dx,0), var(--dy,-300px));
+                 opacity: 0; }}
+  }}
   .breathe {{ animation: breathe 6.5s ease-in-out infinite; }}
   @keyframes breathe {{ 0%,100% {{ opacity: .5 }} 50% {{ opacity: 1 }} }}
 
@@ -168,7 +179,7 @@ _STYLE = f"""<style>
     .caret {{ display: none; }}
   }}
   @media (prefers-reduced-motion: reduce) {{
-    .mote, .breathe, .drip, .lit, .shimmer, .tide, .rise {{
+    .mote, .dust, .breathe, .drip, .lit, .shimmer, .tide, .rise {{
       animation: none; opacity: .7;
     }}
   }}
@@ -208,7 +219,8 @@ def document(w, sections, extra_defs=""):
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{total}" '
            f'     viewBox="0 0 {w} {total}" role="img">',
            _defs(extra_defs), _STYLE,
-           f'<rect width="{w}" height="{total}" fill="{VOID}"/>']
+           f'<rect width="{w}" height="{total}" fill="{VOID}"/>',
+           dust(w, total)]
     dy = 0
     for h, body in sections:
         out.append(f'<g transform="translate(0,{dy})">')
@@ -326,6 +338,31 @@ def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
         f'fill="{fill}" filter="url(#bloomSoft)" '
         f'style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
     )
+
+
+def dust(w, h, n=64, seed=101):
+    """Ambient spores for the whole page, drawn once behind every section.
+
+    These travel far enough to cross a section boundary — up to two thirds of
+    a section's height — so the page reads as one column of air rather than
+    three stacked panels that each happen to have their own weather. Slower
+    and dimmer than the per-section motes, which stay where they are.
+    """
+    import random
+    rng = random.Random(seed)
+    out = []
+    for _ in range(n):
+        cx, cy = rng.uniform(-20, w + 20), rng.uniform(0, h)
+        r = rng.uniform(0.9, 3.2)
+        far = rng.uniform(220, 520)          # comfortably past a section edge
+        dur = rng.uniform(34, 78)
+        out.append(
+            f'<circle class="dust" cx="{cx:.0f}" cy="{cy:.0f}" r="{r:.2f}" '
+            f'fill="{SOUL}" opacity="0" filter="url(#bloomSoft)" '
+            f'style="--t:{dur:.0f}s;--dx:{rng.uniform(-34, 34):.0f}px;'
+            f'--dy:-{far:.0f}px;--o:{rng.uniform(.10, .34):.2f};'
+            f'animation-delay:-{rng.uniform(0, dur):.0f}s"/>')
+    return "".join(out)
 
 
 def motes(x, y, w, h, n=14, seed=3, fill=SOUL):
