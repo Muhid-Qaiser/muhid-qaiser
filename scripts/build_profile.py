@@ -9,11 +9,24 @@ local coordinates.
 
 Import order is the reading order down the page.
 """
-import sys
+import json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from theme import document
+
+# A merge can leave conflict markers in data/stats.json, which parses as a
+# JSONDecodeError three imports later with a traceback that says nothing
+# useful. Fail here instead, with the reason.
+_stats = Path(__file__).resolve().parent.parent / "data" / "stats.json"
+try:
+    json.loads(_stats.read_text(encoding="utf-8"))
+except json.JSONDecodeError as exc:
+    raise SystemExit(
+        f"{_stats} is not valid JSON ({exc}). "
+        "If a merge left conflict markers in it, re-run scripts/fetch_stats.py "
+        "to overwrite it with fresh data.")
+
 import section_vessel, section_map, section_ledger
 
 OUT = Path(__file__).resolve().parent.parent / "assets" / "profile.svg"
