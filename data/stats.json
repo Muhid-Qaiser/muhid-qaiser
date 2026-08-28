@@ -5,12 +5,8 @@
   "repos_mapped": 91,
   "followers": 5,
   "stars": 2,
-  "commits": 277,
-<<<<<<< HEAD
+  "commits": 279,
   "contributions_year": 99,
-=======
-  "contributions_year": 97,
->>>>>>> origin/master
   "streak_current": 2,
   "streak_best": 9,
   "active_days": 37,
@@ -19,12 +15,12 @@
     "date": "2026-08-28",
     "count": 49
   },
-  "pull_requests": 48,
-  "pull_requests_merged": 46,
+  "pull_requests": 0,
+  "pull_requests_merged": 0,
   "issues": 0,
   "starred": 66,
   "following": 4,
-  "contributed_to": 3,
+  "contributed_to": 0,
   "year": {
     "commits": 91,
     "pull_requests": 0,
@@ -78,7 +74,7 @@
     22,
     15,
     54,
-    14,
+    16,
     21,
     16,
     3,
@@ -89,7 +85,7 @@
   "commits_by_year": {
     "2024": 59,
     "2025": 129,
-    "2026": 89
+    "2026": 91
   },
   "languages": [
     {
@@ -104,11 +100,7 @@
     },
     {
       "name": "Python",
-<<<<<<< HEAD
       "size": 853919,
-=======
-      "size": 852196,
->>>>>>> origin/master
       "color": "#3572A5"
     },
     {
@@ -155,7 +147,7 @@
       "pushed": "2026-08-28",
       "stars": 0,
       "language": "Python",
-      "commits": 53,
+      "commits": 55,
       "region": "FOUNDATIONS",
       "scratch": false
     },
