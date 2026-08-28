@@ -40,7 +40,7 @@ svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
-svg.append('<g transform="translate(846,46) scale(1.24)">')
+svg.append('<g transform="translate(838,26) scale(1.42)">')
 svg.append(f'  <path d="{MASK}" fill="{SOUL}" opacity=".2" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
@@ -71,10 +71,34 @@ for path, w in ((CRACK, 2.8), (BRANCH_A, 1.6), (BRANCH_B, 1.6)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#DEFBFF" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round" '
                f'filter="url(#glow)" class="breathe"/>')
+
+SEEP = "M 107 170 L 115 196 L 110 218"
+svg.append(f'  <path d="{SEEP}" fill="none" stroke="{INFECT}" stroke-width="7" '
+           f'stroke-linecap="round" stroke-linejoin="round" opacity=".5" '
+           f'filter="url(#glowMed)" class="breathe" '
+           f'style="animation-delay:-3.2s"/>')
+svg.append(f'  <path d="{SEEP}" fill="none" stroke="#FFCE77" stroke-width="2.2" '
+           f'stroke-linecap="round" stroke-linejoin="round" '
+           f'filter="url(#glow)" class="breathe" style="animation-delay:-3.2s"/>')
+svg.append('</g>')
+
+# What got out. Amber is the profile's breach colour and this is the only
+# place it is earned: the seal has failed, so the infection is leaving.
+# Points sit on the fracture, low enough that a drop falls clear of the chin.
+LEAK = [(111, 152), (114, 176), (107, 196), (115, 210), (110, 224)]
+svg.append('<g transform="translate(838,26) scale(1.42)">')
+for i, (lx, ly) in enumerate(LEAK):
+    delay = -i * 1.45
+    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
+               f'fill="{INFECT}" filter="url(#glowMed)" opacity="0" '
+               f'style="animation-delay:{delay:.2f}s"/>')
+    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="1.7" ry="2.6" '
+               f'fill="#FFD98A" opacity="0" '
+               f'style="animation-delay:{delay:.2f}s"/>')
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
-svg.append(motes(965, 120, 70, 240, n=18, seed=11))
+svg.append(motes(985, 110, 76, 268, n=18, seed=11))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
 svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))

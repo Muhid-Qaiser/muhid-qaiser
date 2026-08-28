@@ -98,8 +98,27 @@ _STYLE = f"""<style>
   }}
   .breathe {{ animation: breathe 6.5s ease-in-out infinite; }}
   @keyframes breathe {{ 0%,100% {{ opacity: .5 }} 50% {{ opacity: 1 }} }}
+
+  /* Infection gathering at the breach, swelling, and falling away. */
+  .drip {{ animation: drip 7s cubic-bezier(.5,0,.85,.4) infinite;
+           transform-box: fill-box; transform-origin: center; }}
+  @keyframes drip {{
+    0%   {{ transform: translateY(0) scale(.35); opacity: 0; }}
+    22%  {{ transform: translateY(2px) scale(1);  opacity: .95; }}
+    38%  {{ transform: translateY(6px) scale(1);  opacity: .95; }}
+    100% {{ transform: translateY(74px) scale(.5); opacity: 0; }}
+  }}
+  /* A lantern carried past: areas take the light in turn, never all at once. */
+  .lit {{ animation: lit 14s ease-in-out infinite; }}
+  @keyframes lit {{ 0%,72%,100% {{ opacity: .62 }} 30% {{ opacity: 1 }} }}
+  /* The surface of a filled vessel is never quite still. */
+  .shimmer {{ animation: shimmer 5.5s ease-in-out infinite; }}
+  @keyframes shimmer {{ 0%,100% {{ opacity: .18 }} 50% {{ opacity: .5 }} }}
+
   @media (prefers-reduced-motion: reduce) {{
-    .mote, .breathe {{ animation: none; opacity: .6; }}
+    .mote, .breathe, .drip, .lit, .shimmer {{
+      animation: none; opacity: .7;
+    }}
   }}
 </style>"""
 

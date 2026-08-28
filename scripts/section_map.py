@@ -139,7 +139,14 @@ by_area = {}
 for repo in stats["repo_list"]:
     by_area.setdefault(repo["region"], []).append(repo)
 
-DEFS = "".join(
+SHAFT_DEFS = f"""
+  <linearGradient id="shaft" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="{SOUL}" stop-opacity=".15"/>
+    <stop offset="55%"  stop-color="{SOUL}" stop-opacity=".05"/>
+    <stop offset="100%" stop-color="{SOUL}" stop-opacity="0"/>
+  </linearGradient>"""
+
+DEFS = SHAFT_DEFS + "".join(
     f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
     for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
 
@@ -147,6 +154,14 @@ svg = []
 # Read from the data, never spelled out — the total moves on its own.
 svg.append(section("The Map", f"{stats['repos']} public repositories, drawn as "
                               f"Hallownest. Every room is one repository."))
+
+# The way down from Dirtmouth is a well, so the band above Foundations is not
+# empty space — it is the descent. Drawn from above this section's own origin
+# so the beam crosses the gap the masthead leaves, and the spores inside it
+# drift up toward the opening.
+svg.append('<path d="M 524 -150 L 556 -150 L 598 168 L 482 168 Z" '
+           'fill="url(#shaft)" filter="url(#glowWide)"/>')
+svg.append(motes(494, -120, 92, 274, n=13, seed=41))
 
 for i, (name, area) in enumerate(AREAS.items()):
     poly, colour = area["poly"], area["colour"]
@@ -173,10 +188,14 @@ for i, (name, area) in enumerate(AREAS.items()):
     svg.append('</g>')
 
     # The wall: a wide bloom under a crisp line, both roughened.
-    svg.append(f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="7" '
-               f'opacity=".3" filter="url(#glowMed)"/>')
-    svg.append(f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="2" '
-               f'opacity=".95" filter="url(#ink)"/>')
+    svg.append(f'<path class="lit" d="{d}" fill="none" stroke="{colour}" '
+               f'stroke-width="7" filter="url(#glowMed)" opacity=".3" '
+               f'style="animation-delay:-{i * 2.3:.1f}s"/>')
+    # Each area takes the light in turn, so the kingdom is never lit all at
+    # once — the closest thing to a hover state an <img> can carry.
+    svg.append(f'<path class="lit" d="{d}" fill="none" stroke="{colour}" '
+               f'stroke-width="2" filter="url(#ink)" '
+               f'style="animation-delay:-{i * 2.3:.1f}s"/>')
 
     for j, line in enumerate(lines):
         svg.append(caps(lx, ly + j * 26, line, size=size, track=2.4,
