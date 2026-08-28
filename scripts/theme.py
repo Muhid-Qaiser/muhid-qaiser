@@ -17,7 +17,8 @@ VOID   = "#080B12"   # deepest ground
 CAVERN = "#111725"   # midground panels and room fill
 STONE  = "#1D2637"   # carved edges
 BONE   = "#E9E6DC"   # the mask; anything carved or written
-ASH    = "#8B96AB"   # secondary lettering — stays unlit
+LUMEN  = "#EAF3FA"   # display lettering — cold, and lit
+ASH    = "#9AA7BD"   # secondary lettering — cold, and unlit
 SOUL   = "#A9E8F0"   # pale light, still contained
 INFECT = "#F0A93C"   # what leaked out — breach only
 
@@ -224,14 +225,37 @@ def footnote(text, y, w=1200):
             + prose(MARGIN, y, text, size=13, opacity=.85))
 
 
-def caps(x, y, s, size=13, fill=BONE, track=4.2, weight="normal",
+def _halo(body, txt, size, opacity=1.0):
+    """The layers under a lit line of type, largest first."""
+    if size >= 30:
+        stack = (("glowWide", .40), ("glowMed", .62))
+    elif size >= 20:
+        stack = (("glowMed", .55),)
+    else:
+        stack = (("bloomSoft", .5),)
+    return "".join(
+        f'<text class="d" {body} fill="{SOUL}" opacity="{op * opacity:.2f}" '
+        f'filter="url(#{flt})">{txt}</text>' for flt, op in stack)
+
+
+def caps(x, y, s, size=13, fill=None, track=4.2, weight="normal",
          anchor="start", opacity=1, glow=False):
-    """Inscriptional caps — the house voice for anything that names a thing."""
-    f = (f' filter="url(#{"bloom" if size >= 16 else "bloomSoft"})"'
-         if glow else "")
-    return (f'<text class="d" x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
-            f'letter-spacing="{track}" font-weight="{weight}" '
-            f'text-anchor="{anchor}" opacity="{opacity}"{f}>{esc(s.upper())}</text>')
+    """Inscriptional caps — the house voice for anything that names a thing.
+
+    glow=True sets the line twice: a Soul-coloured blur underneath and the
+    cold white on top of it. A single blurred copy of the text itself only
+    ever makes the text fuzzy; the halo has to be a different colour from the
+    core for it to read as light coming off the letters. Halo radius follows
+    the type size, because a big blur under a 12px cap is just a smudge.
+    """
+    fill = LUMEN if fill is None else fill
+    body = (f'x="{x}" y="{y}" font-size="{size}" letter-spacing="{track}" '
+            f'font-weight="{weight}" text-anchor="{anchor}"')
+    txt = esc(s.upper())
+    if not glow:
+        return f'<text class="d" {body} fill="{fill}" opacity="{opacity}">{txt}</text>'
+    return (_halo(body, txt, size, opacity)
+            + f'<text class="d" {body} fill="{fill}" opacity="{opacity}">{txt}</text>')
 
 
 def prose(x, y, s, size=15, fill=ASH, italic=True, anchor="start", opacity=1):
@@ -241,10 +265,16 @@ def prose(x, y, s, size=15, fill=ASH, italic=True, anchor="start", opacity=1):
             f'text-anchor="{anchor}" opacity="{opacity}">{esc(s)}</text>')
 
 
-def numeral(x, y, s, size=40, fill=BONE, anchor="start", glow=True):
-    f = ' filter="url(#bloom)"' if glow else ""
-    return (f'<text class="d" x="{x}" y="{y}" font-size="{size}" fill="{fill}" '
-            f'letter-spacing="1.5" text-anchor="{anchor}"{f}>{esc(s)}</text>')
+def numeral(x, y, s, size=40, fill=None, anchor="start", glow=True):
+    """Figures carry the same halo as the caps, for the same reason."""
+    fill = LUMEN if fill is None else fill
+    body = (f'x="{x}" y="{y}" font-size="{size}" letter-spacing="1.5" '
+            f'text-anchor="{anchor}"')
+    txt = esc(s)
+    if not glow:
+        return f'<text class="d" {body} fill="{fill}">{txt}</text>'
+    return (_halo(body, txt, size)
+            + f'<text class="d" {body} fill="{fill}">{txt}</text>')
 
 
 def motes(x, y, w, h, n=14, seed=3, fill=SOUL):
