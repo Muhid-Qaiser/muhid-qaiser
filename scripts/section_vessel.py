@@ -50,9 +50,9 @@ DEFS = f"""
 
 svg = [lantern(W, H)]
 # A second light source behind the shell itself.
-svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
+svg.append(lantern(W, H, cx=1020, cy=206, rx=340, ry=258))
 
-svg.append('<g transform="translate(862,6) scale(1.06)">')
+svg.append('<g transform="translate(890,10) scale(1.02)">')
 svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
 # Horns first, so the head's edge sits over their bases and the join is clean.
@@ -86,7 +86,7 @@ svg.append('</g>')
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
 LEAK = [(146, 206), (140, 244), (150, 278), (143, 310), (146, 336)]
-svg.append('<g transform="translate(862,6) scale(1.06)">')
+svg.append('<g transform="translate(890,10) scale(1.02)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
     svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
@@ -101,19 +101,19 @@ svg.append('</g>')
 svg.append(motes(996, 130, 80, 272, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
-svg.append(caps(MARGIN, 156, "Muhid Qaiser", size=57, track=9, glow=True))
+svg.append(caps(MARGIN, 150, "Muhid Qaiser", size=64, track=9, glow=True))
 svg.append(f'<path d="M {MARGIN} 182 L 536 182" stroke="{BONE}" stroke-width="1.4" '
            f'opacity=".28" filter="url(#ink)"/>')
 
-svg.append(prose(MARGIN, 220,
+svg.append(prose(MARGIN, 222,
                  "AI Security Engineer | Computer Vision Engineer | "
                  "Generative AI Engineer",
-                 size=23, fill=LUMEN, italic=False))
+                 size=24, fill=LUMEN, italic=False))
 
 # The vessel's own inscription, typed out and repeated. It belongs under a
 # cracked shell more than any line I could write.
-svg.append(typeline(MARGIN, 280,
+svg.append(typeline(MARGIN, 332,
                     "No cost too great. No mind to think. "
                     "No will to break. No voice to cry suffering.",
-                    size=24, cycle=15))
+                    size=26, cycle=15))
 

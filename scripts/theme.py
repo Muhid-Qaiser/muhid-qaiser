@@ -228,7 +228,7 @@ def section(title, subtitle="", w=1200):
     its rule. The rule stays at the same height regardless, so the three
     sections still line up.
     """
-    return (caps(MARGIN, 72, title, size=31, track=6, glow=True)
+    return (caps(MARGIN, 76, title, size=36, track=5.5, glow=True)
             + f'<path d="M {MARGIN} {RULE_Y} L {w - MARGIN} {RULE_Y}" '
               f'stroke="{BONE}" stroke-width="1.2" opacity=".2" '
               f'filter="url(#ink)"/>')
