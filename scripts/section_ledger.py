@@ -273,8 +273,8 @@ svg.append(web(884, 500, 130))
 # ── Commits by hour, across the foot ──────────────────────────────────────
 BASE, TALL, X0, SPAN = 862, 62, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 790, "Every commit, by hour", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 790, f"busiest at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 790, "Every commit, by hour of day (PKT)", size=17, track=2.3, fill=ASH))
+svg.append(caps(1128, 790, f"most commits at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
