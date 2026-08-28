@@ -205,7 +205,32 @@ svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="6" '
            f'opacity=".16" filter="url(#glowMed)"/>')
 svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="1.7" '
            f'opacity=".5" stroke-dasharray="5 9" filter="url(#ink)"/>')
-svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=16, seed=31))
+# What the Abyss actually looks like: a floor of dead vessels, so the dark
+# is full of small pale eyes looking back up out of it. Rejection-sampled so
+# no pair straddles a wall, and kept clear of the caption.
+_rng = random.Random(5150)
+cap_x, cap_y = ABYSS["label"]
+_eyes = []
+while len(_eyes) < 22:
+    ex = _rng.uniform(ax0 + 16, ax1 - 16)
+    ey = _rng.uniform(ay0 + 14, ay1 - 14)
+    if not inside(ex, ey, ABYSS["poly"]):
+        continue
+    if abs(ex - cap_x) < 190 and abs(ey - cap_y - 8) < 40:   # off the caption
+        continue
+    if any((ex - px) ** 2 + (ey - py) ** 2 < 30 ** 2 for px, py, _ in _eyes):
+        continue
+    _eyes.append((ex, ey, _rng.uniform(1.4, 2.5)))
+for i, (ex, ey, er) in enumerate(_eyes):
+    gap, tilt = er * 2.5, _rng.uniform(-8, 8)
+    svg.append(f'<g class="breathe" style="animation-delay:-{i*0.7:.1f}s" '
+               f'transform="rotate({tilt:.0f} {ex:.0f} {ey:.0f})">'
+               f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er:.1f}" '
+               f'ry="{er*1.35:.1f}" fill="#DCF4F8" filter="url(#bloomSoft)"/>'
+               f'<ellipse cx="{ex+gap:.1f}" cy="{ey:.1f}" rx="{er:.1f}" '
+               f'ry="{er*1.35:.1f}" fill="#DCF4F8" filter="url(#bloomSoft)"/></g>')
+
+svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=31))
 lx, ly = ABYSS["label"]
 svg.append(caps(lx, ly, "AI Security", size=17, track=2.4, fill=SOUL,
                 anchor="middle", glow=True))

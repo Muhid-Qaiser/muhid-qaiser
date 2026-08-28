@@ -56,7 +56,7 @@ ORB_MASK = (
 COUNTS = [
     (stats["repos"],          "Repositories"),
     (stats["pull_requests"],  "Pull requests"),
-    (stats["scratch_builds"], "From scratch"),
+    (stats["contributions_year"], "Contributions"),
 ]
 
 # Six account-wide figures, largest first, clockwise from the top.
@@ -68,7 +68,6 @@ METRICS = [
     ("REPOS STARRED", stats["starred"]),
     ("CONTRIBUTIONS", stats["contributions_year"]),
     ("PULL REQUESTS", stats["pull_requests"]),
-    ("FROM SCRATCH",  stats["scratch_builds"]),
 ]
 # These span 241 down to 6. On one linear radius everything but commits
 # collapses to a sliver, so the reach is logarithmic and every spoke prints
@@ -95,7 +94,7 @@ def blob(cx, cy, r):
     return " ".join(d) + " Z"
 
 
-def vessel(cx, cy, r, frac, idx, eyes=True):
+def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
     """The Soul meter, after the game's own sprite.
 
     No rim and no outline — it is a soft mass of near-white with a bloom
@@ -109,13 +108,34 @@ def vessel(cx, cy, r, frac, idx, eyes=True):
     out = [f'<path d="{shape}" fill="{LIQUID}" opacity=".3" '
            f'filter="url(#glowWide)"/>',
            f'<clipPath id="lvl{idx}"><path d="{shape}"/></clipPath>',
-           f'<path d="{shape}" fill="#0B111C"/>',
-           f'<g clip-path="url(#lvl{idx})">',
-           f'  <rect x="{cx-r*1.2:.1f}" y="{level:.1f}" width="{r*2.4:.1f}" '
-           f'height="{r*2.4:.1f}" fill="{LIQUID}"/>',
-           f'  <rect x="{cx-r*1.2:.1f}" y="{level:.1f}" width="{r*2.4:.1f}" '
-           f'height="3" fill="#FFFFFF" opacity=".55" class="shimmer"/>',
-           '</g>']
+           f'<path d="{shape}" fill="#0B111C"/>']
+
+    # Soul is a liquid, so the surface is a wave, not a straight edge. The
+    # crest travels exactly one wavelength and repeats, which makes the loop
+    # seamless; the body is drawn wider than the bowl so no edge is ever
+    # exposed as it slides.
+    wl, amp = 40, max(1.6, r * 0.045)
+    x0, span = cx - r - wl, 2 * r + 2 * wl
+    body = [f"M {x0:.1f} {level:.1f}"]
+    x = x0
+    while x < x0 + span:
+        body.append(f"q {wl/4:.1f} {-amp:.1f} {wl/2:.1f} 0 "
+                    f"q {wl/4:.1f} {amp:.1f} {wl/2:.1f} 0")
+        x += wl
+    body.append(f"L {x:.1f} {cy + r * 2.2:.1f} L {x0:.1f} {cy + r * 2.2:.1f} Z")
+    wave = " ".join(body)
+
+    out.append(f'<g clip-path="url(#lvl{idx})">')
+    if drain:
+        # The meter is spent and gathered again, never emptied — the level
+        # stays above the eye holes so the face reads throughout.
+        out.append(f'  <g class="rise" style="--low:{r*0.5:.0f}px">')
+    else:
+        out.append('  <g>')
+    out.append(f'    <g class="tide"><path d="{wave}" fill="{LIQUID}"/></g>')
+    out.append('  </g>')
+    out.append('</g>')
+
     if eyes:
         # Geometry measured off the game's own Soul_Meter sprite: the holes sit
         # low and wide — at ±0.47r across and +0.43r down, radius ~0.27r — which
@@ -301,7 +321,7 @@ for i, (value, label) in enumerate(COUNTS):
                    f'stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, and one smaller vessel per year ───────────────────────────
-svg.append(vessel(168, 356, 68, 1.0, 0))
+svg.append(vessel(168, 356, 68, 1.0, 0, drain=True))
 svg.append(numeral(168, 462, commas(stats["commits"]), size=34, anchor="middle"))
 svg.append(caps(168, 484, "commits gathered", size=10, track=2.6, fill=ASH,
                 anchor="middle"))

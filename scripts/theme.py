@@ -115,8 +115,19 @@ _STYLE = f"""<style>
   .shimmer {{ animation: shimmer 5.5s ease-in-out infinite; }}
   @keyframes shimmer {{ 0%,100% {{ opacity: .18 }} 50% {{ opacity: .5 }} }}
 
+  /* Soul is a liquid. The crest travels one wavelength and repeats, so the
+     loop is seamless; the level rises and falls the way the meter does when
+     Soul is spent and gathered again. */
+  .tide {{ animation: tide 6.5s linear infinite; }}
+  @keyframes tide {{ to {{ transform: translateX(-40px); }} }}
+  .rise {{ animation: rise 15s ease-in-out infinite; }}
+  @keyframes rise {{
+    0%, 100% {{ transform: translateY(var(--low, 0px)); }}
+    45%, 62% {{ transform: translateY(0px); }}
+  }}
+
   @media (prefers-reduced-motion: reduce) {{
-    .mote, .breathe, .drip, .lit, .shimmer {{
+    .mote, .breathe, .drip, .lit, .shimmer, .tide, .rise {{
       animation: none; opacity: .7;
     }}
   }}

@@ -104,7 +104,10 @@ query($login:String!) {
       totalPullRequestReviewContributions
       totalRepositoryContributions
       restrictedContributionsCount
-      contributionCalendar { totalContributions }
+      contributionCalendar {
+        totalContributions
+        weeks { contributionDays { date contributionCount weekday } }
+      }
     }
   }
 }
@@ -165,6 +168,28 @@ for i, repo in enumerate(nodes, 1):
     if i % 20 == 0:
         print(f"    {i}/{len(nodes)}")
 
+calendar = user["contributionsCollection"]["contributionCalendar"]
+days = [(d["date"], d["contributionCount"])
+        for w in calendar["weeks"] for d in w["contributionDays"]]
+days.sort()
+
+# Today may not be over yet, so an empty final day does not break a streak.
+tail = days[:-1] if days and days[-1][1] == 0 else days
+streak_current = 0
+for _, count in reversed(tail):
+    if not count:
+        break
+    streak_current += 1
+
+streak_best = run = 0
+for _, count in days:
+    run = run + 1 if count else 0
+    streak_best = max(streak_best, run)
+
+active_days = sum(1 for _, c in days if c)
+busiest = max(days, key=lambda d: d[1]) if days else ("", 0)
+busiest = {"date": busiest[0], "count": busiest[1]}
+
 by_region = Counter(r["region"] for r in repos)
 stats = {
     "login": LOGIN,
@@ -174,7 +199,12 @@ stats = {
     "followers": user["followers"]["totalCount"],
     "stars": sum(r["stars"] for r in repos),
     "commits": total_commits,
-    "contributions_year": user["contributionsCollection"]["contributionCalendar"]["totalContributions"],
+    "contributions_year": calendar["totalContributions"],
+    "streak_current": streak_current,
+    "streak_best": streak_best,
+    "active_days": active_days,
+    "calendar_days": len(days),
+    "busiest_day": busiest,
     "pull_requests": user["pullRequests"]["totalCount"],
     "issues": user["issues"]["totalCount"],
     "gists": user["gists"]["totalCount"],
@@ -204,5 +234,7 @@ OUT.write_text(json.dumps(stats, indent=2), encoding="utf-8")
 print(f"\nwrote {OUT}")
 print(f"  {stats['repos']} repositories · {total_commits} commits · "
       f"{stats['scratch_builds']} rebuilt from scratch")
+print(f"  streak: {streak_current} now, {streak_best} best · "
+      f"{active_days}/{len(days)} active days")
 for r in stats["regions"]:
     print(f"    {r['name']:14} {r['count']}")

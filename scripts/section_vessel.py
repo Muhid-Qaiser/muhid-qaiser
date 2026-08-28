@@ -12,22 +12,33 @@ from theme import *
 
 W, H = 1200, 420
 
-# Mask drawn in a local 220x250 box, then placed. Horns thick at the base,
-# sweeping outward before they rise; a shallow dome between them; cheeks
-# tapering to a blunt chin.
-MASK = (
-    "M 34 120 "
-    "C 22 90, 14 56, 7 26 C 5 19, 15 16, 19 24 C 31 56, 50 86, 70 98 "
-    "C 84 76, 136 76, 150 98 "
-    "C 170 86, 189 56, 201 24 C 205 16, 215 19, 213 26 C 206 56, 198 90, 186 120 "
-    "C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z"
+# Redrawn from the game's The_Knight_Front sprite rather than from memory.
+# Measured off it: the head is a rounded rectangle wider than it is tall
+# (47x38, aspect 1.24) — not the tapering oval this used to be — the horns
+# span 1.45x the head's width and take the top half of the silhouette, and the
+# eyes are large circles at ±0.65 of the head's half-width, 0.71 of the way
+# down, each 0.35 of the head's width.
+#
+# Local box is 290 x 318, head centred on x=145.
+HEAD = (
+    "M 45 215 "
+    "C 45 178, 62 156, 102 154 L 188 154 C 228 156, 245 178, 245 215 "
+    "L 245 250 C 245 292, 224 316, 211 318 L 79 318 "
+    "C 66 316, 45 292, 45 250 Z"
 )
+# Two crescents: out and up from the head's shoulders, tips curling back in.
+HORN_L = ("M 64 176 C 34 142, 3 98, 2 50 C 1 22, 11 0, 23 7 "
+          "C 34 64, 70 126, 108 152 Z")
+HORN_R = ("M 226 176 C 256 142, 287 98, 288 50 C 289 22, 279 0, 267 7 "
+          "C 256 64, 220 126, 182 152 Z")
+MASK = HEAD + " " + HORN_L + " " + HORN_R
 
-# The failed seal, running the centre line between the eyes. A shell that
-# opens is no longer a shell.
-CRACK = "M 111 90 L 106 116 L 114 142 L 107 170 L 115 196 L 110 218"
-BRANCH_A = "M 108 104 L 122 99"
-BRANCH_B = "M 107 170 L 92 182"
+EYE_R, EYE_DX, EYE_CY = 32, 60, 262
+
+# The failed seal, running the centre line between the eyes.
+CRACK = "M 145 156 L 137 188 L 152 218 L 139 250 L 151 282 L 144 312"
+BRANCH_A = "M 137 188 L 116 180"
+BRANCH_B = "M 139 250 L 120 262"
 
 DEFS = f"""
   <linearGradient id="shell" x1="0" y1="0" x2="0.35" y2="1">
@@ -40,20 +51,16 @@ svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
-svg.append('<g transform="translate(838,26) scale(1.42)">')
+svg.append('<g transform="translate(866,36) scale(0.96)">')
 svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
-svg.append(f'    <path d="{MASK}" fill="none" stroke="#6E7686" stroke-width="1.5" '
-           f'opacity=".55"/>')
+svg.append(f'    <path d="{MASK}" fill="none" stroke="#6E7686" stroke-width="1.2" '
+           f'opacity=".16"/>')
 # Eye voids. Nothing looks back out.
-svg.append(f'    <ellipse cx="80" cy="143" rx="16" ry="28" fill="{VOID}" '
-           f'transform="rotate(-9 80 143)"/>')
-svg.append(f'    <ellipse cx="140" cy="143" rx="16" ry="28" fill="{VOID}" '
-           f'transform="rotate(9 140 143)"/>')
-# Shading down the left cheek, so the shell has a side turned away from us.
-svg.append(f'    <path d="M 34 120 C 32 164, 52 212, 110 236 C 68 206, 47 168, '
-           f'48 128 Z" fill="#39404E" opacity=".3"/>')
+for sx in (-1, 1):
+    svg.append(f'    <circle cx="{145 + sx*EYE_DX}" cy="{EYE_CY}" r="{EYE_R}" '
+               f'fill="{VOID}"/>')
 svg.append('  </g>')
 
 # The breach: the dark cut first, then the light coming through it.
@@ -77,8 +84,8 @@ svg.append('</g>')
 # What got out. Amber is the profile's breach colour and this is the only
 # place it is earned: the seal has failed, so the infection is leaving.
 # Points sit on the fracture, low enough that a drop falls clear of the chin.
-LEAK = [(111, 152), (114, 176), (107, 196), (115, 210), (110, 224)]
-svg.append('<g transform="translate(838,26) scale(1.42)">')
+LEAK = [(146, 206), (140, 244), (150, 274), (143, 300), (147, 316)]
+svg.append('<g transform="translate(866,36) scale(0.96)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
     svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="3.1" ry="4.3" '
@@ -90,7 +97,7 @@ for i, (lx, ly) in enumerate(LEAK):
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
-svg.append(motes(985, 110, 76, 268, n=18, seed=11, fill=INFECT))
+svg.append(motes(996, 130, 80, 272, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
 svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))
