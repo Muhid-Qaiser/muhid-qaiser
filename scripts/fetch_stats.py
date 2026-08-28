@@ -69,9 +69,14 @@ def graphql(query, **variables):
                                  headers={**HEADERS, "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=45) as r:
         body = json.load(r)
-    if body.get("errors"):
-        raise RuntimeError(body["errors"])
-    return body["data"]
+    errors = body.get("errors") or []
+    data = body.get("data") or {}
+    if errors and not data.get("user"):
+        raise RuntimeError(errors)
+    for e in errors:
+        where = ".".join(str(p) for p in e.get("path", []))
+        print(f"  ! skipped {where}: {e.get('message')}")
+    return data
 
 
 PROFILE_Q = """
@@ -80,7 +85,6 @@ query($login:String!) {
     createdAt
     followers { totalCount }
     following { totalCount }
-    gists(privacy:PUBLIC) { totalCount }
     starredRepositories { totalCount }
     pullRequests { totalCount }
     issues { totalCount }
@@ -205,12 +209,11 @@ stats = {
     "active_days": active_days,
     "calendar_days": len(days),
     "busiest_day": busiest,
-    "pull_requests": user["pullRequests"]["totalCount"],
-    "issues": user["issues"]["totalCount"],
-    "gists": user["gists"]["totalCount"],
-    "starred": user["starredRepositories"]["totalCount"],
-    "following": user["following"]["totalCount"],
-    "contributed_to": user["repositoriesContributedTo"]["totalCount"],
+    "pull_requests": (user.get("pullRequests") or {}).get("totalCount", 0),
+    "issues": (user.get("issues") or {}).get("totalCount", 0),
+    "starred": (user.get("starredRepositories") or {}).get("totalCount", 0),
+    "following": (user.get("following") or {}).get("totalCount", 0),
+    "contributed_to": (user.get("repositoriesContributedTo") or {}).get("totalCount", 0),
     "year": {k: user["contributionsCollection"][v] for k, v in (
         ("commits", "totalCommitContributions"),
         ("pull_requests", "totalPullRequestContributions"),
