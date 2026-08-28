@@ -201,9 +201,9 @@ svg.append(f'<g clip-path="url(#clip{len(AREAS)})"><rect x="{ax0}" y="{ay0}" '
            f'opacity=".1"/></g>')
 svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="170" ry="56" '
            f'fill="{SOUL}" opacity=".08" filter="url(#glowWide)"/>')
-ABYSS_EDGE = "#243247"
+ABYSS_EDGE = "#8A6440"
 svg.append(f'<path d="{d}" fill="none" stroke="{ABYSS_EDGE}" stroke-width="2.4" '
-           f'opacity=".95" stroke-dasharray="5 9" filter="url(#ink)"/>')
+           f'opacity=".9" stroke-dasharray="5 9" filter="url(#ink)"/>')
 # What the Abyss actually looks like: a floor of dead vessels, so the dark
 # is full of small pale eyes looking back up out of it. Rejection-sampled so
 # no pair straddles a wall, and kept clear of the caption.
