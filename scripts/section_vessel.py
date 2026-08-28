@@ -41,7 +41,7 @@ svg = [lantern(W, H)]
 svg.append(lantern(W, H, cx=978, cy=200, rx=330, ry=250))
 
 svg.append('<g transform="translate(838,26) scale(1.42)">')
-svg.append(f'  <path d="{MASK}" fill="{SOUL}" opacity=".2" filter="url(#glowWide)"/>')
+svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
 svg.append('  <g filter="url(#inkSoft)">')
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
 svg.append(f'    <path d="{MASK}" fill="none" stroke="#6E7686" stroke-width="1.5" '
@@ -63,23 +63,15 @@ for path, w in ((CRACK, 3.4), (BRANCH_A, 2.2), (BRANCH_B, 2.2)):
 svg.append('  <g style="mix-blend-mode:screen">')
 for flt, width, op in (("glowWide", 16, .75), ("glowMed", 7, .95)):
     for path in (CRACK, BRANCH_A, BRANCH_B):
-        svg.append(f'    <path d="{path}" fill="none" stroke="{SOUL}" '
+        svg.append(f'    <path d="{path}" fill="none" stroke="{INFECT}" '
                    f'stroke-width="{width}" stroke-linecap="round" '
                    f'stroke-linejoin="round" opacity="{op}" filter="url(#{flt})"/>')
 svg.append('  </g>')
 for path, w in ((CRACK, 2.8), (BRANCH_A, 1.6), (BRANCH_B, 1.6)):
-    svg.append(f'  <path d="{path}" fill="none" stroke="#DEFBFF" stroke-width="{w}" '
+    svg.append(f'  <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round" '
                f'filter="url(#glow)" class="breathe"/>')
 
-SEEP = "M 107 170 L 115 196 L 110 218"
-svg.append(f'  <path d="{SEEP}" fill="none" stroke="{INFECT}" stroke-width="7" '
-           f'stroke-linecap="round" stroke-linejoin="round" opacity=".5" '
-           f'filter="url(#glowMed)" class="breathe" '
-           f'style="animation-delay:-3.2s"/>')
-svg.append(f'  <path d="{SEEP}" fill="none" stroke="#FFCE77" stroke-width="2.2" '
-           f'stroke-linecap="round" stroke-linejoin="round" '
-           f'filter="url(#glow)" class="breathe" style="animation-delay:-3.2s"/>')
 svg.append('</g>')
 
 # What got out. Amber is the profile's breach colour and this is the only
@@ -98,7 +90,7 @@ for i, (lx, ly) in enumerate(LEAK):
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
-svg.append(motes(985, 110, 76, 268, n=18, seed=11))
+svg.append(motes(985, 110, 76, 268, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
 svg.append(caps(MARGIN, 158, "Muhid Qaiser", size=46, track=9, glow=True))
