@@ -7,10 +7,17 @@
 # before it, so a failed build cannot reach the remote.
 set -euo pipefail
 
+# Commit local work before merging: git refuses to merge over a dirty tree,
+# and the nightly redraw means origin has usually moved.
+git add -A
+if ! git diff --cached --quiet; then
+  git commit -q -F "${1:?usage: publish.sh <message-file>}"
+fi
+
 git fetch -q origin
 if ! git merge-base --is-ancestor origin/master HEAD; then
   echo "· merging origin/master"
-  git merge origin/master --no-edit || true          # conflicts expected in generated files
+  git merge origin/master --no-edit || true          # generated files will conflict
 fi
 
 echo "· rebuilding"
@@ -28,10 +35,8 @@ print(f"  stats.json parses; profile.svg valid, {len(svg)/1024:.0f} KB")
 PY
 
 git add -A
-if git diff --cached --quiet; then
-  echo "· nothing to commit"
-else
-  git commit -q -F "${1:?usage: publish.sh <message-file>}"
+if ! git diff --cached --quiet; then
+  git commit -q --no-edit 2>/dev/null || git commit -q -m "Rebuild"
 fi
 git push -q origin master
 echo "· pushed $(git rev-parse --short HEAD)"
