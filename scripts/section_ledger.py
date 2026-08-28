@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 700
+W, H = 1200, 800
 DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -155,38 +155,28 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
 
 
 def spider(cx, cy, s=1.0):
-    """A Weaver, after the Deepnest sprites: a big round dark abdomen with a
-    seam of light down it, a pale mask beneath carrying the six eyes, and thin
-    legs splayed out from between the two. Drawn large enough that the mask
-    still reads at the size the web renders it."""
-    out = []
-    # Legs first, so the body sits over where they join.
-    out.append(f'<g fill="none" stroke="{BONE}" stroke-width="{1.15*s:.2f}" '
-               f'stroke-linecap="round" opacity=".8">')
-    for sx in (-1, 1):
-        for reach, drop, tip in ((13, -5, -9), (15, 2, 3), (12, 8, 14)):
-            out.append(f'<path d="M {cx + sx*2*s:.1f} {cy + 2*s:.1f} '
-                       f'Q {cx + sx*reach*s:.1f} {cy + drop*s:.1f} '
-                       f'{cx + sx*(reach-2)*s:.1f} {cy + tip*s:.1f}"/>')
+    """Hornet's mask, from her idle sprite.
+
+    Measured off it: a tall leaf roughly 81 wide by 94 high, with a V-notch
+    cut more than halfway down the top that splits it into two horns — the
+    right one markedly taller — and two small angled slits low on the face.
+    Drawn in a 60x92 box and scaled to the caller.
+    """
+    k = s * 0.42
+    tx, ty = cx - 30 * k, cy - 46 * k
+    mask = ("M 26 91 C 9 77, 1 52, 6 32 L 16 13 "
+            "C 20 30, 25 41, 30 48 C 35 30, 43 12, 52 0 "
+            "C 53 29, 46 62, 26 91 Z")
+    out = [f'<g transform="translate({tx:.1f},{ty:.1f}) scale({k:.3f})">',
+           f'  <path d="{mask}" fill="{SOUL}" opacity=".35" '
+           f'filter="url(#glowMed)"/>',
+           f'  <path d="{mask}" fill="{LUMEN}"/>',
+           f'  <path d="{mask}" fill="none" stroke="#0A0D14" '
+           f'stroke-width="2.4" opacity=".55"/>']
+    for ex, ey, rot in ((18.5, 66, -24), (31.5, 62, -30)):
+        out.append(f'  <ellipse cx="{ex}" cy="{ey}" rx="3.3" ry="6.4" '
+                   f'fill="#0A0D14" transform="rotate({rot} {ex} {ey})"/>')
     out.append('</g>')
-    # Abdomen.
-    out.append(f'<circle cx="{cx:.1f}" cy="{cy - 5*s:.1f}" r="{8.5*s:.1f}" '
-               f'fill="#080B12" stroke="{BONE}" stroke-width="{0.9*s:.2f}" '
-               f'stroke-opacity=".5"/>')
-    out.append(f'<path d="M {cx - 3.5*s:.1f} {cy - 12.5*s:.1f} '
-               f'Q {cx + 1.5*s:.1f} {cy - 5*s:.1f} {cx - 2*s:.1f} {cy + 2*s:.1f}" '
-               f'fill="none" stroke="{BONE}" stroke-width="{0.8*s:.2f}" '
-               f'opacity=".38"/>')
-    # Mask, with the Weavers' six eyes.
-    out.append(f'<path d="M {cx - 4.6*s:.1f} {cy + 3*s:.1f} '
-               f'Q {cx:.1f} {cy + 1*s:.1f} {cx + 4.6*s:.1f} {cy + 3*s:.1f} '
-               f'Q {cx + 3.4*s:.1f} {cy + 11*s:.1f} {cx:.1f} {cy + 12.4*s:.1f} '
-               f'Q {cx - 3.4*s:.1f} {cy + 11*s:.1f} {cx - 4.6*s:.1f} {cy + 3*s:.1f} Z" '
-               f'fill="{LUMEN}" opacity=".92"/>')
-    for sx in (-1, 1):
-        for dx, dy in ((1.1, 5.4), (2.6, 6.2), (1.8, 8.4)):
-            out.append(f'<ellipse cx="{cx + sx*dx*s:.1f}" cy="{cy + dy*s:.1f}" '
-                       f'rx="{0.62*s:.2f}" ry="{1.05*s:.2f}" fill="#0A0D14"/>')
     return "".join(out)
 
 
@@ -235,7 +225,7 @@ def web(cx, cy, R):
         out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.2" fill="{SOUL}" '
                    f'filter="url(#bloomSoft)"/>')
 
-    out.append(spider(cx, cy, 1.45))
+    out.append(spider(cx, cy, 1.5))
 
     for a, (name, value) in zip(ang, METRICS):
         # One order everywhere: name above, figure below. Straight up that
@@ -264,25 +254,25 @@ for i, (value, label) in enumerate(COUNTS):
                    f'stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, and one smaller vessel per year ───────────────────────────
-svg.append(vessel(168, 350, 68, 1.0, 0, drain=True))
-svg.append(numeral(168, 464, commas(stats["commits"]), size=44, anchor="middle"))
-svg.append(caps(168, 490, "commits gathered", size=16, track=2.1, fill=ASH,
+svg.append(vessel(168, 372, 68, 1.0, 0, drain=True))
+svg.append(numeral(168, 490, commas(stats["commits"]), size=44, anchor="middle"))
+svg.append(caps(168, 516, "commits gathered", size=16, track=2.1, fill=ASH,
                 anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 300 + i * 52
+    cy = 320 + i * 56
     svg.append(vessel(290, cy, 18, n / best, 10 + i, eyes=False))
     svg.append(caps(322, cy - 4, year, size=16, track=1.7, opacity=.95))
     svg.append(prose(322, cy + 17, f"{n} commits", size=17, opacity=.9))
 
 # ── The web ───────────────────────────────────────────────────────────────
-svg.append(web(856, 352, 122))
+svg.append(web(856, 382, 126))
 
 # ── Commits by hour ───────────────────────────────────────────────────────
-BASE, TALL, X0, SPAN = 618, 56, 72, 1056
+BASE, TALL, X0, SPAN = 706, 60, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 552, "Every commit, by hour", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 552, f"busiest at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 636, "Every commit, by hour", size=17, track=2.3, fill=ASH))
+svg.append(caps(1128, 636, f"busiest at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
@@ -305,4 +295,4 @@ for h in (0, 6, 12, 18):
     svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 19, f"{h:02d}", size=17,
                      anchor="middle", opacity=.75))
 
-svg.append(motes(90, 150, 1030, 380, n=16, seed=17))
+svg.append(motes(90, 150, 1030, 460, n=18, seed=17))

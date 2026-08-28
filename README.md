@@ -1,5 +1,1 @@
 <img src="./assets/profile.svg" width="100%" alt="Muhid Qaiser — AI Security Engineer. I red-team large language models and the agents built on them. Before this, computer vision, where adversarial examples were first found; the method did not change when the input became language. The Map draws every public repository as Hallownest: Foundations stands where Dirtmouth does, Computer Vision takes Greenpath's place, Machine Learning holds the Fungal Wastes, Generative AI is the City of Tears, Agentic AI sits at Crystal Peak, and Parallel Compute holds Kingdom's Edge. At the bottom, where the Abyss is, an unmapped area labelled AI Security, because that work is private. The Ledger counts repositories, commits, architectures rebuilt from scratch, regions mapped and years on record, and plots every commit by hour of the day." />
-
-<p align="center">
-  <sub>The map and the ledger redraw themselves nightly from the GitHub API. Nothing here is a badge service.</sub>
-</p>
