@@ -1,191 +1,222 @@
 #!/usr/bin/env python3
 """assets/map.svg — every public repository, drawn as Hallownest.
 
-Cornifer draws rooms as rough boxes joined by corridors, tints each area its
-own colour, and leaves unvisited ground blank. The layout here follows the
-real geography: Foundations sits where Dirtmouth and the Forgotten Crossroads
-do, because that is where everyone starts; Computer Vision takes Greenpath's
-place in the west; Generative AI takes the City of Tears; and AI Security is
-the Abyss at the bottom — the deepest part of the kingdom, and the one the map
-refuses to draw, because that work is private.
+Modelled on the in-game world map rather than on a chart. Each area is one
+continuous rectilinear silhouette with a stepped edge, filled near-black,
+outlined in its own glowing colour, and captioned inside itself — Greenpath
+green, the City of Tears blue, Crystal Peak pink. The areas interlock.
+
+The layout keeps the real geography, so the substitutions carry meaning:
+Foundations sits where Dirtmouth and the Forgotten Crossroads do, because that
+is where everyone starts. Computer Vision takes Greenpath's place in the west.
+Generative AI is the City of Tears. AI Security is the Abyss at the bottom of
+the kingdom — the deepest ground, and the only area the map leaves unlit,
+because that work is private.
 """
-import json, math, random, sys
+import json, random, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "map.svg"
-W, H = 1200, 880
+W, H = 1200, 820
 
-# name: (x0, y0, x1, y1, tint, label side, the Hallownest area it stands in for)
+# Every outline is orthogonal — Hallownest's areas step, they never slope.
 AREAS = {
-    "FOUNDATIONS":      (372, 170, 640, 274, "#4A4034", "above", "Dirtmouth"),
-    "COMPUTER VISION":  ( 88, 300, 400, 566, "#2F5C3A", "above", "Greenpath"),
-    "MACHINE LEARNING": (420, 332, 662, 488, "#6A5326", "below", "Fungal Wastes"),
-    "GENERATIVE AI":    (700, 252, 884, 514, "#28466B", "below", "City of Tears"),
-    "AGENTIC AI":       (912, 198, 1112, 342, "#5A2D4A", "above", "Crystal Peak"),
-    "PARALLEL COMPUTE": (944, 394, 1104, 476, "#3A4250", "below", "Kingdom's Edge"),
+    # Dirtmouth and the Crossroads: wide, shallow, with a bay along the bottom
+    # that Machine Learning fills from below.
+    "FOUNDATIONS": {
+        "poly": [(340, 196), (380, 196), (380, 168), (520, 168), (520, 160),
+                 (600, 160), (600, 188), (660, 188), (660, 168), (700, 168),
+                 (700, 240), (672, 240), (672, 268), (700, 268), (700, 300),
+                 (560, 300), (560, 272), (460, 272), (460, 300), (400, 300),
+                 (400, 268), (340, 268)],
+        "colour": "#C6C9D6", "label": (520, 224), "lines": ["Foundations"],
+    },
+    # Greenpath: the widest ground on the map, stepping down to the south-west.
+    "COMPUTER VISION": {
+        "poly": [(60, 268), (140, 268), (140, 240), (340, 240), (340, 268),
+                 (400, 268), (400, 320), (372, 320), (372, 368), (400, 368),
+                 (400, 440), (348, 440), (348, 412), (300, 412), (300, 468),
+                 (332, 468), (332, 532), (240, 532), (240, 560), (160, 560),
+                 (160, 516), (96, 516), (96, 468), (60, 468)],
+        "colour": "#86D96F", "label": (214, 330), "lines": ["Computer", "Vision"],
+    },
+    # Fungal Wastes: rises into Foundations' bay, drops toward the Abyss.
+    "MACHINE LEARNING": {
+        "poly": [(400, 300), (460, 300), (460, 272), (560, 272), (560, 300),
+                 (700, 300), (700, 348), (672, 348), (672, 396), (700, 396),
+                 (700, 460), (660, 460), (660, 512), (692, 512), (692, 568),
+                 (600, 568), (600, 600), (500, 600), (500, 556), (452, 556),
+                 (452, 508), (420, 508), (420, 440), (400, 440)],
+        "colour": "#C9C271", "label": (548, 416), "lines": ["Machine", "Learning"],
+    },
+    # The City of Tears: the tall capital, notched along its eastern wall.
+    "GENERATIVE AI": {
+        "poly": [(720, 300), (1010, 300), (1010, 360), (980, 360), (980, 412), (1010, 412),
+                 (1010, 500), (968, 500), (968, 544), (1010, 544), (1010, 580),
+                 (880, 580), (880, 548), (800, 548), (800, 580), (720, 580),
+                 (720, 520), (748, 520), (748, 468), (720, 468)],
+        "colour": "#74ADEC", "label": (856, 398), "lines": ["Generative", "AI"],
+    },
+    # Crystal Peak: high in the east, its floor toothed where it meets the City.
+    "AGENTIC AI": {
+        "poly": [(750, 190), (790, 190), (790, 158), (920, 158), (920, 182),
+                 (975, 182), (975, 250), (940, 250), (940, 288), (858, 288),
+                 (858, 258), (806, 258), (806, 288), (750, 288)],
+        "colour": "#E28FCB", "label": (866, 200), "lines": ["Agentic", "AI"],
+    },
+    # Kingdom's Edge: narrow, far out, barely joined to anything.
+    "PARALLEL COMPUTE": {
+        "poly": [(1030, 340), (1070, 340), (1070, 312), (1150, 312),
+                 (1150, 420), (1122, 420), (1122, 460), (1150, 460),
+                 (1150, 520), (1080, 520), (1080, 488), (1030, 488)],
+        "colour": "#AFBCCC", "label": (1090, 360), "lines": ["Parallel", "Compute"],
+        "size": 13,
+    },
 }
-ROUTES = [("FOUNDATIONS", "COMPUTER VISION"), ("FOUNDATIONS", "MACHINE LEARNING"),
-          ("FOUNDATIONS", "AGENTIC AI"), ("COMPUTER VISION", "MACHINE LEARNING"),
-          ("MACHINE LEARNING", "GENERATIVE AI"), ("AGENTIC AI", "GENERATIVE AI"),
-          ("GENERATIVE AI", "PARALLEL COMPUTE")]
 
-# The Abyss. Nothing is drawn inside it.
-ABYSS = (430, 606, 800, 764)
+# The Abyss, drawn but never lit.
+ABYSS = {
+    "poly": [(380, 640), (470, 640), (470, 620), (560, 620), (560, 600),
+             (700, 600), (700, 620), (900, 620), (900, 680), (860, 680),
+             (860, 720), (900, 720), (900, 752), (700, 752), (700, 724),
+             (600, 724), (600, 752), (440, 752), (440, 712), (380, 712)],
+    "label": (650, 664),
+}
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
 rng = random.Random(20260827)   # fixed, so the file changes only when data does
 
 
-def pack(x0, y0, x1, y1, repos):
-    """Carve the area into irregular cells, then set a room inside each.
-
-    Recursive subdivision is what gives a metroidvania map its look: rooms
-    tile the space but no two are the same size, and nothing lines up into a
-    grid. Bigger repositories are handed the bigger cells.
-    """
-    n = len(repos)
-    cells = [(x0, y0, x1, y1)]
-    while len(cells) < n:
-        cells.sort(key=lambda c: -((c[2] - c[0]) * (c[3] - c[1])))
-        cx0, cy0, cx1, cy1 = cells.pop(0)
-        w, h = cx1 - cx0, cy1 - cy0
-        if w > h * 1.15:
-            sx = cx0 + w * rng.uniform(0.33, 0.67)
-            cells += [(cx0, cy0, sx, cy1), (sx, cy0, cx1, cy1)]
-        else:
-            sy = cy0 + h * rng.uniform(0.33, 0.67)
-            cells += [(cx0, cy0, cx1, sy), (cx0, sy, cx1, cy1)]
-
-    cells.sort(key=lambda c: -((c[2] - c[0]) * (c[3] - c[1])))
-    ranked = sorted(repos, key=lambda r: -r["commits"])
-    rooms = []
-    for cell, repo in zip(cells, ranked):
-        cx0, cy0, cx1, cy1 = cell
-        w, h = cx1 - cx0, cy1 - cy0
-        padx = w * rng.uniform(0.20, 0.36)
-        pady = h * rng.uniform(0.22, 0.40)
-        rooms.append((cx0 + padx / 2, cy0 + pady / 2, w - padx, h - pady, repo))
-    return rooms
+def path_of(poly):
+    first, *rest = poly
+    return (f"M {first[0]} {first[1]} "
+            + " ".join(f"L {x} {y}" for x, y in rest) + " Z")
 
 
-def span(pts):
-    """Minimum spanning tree — a corridor only where it shortens the walk."""
-    if len(pts) < 2:
-        return []
-    inside, outside, edges = {0}, set(range(1, len(pts))), []
-    while outside:
-        i, j = min(((i, j) for i in inside for j in outside),
-                   key=lambda e: (pts[e[0]][0] - pts[e[1]][0]) ** 2
-                                 + (pts[e[0]][1] - pts[e[1]][1]) ** 2)
-        edges.append((i, j))
-        inside.add(j)
-        outside.discard(j)
-    return edges
+def inside(px, py, poly):
+    """Ray casting, so interior marks land inside the silhouette."""
+    hit = False
+    for i in range(len(poly)):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % len(poly)]
+        if (y1 > py) != (y2 > py) and px < x1 + (py - y1) / (y2 - y1) * (x2 - x1):
+            hit = not hit
+    return hit
 
 
-def ortho(a, b):
-    """Corridors in Hallownest turn square corners, never diagonals."""
-    (x1, y1), (x2, y2) = a, b
-    if rng.random() < 0.5:
-        return f"M {x1:.1f} {y1:.1f} L {x2:.1f} {y1:.1f} L {x2:.1f} {y2:.1f}"
-    return f"M {x1:.1f} {y1:.1f} L {x1:.1f} {y2:.1f} L {x2:.1f} {y2:.1f}"
+def bounds(poly):
+    xs, ys = [p[0] for p in poly], [p[1] for p in poly]
+    return min(xs), min(ys), max(xs), max(ys)
 
 
-svg = [head(W, H)]
-svg.append(section("The Map", "Ninety-two public repositories, drawn as ground "
-                                    "that was walked. Room size is commits."))
+def rooms_in(poly, n, keep_clear):
+    """One small mark per repository, the way the Forgotten Crossroads shows
+    its mapped rooms. Rejection-sampled, and kept off the caption."""
+    x0, y0, x1, y1 = bounds(poly)
+    cx, cy, cw, ch = keep_clear
+    out = []
+    for _ in range(n * 900):
+        if len(out) == n:
+            break
+        w, h = rng.uniform(9, 20), rng.uniform(7, 13)
+        px, py = rng.uniform(x0 + 8, x1 - 8 - w), rng.uniform(y0 + 8, y1 - 8 - h)
+        # Every corner must sit inside, or the mark straddles a wall.
+        if not all(inside(px + dx, py + dy, poly)
+                   for dx in (-3, w + 3) for dy in (-3, h + 3)):
+            continue
+        if abs(px + w / 2 - cx) < cw / 2 + w and abs(py + h / 2 - cy) < ch / 2 + h:
+            continue
+        if any(abs(px - ox) < ow + 7 and abs(py - oy) < oh + 7
+               for ox, oy, ow, oh in out):
+            continue
+        out.append((px, py, w, h))
+    return out
+
 
 by_area = {}
 for repo in stats["repo_list"]:
     by_area.setdefault(repo["region"], []).append(repo)
 
-# Each area's colour wash, laid down before anything is drawn on top of it.
-for name, (x0, y0, x1, y1, tint, _, _) in AREAS.items():
-    svg.append(f'<ellipse cx="{(x0+x1)/2}" cy="{(y0+y1)/2}" '
-               f'rx="{(x1-x0)/2 + 54}" ry="{(y1-y0)/2 + 46}" fill="{tint}" '
-               f'opacity=".3" filter="url(#glowWide)"/>')
+grain = """
+  <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="9"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>"""
+clips = "".join(
+    f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
+    for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
 
-placed = {}
-for name, (x0, y0, x1, y1, *_rest) in AREAS.items():
-    repos = sorted(by_area.get(name, []), key=lambda r: -r["commits"])
-    placed[name] = pack(x0, y0, x1, y1, repos)
+svg = [head(W, H, extra_defs=grain + clips, lantern=False)]
+svg.append(section("The Map", "Ninety-two public repositories, drawn as "
+                              "Hallownest. Every room is one repository."))
 
+for i, (name, area) in enumerate(AREAS.items()):
+    poly, colour = area["poly"], area["colour"]
+    d = path_of(poly)
+    x0, y0, x1, y1 = bounds(poly)
+    repos = by_area.get(name, [])
 
-def centre(room):
-    x, y, w, h, _ = room
-    return (x + w / 2, y + h / 2)
+    svg.append(f'<path d="{d}" fill="#0B1019"/>')
+    svg.append(f'<g clip-path="url(#clip{i})"><rect x="{x0}" y="{y0}" '
+               f'width="{x1-x0}" height="{y1-y0}" filter="url(#grain)" '
+               f'opacity=".16"/></g>')
+    # A breath of the area's own colour, pooling inside its walls.
+    svg.append(f'<g clip-path="url(#clip{i})"><path d="{d}" fill="{colour}" '
+               f'opacity=".08" filter="url(#glowWide)"/></g>')
 
-
-# Corridors first, so the rooms sit on top and hide the joins.
-svg.append(f'<g filter="url(#ink)" fill="none" stroke="{BONE}" opacity=".4" '
-           f'stroke-width="1.4" stroke-linecap="square">')
-for rooms in placed.values():
-    pts = [centre(r) for r in rooms]
-    for i, j in span(pts):
-        svg.append(f'  <path d="{ortho(pts[i], pts[j])}"/>')
-svg.append('</g>')
-
-# The long passages between areas.
-svg.append(f'<g filter="url(#ink)" fill="none" stroke="{BONE}" opacity=".32" '
-           f'stroke-width="1.6" stroke-linecap="square" stroke-dasharray="8 7">')
-for a, b in ROUTES:
-    pair = min(((centre(ra), centre(rb)) for ra in placed[a] for rb in placed[b]),
-               key=lambda e: (e[0][0] - e[1][0]) ** 2 + (e[0][1] - e[1][1]) ** 2)
-    svg.append(f'  <path d="{ortho(*pair)}"/>')
-# Two roads run down into the Abyss and stop being drawn.
-ax0, ay0, ax1, ay1 = ABYSS
-for area, target in (("GENERATIVE AI", (ax1 - 40, ay0 - 6)),
-                     ("COMPUTER VISION", (ax0 + 40, ay0 - 6))):
-    low = max((centre(r) for r in placed[area]), key=lambda p: p[1])
-    svg.append(f'  <path d="{ortho(low, target)}" opacity=".62"/>')
-svg.append('</g>')
-
-# Rooms.
-for name, rooms in placed.items():
-    svg.append('<g filter="url(#bloomSoft)">')
-    for x, y, w, h, repo in rooms:
-        svg.append(f'  <rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" '
-                   f'height="{h:.1f}" rx="2.5" fill="#141C2E" fill-opacity=".95" '
-                   f'stroke="{BONE}" stroke-width="1.3" stroke-opacity=".6"/>')
-        if repo["stars"]:                  # somebody else found this one
-            cx, cy = x + w / 2, y + h / 2
-            svg.append(f'  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="3.6" '
-                       f'fill="{SOUL}" filter="url(#glowMed)"/>')
+    lines, (lx, ly) = area["lines"], area["label"]
+    size = area.get("size", 17)
+    clear = (lx, ly + (len(lines) - 1) * 13, 200, 40 + (len(lines) - 1) * 26)
+    svg.append(f'<g clip-path="url(#clip{i})" filter="url(#ink)">')
+    for px, py, w, h in rooms_in(poly, len(repos), clear):
+        svg.append(f'  <rect x="{px:.1f}" y="{py:.1f}" width="{w:.1f}" '
+                   f'height="{h:.1f}" fill="none" stroke="{colour}" '
+                   f'stroke-width="1" opacity=".28"/>')
     svg.append('</g>')
 
-# ── The Abyss ─────────────────────────────────────────────────────────────
-svg.append(f'<rect x="{ax0}" y="{ay0}" width="{ax1-ax0}" height="{ay1-ay0}" '
-           f'rx="14" fill="#03060B"/>')
-svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-20}" rx="150" ry="54" '
-           f'fill="{SOUL}" opacity=".09" filter="url(#glowWide)"/>')
-svg.append(f'<rect x="{ax0}" y="{ay0}" width="{ax1-ax0}" height="{ay1-ay0}" '
-           f'rx="14" fill="none" stroke="{SOUL}" stroke-width="1.5" '
-           f'opacity=".4" stroke-dasharray="4 10" stroke-linecap="round" '
-           f'filter="url(#ink)"/>')
-svg.append(motes(ax0 + 24, ay0 + 20, ax1 - ax0 - 48, ay1 - ay0 - 40, n=18, seed=31))
-svg.append(caps((ax0 + ax1) / 2, ay0 + 74, "AI Security", size=15, track=5,
-                fill=SOUL, anchor="middle", glow=True))
-svg.append(prose((ax0 + ax1) / 2, ay0 + 98, "unmapped — the work is private",
-                 size=13, anchor="middle"))
+    # The wall: a wide bloom under a crisp line, both roughened.
+    svg.append(f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="7" '
+               f'opacity=".3" filter="url(#glowMed)"/>')
+    svg.append(f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="2" '
+               f'opacity=".95" filter="url(#ink)"/>')
 
-# ── Area names ────────────────────────────────────────────────────────────
-for name, (x0, y0, x1, y1, tint, where, stand_in) in AREAS.items():
-    cx = (x0 + x1) / 2
-    ly = y0 - 34 if where == "above" else y1 + 40
-    svg.append(caps(cx, ly, name, size=14, track=4.4, anchor="middle",
-                    opacity=.92, glow=True))
-    svg.append(prose(cx, ly + 19, f"{len(by_area.get(name, []))} rooms", size=12,
-                     anchor="middle", opacity=.78))
+    for j, line in enumerate(lines):
+        svg.append(caps(lx, ly + j * 26, line, size=size, track=2.4,
+                        anchor="middle", glow=True))
+    svg.append(prose(lx, ly + len(lines) * 26 - 6, f"{len(repos)} repositories",
+                     size=12.5, anchor="middle", opacity=.72))
+
+# ── The Abyss ─────────────────────────────────────────────────────────────
+d = path_of(ABYSS["poly"])
+ax0, ay0, ax1, ay1 = bounds(ABYSS["poly"])
+svg.append(f'<path d="{d}" fill="#03060B"/>')
+svg.append(f'<g clip-path="url(#clip{len(AREAS)})"><rect x="{ax0}" y="{ay0}" '
+           f'width="{ax1-ax0}" height="{ay1-ay0}" filter="url(#grain)" '
+           f'opacity=".1"/></g>')
+svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="170" ry="56" '
+           f'fill="{SOUL}" opacity=".08" filter="url(#glowWide)"/>')
+svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="6" '
+           f'opacity=".16" filter="url(#glowMed)"/>')
+svg.append(f'<path d="{d}" fill="none" stroke="{SOUL}" stroke-width="1.7" '
+           f'opacity=".5" stroke-dasharray="5 9" filter="url(#ink)"/>')
+svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=16, seed=31))
+lx, ly = ABYSS["label"]
+svg.append(caps(lx, ly, "AI Security", size=17, track=2.4, fill=SOUL,
+                anchor="middle", glow=True))
+svg.append(prose(lx, ly + 24, "unmapped — the work is private", size=12.5,
+                 anchor="middle", opacity=.8))
 
 svg.append(footnote("Areas are inferred from repository names and descriptions, "
-                    "and laid out after Hallownest — Foundations where Dirtmouth "
+                    "and placed after Hallownest — Foundations where Dirtmouth "
                     "stands, Computer Vision in Greenpath's place, AI Security "
-                    "in the Abyss.", 836))
+                    "in the Abyss.", 792))
 svg.append(vignette(W, H))
 svg.append(tail())
 
 OUT.write_text("\n".join(svg), encoding="utf-8")
-print(f"wrote {OUT} ({W}x{H})  {sum(len(v) for v in placed.values())} rooms")
+print(f"wrote {OUT} ({W}x{H})  "
+      f"{sum(len(v) for v in by_area.values())} repositories, "
+      f"{len(AREAS)} areas")
