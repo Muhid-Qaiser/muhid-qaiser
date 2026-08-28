@@ -20,6 +20,15 @@ if ! git merge-base --is-ancestor origin/master HEAD; then
   git merge origin/master --no-edit || true          # generated files will conflict
 fi
 
+# Both sides of a data/stats.json conflict are machine-written from the same
+# walk, so there is nothing to hand-merge: take ours, which was just fetched,
+# and let the reconcile below restore anything the other side had higher.
+if git ls-files -u --error-unmatch data/stats.json >/dev/null 2>&1; then
+  echo "· resolving data/stats.json (ours)"
+  git checkout --ours -- data/stats.json
+  git add data/stats.json
+fi
+
 echo "· reconciling monotonic counts"
 python - <<'PY'
 import json, subprocess, pathlib
