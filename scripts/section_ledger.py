@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 880
+W, H = 1200, 960
 DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -56,6 +56,7 @@ ORB_MASK = (
 COUNTS = [(v, k) for v, k in (
     (stats["repos"],              "Repositories"),
     (stats["pull_requests"],      "Pull requests"),
+    (stats["streak_best"],        "Longest streak"),
     (stats["contributions_year"], "Last 12 months"),
 ) if v > 0]
 
@@ -243,33 +244,33 @@ svg.append(section("The Ledger"))
 
 # ── Three figures across the top, centred ─────────────────────────────────
 for i, (value, label) in enumerate(COUNTS):
-    x = 300 + i * 300
-    svg.append(numeral(x, 186, commas(value), size=58, anchor="middle"))
-    svg.append(caps(x, 216, label, size=17, track=2.1, fill=ASH, anchor="middle"))
-for x in (450, 750):
-    svg.append(f'<path d="M {x} 146 L {x} 200" stroke="{BONE}" stroke-width="1" '
+    x = 210 + i * 260
+    svg.append(numeral(x, 190, commas(value), size=58, anchor="middle"))
+    svg.append(caps(x, 220, label, size=17, track=2.1, fill=ASH, anchor="middle"))
+for x in (340, 600, 860):
+    svg.append(f'<path d="M {x} 150 L {x} 204" stroke="{BONE}" stroke-width="1" '
                f'opacity=".13"/>')
 
 # ── The vessel, left ──────────────────────────────────────────────────────
-svg.append(vessel(272, 470, 68, 1.0, 0, drain=True))
-svg.append(numeral(272, 596, commas(stats["commits"]), size=44, anchor="middle"))
-svg.append(caps(272, 624, "commits gathered", size=16, track=2.1, fill=ASH,
+svg.append(vessel(272, 500, 68, 1.0, 0, drain=True))
+svg.append(numeral(272, 630, commas(stats["commits"]), size=44, anchor="middle"))
+svg.append(caps(272, 658, "commits gathered", size=16, track=2.1, fill=ASH,
                 anchor="middle"))
 
 for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 420 + i * 54
+    cy = 450 + i * 54
     svg.append(vessel(404, cy, 19, n / best, 10 + i, eyes=False))
     svg.append(caps(436, cy - 4, year, size=16, track=1.7, opacity=.95))
     svg.append(prose(436, cy + 17, f"{n} commits", size=17, opacity=.9))
 
 # ── The web, right ────────────────────────────────────────────────────────
-svg.append(web(884, 470, 130))
+svg.append(web(884, 500, 130))
 
 # ── Commits by hour, across the foot ──────────────────────────────────────
-BASE, TALL, X0, SPAN = 782, 62, 72, 1056
+BASE, TALL, X0, SPAN = 862, 62, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 712, "Every commit, by hour", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 712, f"busiest at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 790, "Every commit, by hour", size=17, track=2.3, fill=ASH))
+svg.append(caps(1128, 790, f"busiest at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
@@ -292,4 +293,4 @@ for h in (0, 6, 12, 18):
     svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 22, f"{h:02d}", size=17,
                      anchor="middle", opacity=.75))
 
-svg.append(motes(90, 150, 1030, 540, n=20, seed=17))
+svg.append(motes(90, 150, 1030, 620, n=22, seed=17))

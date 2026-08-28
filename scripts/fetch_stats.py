@@ -149,6 +149,7 @@ for repo in nodes:
 print(f"· commits        walking {len(nodes)} repositories")
 hours = [0] * 24
 years = Counter()
+commit_days = set()
 repos, total_commits = [], 0
 
 for i, repo in enumerate(nodes, 1):
@@ -166,6 +167,7 @@ for i, repo in enumerate(nodes, 1):
             hour = (hour + TZ_FALLBACK) % 24
         hours[hour] += 1
         years[date[:4]] += 1
+        commit_days.add(date[:10])
 
     total_commits += mine
     repos.append({
@@ -187,20 +189,33 @@ days = [(d["date"], d["contributionCount"])
         for w in calendar["weeks"] for d in w["contributionDays"]]
 days.sort()
 
-# Today may not be over yet, so an empty final day does not break a streak.
-tail = days[:-1] if days and days[-1][1] == 0 else days
-streak_current = 0
-for _, count in reversed(tail):
-    if not count:
-        break
-    streak_current += 1
-
+# Streaks are counted on the days this account actually committed, not on
+# GitHub's contribution calendar — the calendar counts a narrower set of
+# events and reports 2 where the commits themselves say otherwise.
+from datetime import date as _date, timedelta as _td
+days_sorted = sorted(commit_days)
 streak_best = run = 0
-for _, count in days:
-    run = run + 1 if count else 0
+prev = None
+for ds in days_sorted:
+    d = _date.fromisoformat(ds)
+    run = run + 1 if prev and (d - prev).days == 1 else 1
     streak_best = max(streak_best, run)
+    prev = d
 
-active_days = sum(1 for _, c in days if c)
+streak_current = 0
+if days_sorted:
+    cur = _date.fromisoformat(days_sorted[-1])
+    # A gap of one day is still live: today may simply not be over.
+    if (_date.today() - cur).days <= 1:
+        streak_current, walk = 1, cur
+        for ds in reversed(days_sorted[:-1]):
+            d = _date.fromisoformat(ds)
+            if (walk - d).days != 1:
+                break
+            streak_current += 1
+            walk = d
+
+active_days = len(commit_days)
 busiest = max(days, key=lambda d: d[1]) if days else ("", 0)
 busiest = {"date": busiest[0], "count": busiest[1]}
 
@@ -217,7 +232,7 @@ stats = {
     "streak_current": streak_current,
     "streak_best": streak_best,
     "active_days": active_days,
-    "calendar_days": len(days),
+    "commit_days": len(commit_days),
     "busiest_day": busiest,
     "pull_requests": search_count(f"type:pr author:{LOGIN}"),
     "pull_requests_merged": search_count(f"type:pr author:{LOGIN} is:merged"),
