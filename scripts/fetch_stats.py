@@ -62,6 +62,18 @@ def rest(path, tries=6):
     return []
 
 
+def search_count(query):
+    """Total matches for a search. Search reads public data, so this works
+    with the workflow's repo-scoped token, where user.pullRequests does not."""
+    import urllib.parse
+    try:
+        body = rest(f"/search/issues?q={urllib.parse.quote(query)}&per_page=1")
+        return body.get("total_count", 0) if isinstance(body, dict) else 0
+    except Exception as exc:
+        print(f"  ! search '{query}' failed: {exc}")
+        return 0
+
+
 def graphql(query, **variables):
     payload = json.dumps({"query": query, "variables": variables}).encode()
     req = urllib.request.Request("https://api.github.com/graphql", data=payload,
@@ -86,8 +98,6 @@ query($login:String!) {
     followers { totalCount }
     following { totalCount }
     starredRepositories { totalCount }
-    pullRequests { totalCount }
-    issues { totalCount }
     repositoriesContributedTo(
       contributionTypes:[COMMIT,ISSUE,PULL_REQUEST,REPOSITORY]) { totalCount }
     repositories(ownerAffiliations:OWNER, privacy:PUBLIC) { totalCount }
@@ -209,8 +219,9 @@ stats = {
     "active_days": active_days,
     "calendar_days": len(days),
     "busiest_day": busiest,
-    "pull_requests": (user.get("pullRequests") or {}).get("totalCount", 0),
-    "issues": (user.get("issues") or {}).get("totalCount", 0),
+    "pull_requests": search_count(f"type:pr author:{LOGIN}"),
+    "pull_requests_merged": search_count(f"type:pr author:{LOGIN} is:merged"),
+    "issues": search_count(f"type:issue author:{LOGIN}"),
     "starred": (user.get("starredRepositories") or {}).get("totalCount", 0),
     "following": (user.get("following") or {}).get("totalCount", 0),
     "contributed_to": (user.get("repositoriesContributedTo") or {}).get("totalCount", 0),

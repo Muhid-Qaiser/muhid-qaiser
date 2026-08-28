@@ -72,6 +72,9 @@ METRICS = [
 # These span 241 down to 6. On one linear radius everything but commits
 # collapses to a sliver, so the reach is logarithmic and every spoke prints
 # its exact figure — the shape indexes, the numbers tell the truth.
+# A spoke that could not be fetched drops out rather than plotting zero — a
+# zero here is a statement about the account, not about the fetch.
+METRICS = [(n, v) for n, v in METRICS if v > 0]
 _TOP = math.log(1 + max(v for _, v in METRICS))
 reach = lambda v: math.log(1 + v) / _TOP
 
@@ -222,10 +225,19 @@ def web(cx, cy, R):
         lx, ly = pt(a, R + 34)
         cosa = math.cos(a)
         anchor = "middle" if abs(cosa) < 0.3 else ("start" if cosa > 0 else "end")
-        out.append(caps(lx, ly, name, size=16, track=1.3, anchor=anchor,
-                        opacity=.85))
-        out.append(numeral(lx, ly + 30, commas(value), size=30, anchor=anchor,
-                           glow=False))
+        # Below the centre the figure hangs under its name, away from the
+        # web. Straight up it cannot: dropping it 30px puts it back on the
+        # chart's top vertex, so up there the order flips.
+        if math.sin(a) < -0.5:
+            out.append(numeral(lx, ly - 6, commas(value), size=30,
+                               anchor=anchor, glow=False))
+            out.append(caps(lx, ly + 20, name, size=16, track=1.3,
+                            anchor=anchor, opacity=.85))
+        else:
+            out.append(caps(lx, ly, name, size=16, track=1.3, anchor=anchor,
+                            opacity=.85))
+            out.append(numeral(lx, ly + 30, commas(value), size=30,
+                               anchor=anchor, glow=False))
     return "".join(out)
 
 
