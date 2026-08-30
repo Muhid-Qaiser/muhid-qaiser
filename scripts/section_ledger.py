@@ -284,9 +284,9 @@ for h, count in enumerate(hours):
     height = max(2.5, count / top * TALL)
     lit = h == peak
     if lit:
-        svg.append(f'  <rect class="breathe" x="{x:.1f}" y="{BASE-height:.1f}" '
+        svg.append(f'  <g class="breathe"><rect x="{x:.1f}" y="{BASE-height:.1f}" '
                    f'width="{SLOT*0.68:.1f}" height="{height:.1f}" fill="{SOUL}" '
-                   f'opacity=".75" filter="url(#glowMed)"/>')
+                   f'filter="url(#glowMed)"/></g>')
     svg.append(f'  <rect x="{x:.1f}" y="{BASE - height:.1f}" '
                f'width="{SLOT*0.68:.1f}" height="{height:.1f}" '
                f'fill="#FFFFFF" opacity="1"/>')

@@ -89,10 +89,19 @@ stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
 rng = random.Random(20260827)   # fixed, so the file changes only when data does
 
 
-def path_of(poly):
+def path_of(poly, rough=0.0):
+    """Emit the outline, optionally with the corners nudged.
+
+    `rough` bakes in the wobble the ink filter used to add at paint time. The
+    jitter is drawn from a fixed seed, so the file only changes when the data
+    does."""
+    if rough:
+        jr = random.Random(4242)
+        poly = [(x + jr.uniform(-rough, rough), y + jr.uniform(-rough, rough))
+                for x, y in poly]
     first, *rest = poly
-    return (f"M {first[0]} {first[1]} "
-            + " ".join(f"L {x} {y}" for x, y in rest) + " Z")
+    return (f"M {first[0]:.1f} {first[1]:.1f} "
+            + " ".join(f"L {x:.1f} {y:.1f}" for x, y in rest) + " Z")
 
 
 def inside(px, py, poly):
@@ -158,17 +167,15 @@ for i, (name, area) in enumerate(AREAS.items()):
     repos = by_area.get(name, [])
 
     svg.append(f'<path d="{d}" fill="#0B1019"/>')
-    svg.append(f'<g clip-path="url(#clip{i})"><rect x="{x0}" y="{y0}" '
-               f'width="{x1-x0}" height="{y1-y0}" filter="url(#grain)" '
-               f'opacity=".16"/></g>')
-    # A breath of the area's own colour, pooling inside its walls.
-    svg.append(f'<g clip-path="url(#clip{i})"><path d="{d}" fill="{colour}" '
-               f'opacity=".08" filter="url(#glowWide)"/></g>')
+    # A breath of the area's own colour. This used to be a blurred copy
+    # clipped to its own outline, so the blur only softened an edge that the
+    # clip then cut off — a flat tint is indistinguishable and free.
+    svg.append(f'<path d="{d}" fill="{colour}" opacity=".07"/>')
 
     lines, (lx, ly) = area["lines"], area["label"]
     size = area.get("size", 17)
     clear = (lx, ly + (len(lines) - 1) * 13, 200, 40 + (len(lines) - 1) * 26)
-    svg.append(f'<g clip-path="url(#clip{i})" filter="url(#ink)">')
+    svg.append(f'<g clip-path="url(#clip{i})">')
     for px, py, w, h in rooms_in(poly, len(repos), clear):
         svg.append(f'  <rect x="{px:.1f}" y="{py:.1f}" width="{w:.1f}" '
                    f'height="{h:.1f}" fill="none" stroke="{colour}" '
@@ -176,14 +183,16 @@ for i, (name, area) in enumerate(AREAS.items()):
     svg.append('</g>')
 
     # The wall: a wide bloom under a crisp line, both roughened.
-    svg.append(f'<path class="lit" d="{d}" fill="none" stroke="{colour}" '
-               f'stroke-width="7" filter="url(#glowMed)" opacity=".3" '
-               f'style="animation-delay:-{i * 2.3:.1f}s"/>')
-    # Each area takes the light in turn, so the kingdom is never lit all at
-    # once — the closest thing to a hover state an <img> can carry.
-    svg.append(f'<path class="lit" d="{d}" fill="none" stroke="{colour}" '
-               f'stroke-width="2" filter="url(#ink)" '
-               f'style="animation-delay:-{i * 2.3:.1f}s"/>')
+    svg.append(f'<g class="lit" style="animation-delay:-{i * 2.3:.1f}s">')
+    # No opacity here: `.lit` animates opacity, and a CSS animation overrides
+    # the presentation attribute, so the old inline .3 was never actually
+    # painted. Keeping it now would multiply against the wrapper and dim the
+    # bloom to a third of what it always looked like.
+    svg.append(f'  <path d="{d}" fill="none" stroke="{colour}" stroke-width="7" '
+               f'filter="url(#glowMedT)"/>')
+    svg.append(f'  <path d="{path_of(poly, rough=1.4)}" fill="none" '
+               f'stroke="{colour}" stroke-width="2"/>')
+    svg.append('</g>')
 
     for j, line in enumerate(lines):
         svg.append(caps(lx, ly + j * 37, line, size=size + 7, track=1.8,
@@ -192,18 +201,23 @@ for i, (name, area) in enumerate(AREAS.items()):
                      size=21 if "size" not in area else 15,
                      anchor="middle", opacity=.9))
 
+# One grain pass over the whole map rather than one per area: feTurbulence is
+# the most expensive primitive in the file and seven of them was six too many.
+svg.append('<rect x="40" y="140" width="1130" height="640" '
+           'fill="url(#grainTile)" opacity=".14"/>')
+
 # ── The Abyss ─────────────────────────────────────────────────────────────
 d = path_of(ABYSS["poly"])
 ax0, ay0, ax1, ay1 = bounds(ABYSS["poly"])
 svg.append(f'<path d="{d}" fill="#03060B"/>')
 svg.append(f'<g clip-path="url(#clip{len(AREAS)})"><rect x="{ax0}" y="{ay0}" '
-           f'width="{ax1-ax0}" height="{ay1-ay0}" filter="url(#grain)" '
+           f'width="{ax1-ax0}" height="{ay1-ay0}" fill="url(#grainTile)" '
            f'opacity=".1"/></g>')
 svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="170" ry="56" '
-           f'fill="{SOUL}" opacity=".08" filter="url(#glowWide)"/>')
+           f'fill="{SOUL}" opacity=".08" filter="url(#glowWideT)"/>')
 ABYSS_EDGE = "#3E6A7C"
 svg.append(f'<path d="{d}" fill="none" stroke="{ABYSS_EDGE}" stroke-width="2.4" '
-           f'opacity=".9" stroke-dasharray="5 9" filter="url(#ink)"/>')
+           f'opacity=".9" stroke-dasharray="5 9"/>')
 # What the Abyss actually looks like: a floor of dead vessels, so the dark
 # is full of small pale eyes looking back up out of it. Rejection-sampled so
 # no pair straddles a wall, and kept clear of the caption.
@@ -224,10 +238,10 @@ for i, (ex, ey, er) in enumerate(_eyes):
     gap, tilt = er * 2.5, _rng.uniform(-8, 8)
     svg.append(f'<g class="breathe" style="animation-delay:-{i*0.7:.1f}s" '
                f'transform="rotate({tilt:.0f} {ex:.0f} {ey:.0f})">'
-               f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er:.1f}" '
-               f'ry="{er*1.35:.1f}" fill="#DCF4F8" filter="url(#bloomSoft)"/>'
-               f'<ellipse cx="{ex+gap:.1f}" cy="{ey:.1f}" rx="{er:.1f}" '
-               f'ry="{er*1.35:.1f}" fill="#DCF4F8" filter="url(#bloomSoft)"/></g>')
+               f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
+               f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/>'
+               f'<ellipse cx="{ex+gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
+               f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/></g>')
 
 svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=31))
 lx, ly = ABYSS["label"]

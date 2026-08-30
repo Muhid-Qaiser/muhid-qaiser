@@ -38,6 +38,35 @@ SERIF = "'Palatino Linotype','Book Antiqua',Palatino,'URW Palladio L','Times New
 # it applies in that mode before committing to it. Palatino stays behind it in
 # the stack as the fallback, and keeps the body text, where it has real
 # italics and reads better small.
+# Film grain used to be an feTurbulence pass over the whole map: Perlin noise
+# evaluated per device pixel, which at a 3x raster is six million samples for
+# an effect that is 14% opaque. The same speckle tiles from a 64px image, and
+# a tiled blit is close to free.
+def _grain_tile(size=64, seed=9):
+    import base64, random, struct, zlib
+    rnd = random.Random(seed)
+    raw = bytearray()
+    for _ in range(size):
+        raw.append(0)                              # per-scanline filter: none
+        for _ in range(size):
+            # Grey and alpha both wander, matching fractalNoise's habit of
+            # varying coverage as well as brightness. Quantised to 32 levels
+            # so the IDAT still compresses.
+            g = min(255, max(0, int(rnd.gauss(128, 38)))) & 0xF8
+            a = min(255, max(0, int(rnd.gauss(128, 38)))) & 0xF8
+            raw += bytes((g, a))
+
+    def chunk(tag, data):
+        return (struct.pack(">I", len(data)) + tag + data
+                + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF))
+
+    png = (bytes((137, 80, 78, 71, 13, 10, 26, 10))   # PNG signature
+           + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 4, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(bytes(raw), 9))
+           + chunk(b"IEND", b""))
+    return base64.b64encode(png).decode()
+
+
 def _display_face():
     import base64
     woff = Path(__file__).resolve().parent / "cinzel-caps.woff2"
@@ -57,7 +86,7 @@ RULE_Y = 118         # every header rule sits at the same height
 def _defs(extra=""):
     return f"""<defs>
   <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3"
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2"
                   seed="7" result="n"/>
     <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"
                        xChannelSelector="R" yChannelSelector="G"/>
@@ -78,6 +107,19 @@ def _defs(extra=""):
     <feGaussianBlur stdDeviation="1.7" result="b"/>
     <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
+  <!-- Halos for type. The general-purpose glows carry a 380% filter region,
+       which allocates a buffer fourteen times the element's area — fine for a
+       handful of shapes, ruinous across sixty-odd lines of text. These are
+       sized to what a line of type actually needs. -->
+  <filter id="haloL" x="-12%" y="-45%" width="124%" height="190%">
+    <feGaussianBlur stdDeviation="5"/>
+  </filter>
+  <filter id="haloM" x="-10%" y="-40%" width="120%" height="180%">
+    <feGaussianBlur stdDeviation="2.8"/>
+  </filter>
+  <filter id="haloS" x="-8%" y="-35%" width="116%" height="170%">
+    <feGaussianBlur stdDeviation="1.5"/>
+  </filter>
   <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
     <feGaussianBlur stdDeviation="4" result="b"/>
     <feMerge><feMergeNode in="b"/><feMergeNode in="b"/>
@@ -89,10 +131,32 @@ def _defs(extra=""):
   <filter id="glowWide" x="-140%" y="-140%" width="380%" height="380%">
     <feGaussianBlur stdDeviation="14"/>
   </filter>
-  <filter id="grain" x="0%" y="0%" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="9"/>
-    <feColorMatrix type="saturate" values="0"/>
+  <!-- Same blurs, sized for shapes that are already big. A filter region is a
+       buffer the renderer has to allocate and clear: at 380% that is fourteen
+       times the element's own area, which a small dot needs and a map region
+       does not. A Gaussian reaches about 3 sigma, so these are cut to what the
+       blur can actually touch. -->
+  <filter id="glowMedT" x="-25%" y="-25%" width="150%" height="150%">
+    <feGaussianBlur stdDeviation="6"/>
   </filter>
+  <filter id="glowWideT" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="14"/>
+  </filter>
+  <pattern id="grainTile" width="64" height="64" patternUnits="userSpaceOnUse">
+    <image width="64" height="64" href="data:image/png;base64,{_grain_tile()}"/>
+  </pattern>
+  <!-- Soft dots as gradients rather than blurred circles: same look, no
+       per-frame filter pass. Used by every drifting particle. -->
+  <radialGradient id="sporeCool">
+    <stop offset="0%"   stop-color="{SOUL}" stop-opacity="1"/>
+    <stop offset="38%"  stop-color="{SOUL}" stop-opacity=".62"/>
+    <stop offset="100%" stop-color="{SOUL}" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="sporeWarm">
+    <stop offset="0%"   stop-color="{INFECT}" stop-opacity="1"/>
+    <stop offset="38%"  stop-color="{INFECT}" stop-opacity=".62"/>
+    <stop offset="100%" stop-color="{INFECT}" stop-opacity="0"/>
+  </radialGradient>
   <radialGradient id="lantern" cx="50%" cy="46%" r="62%">
     <stop offset="0%" stop-color="#16203A" stop-opacity=".9"/>
     <stop offset="58%" stop-color="#0B1120" stop-opacity=".5"/>
@@ -255,11 +319,11 @@ def footnote(text, y, w=1200):
 def _halo(body, txt, size, opacity=1.0):
     """The layers under a lit line of type, largest first."""
     if size >= 30:
-        stack = (("glowWide", .50), ("glowMed", .78))
+        stack = (("haloL", .55), ("haloM", .8))
     elif size >= 20:
-        stack = (("glowMed", .72),)
+        stack = (("haloM", .8),)
     else:
-        stack = (("bloomSoft", .66),)
+        stack = (("haloS", .75),)
     return "".join(
         f'<text class="d" {body} fill="{SOUL}" opacity="{op * opacity:.2f}" '
         f'filter="url(#{flt})">{txt}</text>' for flt, op in stack)
@@ -329,13 +393,13 @@ def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
         # Halo and core are both inside the clip, so they reveal together.
         f'<g clip-path="url(#tw{uid})">'
         f'<text x="{x}" y="{y}" font-size="{size}" fill="{SOUL}" opacity=".7"{style} '
-        f'filter="url(#glowMed)" textLength="{w:.1f}" lengthAdjust="spacing">'
+        f'filter="url(#haloM)" textLength="{w:.1f}" lengthAdjust="spacing">'
         f'{esc(text)}</text>'
         f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}"{style} '
         f'textLength="{w:.1f}" lengthAdjust="spacing">{esc(text)}</text></g>'
         f'<rect class="typeline caret" x="{x - 1.4:.1f}" '
         f'y="{y - size * 0.95:.1f}" width="1.9" height="{size * 1.18:.1f}" '
-        f'fill="{fill}" filter="url(#bloomSoft)" '
+        f'fill="{fill}" '
         f'style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
     )
 
@@ -357,8 +421,8 @@ def dust(w, h, n=64, seed=101):
         far = rng.uniform(220, 520)          # comfortably past a section edge
         dur = rng.uniform(34, 78)
         out.append(
-            f'<circle class="dust" cx="{cx:.0f}" cy="{cy:.0f}" r="{r:.2f}" '
-            f'fill="{SOUL}" opacity="0" filter="url(#bloomSoft)" '
+            f'<circle class="dust" cx="{cx:.0f}" cy="{cy:.0f}" r="{r*1.9:.2f}" '
+            f'fill="url(#sporeCool)" opacity="0" '
             f'style="--t:{dur:.0f}s;--dx:{rng.uniform(-34, 34):.0f}px;'
             f'--dy:-{far:.0f}px;--o:{rng.uniform(.10, .34):.2f};'
             f'animation-delay:-{rng.uniform(0, dur):.0f}s"/>')
@@ -376,8 +440,9 @@ def motes(x, y, w, h, n=14, seed=3, fill=SOUL):
         dur = rng.uniform(9, 16)
         # Negative delay: every spore is already partway through its drift when
         # the image loads, so the field is never empty on first paint.
-        out.append(f'<circle class="mote" cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.2f}" '
-                   f'fill="{fill}" opacity="0" filter="url(#bloomSoft)" '
+        grad = "sporeWarm" if fill == INFECT else "sporeCool"
+        out.append(f'<circle class="mote" cx="{cx:.1f}" cy="{cy:.1f}" '
+                   f'r="{r*1.9:.2f}" fill="url(#{grad})" opacity="0" '
                    f'style="animation-delay:-{rng.uniform(0, dur):.1f}s;'
                    f'animation-duration:{dur:.1f}s"/>')
     return "".join(out)

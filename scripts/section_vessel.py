@@ -46,7 +46,7 @@ svg = [lantern(W, H)]
 svg.append(lantern(W, H, cx=1020, cy=206, rx=340, ry=258))
 
 svg.append('<g transform="translate(892,54) scale(2.68)">')
-svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWide)"/>')
+svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWideT)"/>')
 svg.append('  <g>')
 # Horns first, so the head's edge sits over their bases and the join is clean.
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
@@ -67,10 +67,15 @@ for flt, width, op in (("glowWide", 7, .8), ("glowMed", 3.2, 1)):
                    f'stroke-width="{width}" stroke-linecap="round" '
                    f'stroke-linejoin="round" opacity="{op}" filter="url(#{flt})"/>')
 svg.append('  </g>')
+# The pulse rides an unfiltered wrapper. With the class on the paths
+# themselves the browser re-ran three Gaussian blurs on every frame of a
+# 6.5s loop; on the group it blurs once and just fades the cached result.
+svg.append('  <g class="breathe">')
 for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8), (BRANCH_B, 0.8)):
-    svg.append(f'  <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
+    svg.append(f'    <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round" '
-               f'filter="url(#glow)" class="breathe"/>')
+               f'filter="url(#glow)"/>')
+svg.append('  </g>')
 
 svg.append('</g>')
 
@@ -81,8 +86,8 @@ LEAK = [(49, 66), (46, 78), (51, 90), (47, 100), (49, 108)]
 svg.append('<g transform="translate(892,54) scale(2.68)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
-    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="1.1" ry="1.55" '
-               f'fill="{INFECT}" filter="url(#glowMed)" opacity="0" '
+    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="2.1" ry="2.8" '
+               f'fill="url(#sporeWarm)" opacity="0" '
                f'style="--fall:26px;animation-delay:{delay:.2f}s"/>')
     svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="0.6" ry="0.95" '
                f'fill="#FFD98A" opacity="0" '
