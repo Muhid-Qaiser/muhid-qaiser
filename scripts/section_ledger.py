@@ -98,7 +98,7 @@ def blob(cx, cy, r):
     return " ".join(d) + " Z"
 
 
-def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
+def vessel(cx, cy, r, frac, idx, eyes=True):
     """The Soul meter, after the game's own sprite.
 
     No rim and no outline — it is a soft mass of near-white with a bloom
@@ -132,13 +132,11 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
     wave = " ".join(body)
 
     out.append(f'<g clip-path="url(#lvl{idx})">')
-    if drain:
-        # The meter is spent and gathered again, never emptied — the level
-        # stays above the eye holes so the face reads throughout.
-        out.append(f'  <g class="rise" style="--low:{r*0.5:.0f}px">')
-    else:
-        out.append('  <g>')
-    out.append(f'    <g class="tide"><path d="{wave}" fill="{LIQUID}"/></g>')
+    out.append('  <g>')
+    # The large meter moves; the tiny yearly vessels are too small for their
+    # individual wave motion to read, but each still reflects its real level.
+    tide = ' class="tide"' if r >= 45 else ""
+    out.append(f'    <g{tide}><path d="{wave}" fill="{LIQUID}"/></g>')
     out.append('  </g>')
     out.append('</g>')
 
@@ -266,7 +264,7 @@ for a, b in zip(row_x, row_x[1:]):
                f'stroke="{BONE}" stroke-width="1" opacity=".13"/>')
 
 # ── The vessel, left ──────────────────────────────────────────────────────
-svg.append(vessel(214, 500, 68, 1.0, 0, drain=True))
+svg.append(vessel(214, 500, 68, 1.0, 0))
 svg.append(numeral(214, 630, commas(stats["commits"]), size=44, anchor="middle"))
 svg.append(caps(214, 658, "commits gathered", size=16, track=2.1, fill=ASH,
                 anchor="middle"))
@@ -294,7 +292,7 @@ for h, count in enumerate(hours):
     height = max(2.5, count / top * TALL)
     lit = h == peak
     if lit:
-        svg.append(f'  <g class="breathe"><rect x="{x:.1f}" y="{BASE-height:.1f}" '
+        svg.append(f'  <g opacity=".78"><rect x="{x:.1f}" y="{BASE-height:.1f}" '
                    f'width="{SLOT*0.68:.1f}" height="{height:.1f}" fill="{SOUL}" '
                    f'filter="url(#glowMed)"/></g>')
     svg.append(f'  <rect x="{x:.1f}" y="{BASE - height:.1f}" '

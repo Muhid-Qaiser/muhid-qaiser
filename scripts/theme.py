@@ -191,30 +191,8 @@ _STYLE = f"""<style>
   {_display_face()}
   text {{ font-family: {SERIF}; }}
   .d {{ font-family: {DISPLAY}; }}
-  .mote {{ animation: drift 11s ease-in-out infinite; transform-box: fill-box;
-           transform-origin: center; }}
-  @keyframes drift {{
-    0%   {{ transform: translate(0,6px);      opacity: 0; }}
-    18%  {{ opacity: .85; }}
-    72%  {{ opacity: .5; }}
-    100% {{ transform: translate(5px,-30px); opacity: 0; }}
-  }}
-  /* One field across the whole document rather than a field per section, so
-     a spore can leave the masthead and arrive in the map. Distance, duration
-     and brightness ride on each particle as variables. */
-  .dust {{ animation: dust var(--t, 40s) linear infinite;
-           transform-box: fill-box; transform-origin: center; }}
-  @keyframes dust {{
-    0%        {{ transform: translate(0,0);                    opacity: 0; }}
-    12%, 84%  {{ opacity: var(--o, .3); }}
-    100%      {{ transform: translate(var(--dx,0), var(--dy,-300px));
-                 opacity: 0; }}
-  }}
-  .breathe {{ animation: breathe 6.5s ease-in-out infinite; }}
-  @keyframes breathe {{ 0%,100% {{ opacity: .5 }} 50% {{ opacity: 1 }} }}
-
   /* Infection gathering at the breach, swelling, and falling away. */
-  .drip {{ animation: drip 7s cubic-bezier(.5,0,.85,.4) infinite;
+  .drip {{ animation: drip 7s steps(28, end) infinite;
            transform-box: fill-box; transform-origin: center; }}
   @keyframes drip {{
     0%   {{ transform: translateY(0) scale(.35); opacity: 0; }}
@@ -222,23 +200,10 @@ _STYLE = f"""<style>
     38%  {{ transform: translateY(6px) scale(1);  opacity: .95; }}
     100% {{ transform: translateY(var(--fall, 74px)) scale(.5); opacity: 0; }}
   }}
-  /* A lantern carried past: areas take the light in turn, never all at once. */
-  .lit {{ animation: lit 14s ease-in-out infinite; }}
-  @keyframes lit {{ 0%,72%,100% {{ opacity: .62 }} 30% {{ opacity: 1 }} }}
-  /* The surface of a filled vessel is never quite still. */
-  .shimmer {{ animation: shimmer 5.5s ease-in-out infinite; }}
-  @keyframes shimmer {{ 0%,100% {{ opacity: .18 }} 50% {{ opacity: .5 }} }}
-
-  /* Soul is a liquid. The crest travels one wavelength and repeats, so the
-     loop is seamless; the level rises and falls the way the meter does when
-     Soul is spent and gathered again. */
-  .tide {{ animation: tide 6.5s linear infinite; }}
+  /* Soul is a liquid. One crest crosses the large meter and repeats; the tiny
+     year vessels stay still because their surface motion is not readable. */
+  .tide {{ animation: tide 6.5s steps(39, end) infinite; }}
   @keyframes tide {{ to {{ transform: translateX(-40px); }} }}
-  .rise {{ animation: rise 15s ease-in-out infinite; }}
-  @keyframes rise {{
-    0%, 100% {{ transform: translateY(var(--low, 0px)); }}
-    45%, 62% {{ transform: translateY(0px); }}
-  }}
 
   /* A line typed one character at a time: a clip slid right in steps, one
      step per character, with the caret riding the same timing. */
@@ -256,7 +221,7 @@ _STYLE = f"""<style>
     .caret {{ display: none; }}
   }}
   @media (prefers-reduced-motion: reduce) {{
-    .mote, .dust, .breathe, .drip, .lit, .shimmer, .tide, .rise {{
+    .drip, .tide {{
       animation: none; opacity: .7;
     }}
   }}
@@ -428,46 +393,40 @@ def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
 
 
 def dust(w, h, n=64, seed=101):
-    """Ambient spores for the whole page, drawn once behind every section.
-
-    These travel far enough to cross a section boundary — up to two thirds of
-    a section's height — so the page reads as one column of air rather than
-    three stacked panels that each happen to have their own weather. Slower
-    and dimmer than the per-section motes, which stay where they are.
-    """
+    """Sparse ambient spores behind every section, with no runtime repaint."""
     import random
     rng = random.Random(seed)
     out = []
-    for _ in range(n):
+    for i in range(n):
         cx, cy = rng.uniform(-20, w + 20), rng.uniform(0, h)
         r = rng.uniform(0.9, 3.2)
-        far = rng.uniform(220, 520)          # comfortably past a section edge
+        rng.uniform(220, 520)
         dur = rng.uniform(34, 78)
-        out.append(
-            f'<circle class="dust" cx="{cx:.0f}" cy="{cy:.0f}" r="{r*1.9:.2f}" '
-            f'fill="url(#sporeCool)" opacity="0" '
-            f'style="--t:{dur:.0f}s;--dx:{rng.uniform(-34, 34):.0f}px;'
-            f'--dy:-{far:.0f}px;--o:{rng.uniform(.10, .34):.2f};'
-            f'animation-delay:-{rng.uniform(0, dur):.0f}s"/>')
+        rng.uniform(-34, 34)
+        opacity = rng.uniform(.10, .34)
+        rng.uniform(0, dur)
+        body = (f'cx="{cx:.0f}" cy="{cy:.0f}" r="{r*1.9:.2f}" '
+                f'fill="url(#sporeCool)"')
+        if i % 4 == 1:
+            out.append(f'<circle {body} opacity="{opacity * .55:.2f}"/>')
     return "".join(out)
 
 
 def motes(x, y, w, h, n=14, seed=3, fill=SOUL):
-    """Ambient spores. Deterministic, so a file changes only when data does."""
+    """Sparse local spores. Deterministic, so builds stay reproducible."""
     import random
     rng = random.Random(seed)
     out = []
-    for _ in range(n):
+    for i in range(n):
         cx, cy = x + rng.random() * w, y + rng.random() * h
         r = rng.uniform(0.8, 2.1)
         dur = rng.uniform(9, 16)
-        # Negative delay: every spore is already partway through its drift when
-        # the image loads, so the field is never empty on first paint.
         grad = "sporeWarm" if fill == INFECT else "sporeCool"
-        out.append(f'<circle class="mote" cx="{cx:.1f}" cy="{cy:.1f}" '
-                   f'r="{r*1.9:.2f}" fill="url(#{grad})" opacity="0" '
-                   f'style="animation-delay:-{rng.uniform(0, dur):.1f}s;'
-                   f'animation-duration:{dur:.1f}s"/>')
+        rng.uniform(0, dur)
+        body = (f'cx="{cx:.1f}" cy="{cy:.1f}" r="{r*1.9:.2f}" '
+                f'fill="url(#{grad})"')
+        if i % 3 == 1:
+            out.append(f'<circle {body} opacity=".16"/>')
     return "".join(out)
 
 

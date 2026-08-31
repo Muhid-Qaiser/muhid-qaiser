@@ -200,12 +200,11 @@ for i, (name, area) in enumerate(AREAS.items()):
                    f'stroke-width="1" opacity=".28"/>')
     svg.append('</g>')
 
-    # The wall: a wide bloom under a crisp line, both roughened.
-    svg.append(f'<g class="lit" style="animation-delay:-{i * 2.3:.1f}s">')
-    # No opacity here: `.lit` animates opacity, and a CSS animation overrides
-    # the presentation attribute, so the old inline .3 was never actually
-    # painted. Keeping it now would multiply against the wrapper and dim the
-    # bloom to a third of what it always looked like.
+    # The wall: a wide bloom under a crisp line, both roughened. This used to
+    # pulse continuously, invalidating almost the entire map on every display
+    # frame. A stable midpoint keeps the same illuminated appearance without
+    # making the largest geometry in the profile repaint forever.
+    svg.append('<g opacity=".82">')
     # The outline is stored once in defs and referenced six times; six copies
     # of a fifty-point polygon would have cost more bytes than the filter did.
     for bw, bo in BLOOM:
@@ -263,7 +262,7 @@ while len(_eyes) < 22:
     _eyes.append((ex, ey, _rng.uniform(1.4, 2.5)))
 for i, (ex, ey, er) in enumerate(_eyes):
     gap, tilt = er * 2.5, _rng.uniform(-8, 8)
-    svg.append(f'<g class="breathe" style="animation-delay:-{i*0.7:.1f}s" '
+    svg.append(f'<g opacity=".65" '
                f'transform="rotate({tilt:.0f} {ex:.0f} {ey:.0f})">'
                f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
                f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/>'

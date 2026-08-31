@@ -70,10 +70,10 @@ for flt, width, op in (("glowWide", 7, .8), ("glowMed", 3.2, 1)):
                    f'stroke-width="{width}" stroke-linecap="round" '
                    f'stroke-linejoin="round" opacity="{op}" filter="url(#{flt})"/>')
 svg.append('  </g>')
-# The pulse rides an unfiltered wrapper. With the class on the paths
-# themselves the browser re-ran three Gaussian blurs on every frame of a
-# 6.5s loop; on the group it blurs once and just fades the cached result.
-svg.append('  <g class="breathe">')
+# Keep the bright fracture at the midpoint of its old pulse. Repainting the
+# filtered breach continuously was expensive and the movement was too subtle
+# to justify it beside the much clearer falling drops.
+svg.append('  <g opacity=".78">')
 for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8), (BRANCH_B, 0.8)):
     svg.append(f'    <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round" '
@@ -89,12 +89,17 @@ LEAK = [(49, 66), (46, 78), (51, 90), (47, 100), (49, 108)]
 svg.append('<g transform="translate(892,54) scale(2.68)">')
 for i, (lx, ly) in enumerate(LEAK):
     delay = -i * 1.45
-    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="2.1" ry="2.8" '
-               f'fill="url(#sporeWarm)" opacity="0" '
-               f'style="--fall:26px;animation-delay:{delay:.2f}s"/>')
-    svg.append(f'  <ellipse class="drip" cx="{lx}" cy="{ly}" rx="0.6" ry="0.95" '
-               f'fill="#FFD98A" opacity="0" '
-               f'style="--fall:26px;animation-delay:{delay:.2f}s"/>')
+    # One live drop communicates the failed seal; the other fracture points
+    # stay as dim infection rather than independent animation timelines.
+    motion = ('class="drip" opacity="0" '
+              f'style="--fall:26px;animation-delay:{delay:.2f}s"'
+              if i == 0 else 'opacity=".24"')
+    svg.append(f'  <g {motion}>')
+    svg.append(f'    <ellipse cx="{lx}" cy="{ly}" rx="2.1" ry="2.8" '
+               f'fill="url(#sporeWarm)"/>')
+    svg.append(f'    <ellipse cx="{lx}" cy="{ly}" rx="0.6" ry="0.95" '
+               f'fill="#FFD98A"/>')
+    svg.append('  </g>')
 svg.append('</g>')
 
 # Spores lifting out of the fracture.
