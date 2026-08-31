@@ -53,21 +53,21 @@ ORB_MASK = (
     "C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z"
 )
 
-COUNTS = [(v, k) for v, k in (
-    (stats["repos"],              "Repos"),
-    (stats["pull_requests"],      "Pull requests"),
+COUNTS = [
+    (stats["streak_current"],     "Current streak"),
     (stats["streak_best"],        "Longest streak"),
-    (stats["contributions_year"], "Last 12 months"),
-) if v > 0]
+    (stats["pull_requests"],      "Pull requests"),
+    (stats["contributions_year"], "12-mo contributions"),
+]
 
-# Six account-wide figures, largest first, clockwise from the top.
+# Five account-wide figures, largest first, clockwise from the top.
 # Issues, gists and reviews are all zero on this account, so they are left
 # off: three flat spokes would read as inactivity rather than as absence.
 METRICS = [
     ("COMMITS",       stats["commits"]),
     ("REPOS",         stats["repos"]),
     ("REPOS STARRED", stats["starred"]),
-    ("LAST 12 MONTHS", stats["contributions_year"]),
+    ("12-MO CONTRIBUTIONS", stats["contributions_year"]),
     ("PULL REQUESTS", stats["pull_requests"]),
 ]
 # These span 241 down to 6. On one linear radius everything but commits
