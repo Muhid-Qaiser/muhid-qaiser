@@ -24,7 +24,7 @@ Deliberately no lines-of-code total. This account is largely Jupyter
 notebooks, whose committed JSON carries base64 image output, so an additions
 figure would measure the file format rather than the work.
 """
-import json, math, sys
+import json, math, random, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
@@ -109,8 +109,10 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
     frac = max(0.0, min(1.0, frac))
     level = cy + r - 2 * r * frac
     shape = blob(cx, cy, r)
+    wide = "glowWideT" if r >= 45 else "glowWide"
+    med = "glowMedT" if r >= 45 else "glowMed"
     out = [f'<path d="{shape}" fill="{LIQUID}" opacity=".3" '
-           f'filter="url(#glowWide)"/>',
+           f'filter="url(#{wide})"/>',
            f'<clipPath id="lvl{idx}"><path d="{shape}"/></clipPath>',
            f'<path d="{shape}" fill="#0B111C"/>']
 
@@ -151,7 +153,7 @@ def vessel(cx, cy, r, frac, idx, eyes=True, drain=False):
                        f'ry="{r*.26:.1f}" fill="#232A3C" '
                        f'transform="rotate({sx*16} {ex:.1f} {ey:.1f})"/>')
     out.append(f'<path d="{shape}" fill="{LIQUID}" opacity=".16" '
-               f'filter="url(#glowMed)"/>')
+               f'filter="url(#{med})"/>')
     return "".join(out)
 
 
@@ -190,19 +192,27 @@ def web(cx, cy, R):
     # are far more spokes than data axes, so the silk scallops finely instead
     # of reading as a wireframe box.
     spokes = [math.radians(-90 + i * 360 / (n * 4)) for i in range(n * 4)]
+    # Silk is never spun to a true circle. That unevenness used to come from
+    # an ink displacement at paint time — seven turbulence passes for a
+    # hairline. It is baked into the radii instead, from a fixed seed, and the
+    # wobble is carried per spoke rather than per vertex so consecutive
+    # segments still meet and the stroke does not develop kinks.
+    jr = random.Random(808)
     for ring in (0.17, 0.31, 0.45, 0.6, 0.76, 0.92, 1.0):
         r = R * ring
+        sway = [1 + jr.uniform(-0.016, 0.016) for _ in spokes]
         d = []
         for i, a in enumerate(spokes):
-            b = spokes[(i + 1) % len(spokes)]
-            x1, y1 = pt(a, r)
-            mx, my = pt(a + math.radians(360 / len(spokes) / 2), r * 0.94)
-            x2, y2 = pt(b, r)
+            j = (i + 1) % len(spokes)
+            x1, y1 = pt(a, r * sway[i])
+            mx, my = pt(a + math.radians(360 / len(spokes) / 2),
+                        r * 0.94 * (sway[i] + sway[j]) / 2)
+            x2, y2 = pt(spokes[j], r * sway[j])
             d.append(f"{'M' if not i else 'L'} {x1:.1f} {y1:.1f} "
                      f"Q {mx:.1f} {my:.1f} {x2:.1f} {y2:.1f}")
         out.append(f'<path d="{" ".join(d)} Z" fill="none" stroke="{BONE}" '
                    f'stroke-width="{0.9 if ring == 1 else 0.6}" '
-                   f'opacity="{.3 if ring == 1 else .13}" filter="url(#ink)"/>')
+                   f'opacity="{.3 if ring == 1 else .13}"/>')
 
     # Fine radials first, then the six anchor threads the data hangs from.
     for a in spokes:
@@ -216,9 +226,9 @@ def web(cx, cy, R):
                      for i, (x, y) in enumerate(pts)) + " Z"
     out.append(f'<path d="{shape}" fill="{SOUL}" opacity=".13"/>')
     out.append(f'<path d="{shape}" fill="none" stroke="{SOUL}" stroke-width="6" '
-               f'opacity=".28" filter="url(#glowMed)"/>')
+               f'opacity=".28" filter="url(#glowMedT)"/>')
     out.append(f'<path d="{shape}" fill="none" stroke="{SOUL}" stroke-width="1.9" '
-               f'opacity=".95" filter="url(#bloomSoft)"/>')
+               f'opacity=".95" filter="url(#bloomT)"/>')
     for x, y in pts:
         out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.2" fill="{SOUL}" '
                    f'filter="url(#bloomSoft)"/>')
@@ -278,7 +288,7 @@ svg.append(caps(1128, 790, f"most commits at {peak:02d}:00", size=17, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
 
 top = max(hours) or 1
-svg.append('<g filter="url(#bloomSoft)">')
+svg.append('<g filter="url(#bloomT)">')
 for h, count in enumerate(hours):
     x = X0 + h * SLOT
     height = max(2.5, count / top * TALL)

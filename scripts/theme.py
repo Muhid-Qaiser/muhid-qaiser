@@ -11,6 +11,7 @@ Three rules hold it together:
 3. Every figure uses the same ground, the same 72px margin and the same header
    block, so scrolling the README feels like walking, not like changing tabs.
 """
+import random
 from pathlib import Path
 
 VOID   = "#080B12"   # deepest ground
@@ -67,6 +68,28 @@ def _grain_tile(size=64, seed=9):
     return base64.b64encode(png).decode()
 
 
+
+def wobble(x0, y0, x1, y1, amp=1.1, step=44, seed=5):
+    """A rule that was drawn by hand rather than laid against a straightedge.
+
+    This was an feTurbulence displacement at paint time: Perlin noise
+    evaluated per pixel in order to move a hairline by about one pixel. The
+    same waver baked into the geometry from a fixed seed costs nothing, and
+    since the seed never changes the file only moves when the data does.
+    """
+    r = random.Random(seed)
+    n = max(2, int(abs(x1 - x0) / step))
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        x, y = x0 + (x1 - x0) * t, y0 + (y1 - y0) * t
+        if 0 < i < n:
+            x += r.uniform(-amp, amp)
+            y += r.uniform(-amp, amp)
+        pts.append((x, y))
+    return "M " + " L ".join("%.1f %.1f" % (x, y) for x, y in pts)
+
+
 def _display_face():
     import base64
     woff = Path(__file__).resolve().parent / "cinzel-caps.woff2"
@@ -85,24 +108,6 @@ RULE_Y = 118         # every header rule sits at the same height
 
 def _defs(extra=""):
     return f"""<defs>
-  <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2"
-                  seed="7" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"
-                       xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-  <filter id="inkSoft" x="-8%" y="-8%" width="116%" height="116%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2"
-                  seed="19" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3"
-                       xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-  <!-- The game's bloom pass: pale things bleed light into the dark. -->
-  <filter id="bloom" x="-60%" y="-60%" width="220%" height="220%">
-    <feGaussianBlur stdDeviation="3.4" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/>
-             <feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
   <filter id="bloomSoft" x="-45%" y="-45%" width="190%" height="190%">
     <feGaussianBlur stdDeviation="1.7" result="b"/>
     <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -136,6 +141,14 @@ def _defs(extra=""):
        times the element's own area, which a small dot needs and a map region
        does not. A Gaussian reaches about 3 sigma, so these are cut to what the
        blur can actually touch. -->
+  <!-- Same soft bloom, for shapes that are already wide. bloomSoft reserves
+       45% of the element's width on each side; on the hour chart, which is a
+       thousand pixels across, that is a buffer twice the size of the thing
+       being drawn for a blur that reaches five pixels. -->
+  <filter id="bloomT" x="-5%" y="-30%" width="110%" height="160%">
+    <feGaussianBlur stdDeviation="1.7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
   <filter id="glowMedT" x="-25%" y="-25%" width="150%" height="150%">
     <feGaussianBlur stdDeviation="6"/>
   </filter>
@@ -305,14 +318,13 @@ def section(title, subtitle="", w=1200):
     sections still line up.
     """
     return (caps(MARGIN, 76, title, size=36, track=5.5, glow=True)
-            + f'<path d="M {MARGIN} {RULE_Y} L {w - MARGIN} {RULE_Y}" '
-              f'stroke="{BONE}" stroke-width="1.2" opacity=".2" '
-              f'filter="url(#ink)"/>')
+            + f'<path d="{wobble(MARGIN, RULE_Y, w - MARGIN, RULE_Y, seed=3)}" '
+              f'fill="none" stroke="{BONE}" stroke-width="1.2" opacity=".2"/>')
 
 
 def footnote(text, y, w=1200):
-    return (f'<path d="M {MARGIN} {y - 30} L {w - MARGIN} {y - 30}" '
-            f'stroke="{BONE}" stroke-width="1" opacity=".14" filter="url(#ink)"/>'
+    return (f'<path d="{wobble(MARGIN, y - 30, w - MARGIN, y - 30, seed=11)}" '
+            f'fill="none" stroke="{BONE}" stroke-width="1" opacity=".14"/>'
             + prose(MARGIN, y, text, size=13, opacity=.85))
 
 
@@ -327,6 +339,19 @@ def _halo(body, txt, size, opacity=1.0):
     return "".join(
         f'<text class="d" {body} fill="{SOUL}" opacity="{op * opacity:.2f}" '
         f'filter="url(#{flt})">{txt}</text>' for flt, op in stack)
+
+
+def _lit(body, txt, fill, size, opacity=1.0):
+    """One line of type, glowing: a Soul-coloured blur under a cold core.
+
+    A stroke laid behind the fill was tried here instead, to save the second
+    glyph run and the filter buffer. Measured over sixty draws it came out
+    slightly slower than the blur — stroking glyph outlines costs about what
+    blurring them does — and it thickened type at 24px. The blur stays.
+    """
+    op = "" if opacity == 1 else f' opacity="{opacity}"'
+    return (_halo(body, txt, size, opacity)
+            + f'<text class="d" {body} fill="{fill}"{op}>{txt}</text>')
 
 
 def caps(x, y, s, size=13, fill=None, track=4.2, weight="normal",
@@ -345,8 +370,7 @@ def caps(x, y, s, size=13, fill=None, track=4.2, weight="normal",
     txt = esc(s.upper())
     if not glow:
         return f'<text class="d" {body} fill="{fill}" opacity="{opacity}">{txt}</text>'
-    return (_halo(body, txt, size, opacity)
-            + f'<text class="d" {body} fill="{fill}" opacity="{opacity}">{txt}</text>')
+    return _lit(body, txt, fill, size, opacity)
 
 
 def prose(x, y, s, size=15, fill=ASH, italic=True, anchor="start", opacity=1):
@@ -364,8 +388,7 @@ def numeral(x, y, s, size=40, fill=None, anchor="start", glow=True):
     txt = esc(s)
     if not glow:
         return f'<text class="d" {body} fill="{fill}">{txt}</text>'
-    return (_halo(body, txt, size)
-            + f'<text class="d" {body} fill="{fill}">{txt}</text>')
+    return _lit(body, txt, fill, size)
 
 
 def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,

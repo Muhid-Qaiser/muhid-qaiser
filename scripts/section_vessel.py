@@ -46,7 +46,10 @@ svg = [lantern(W, H)]
 svg.append(lantern(W, H, cx=1020, cy=206, rx=340, ry=258))
 
 svg.append('<g transform="translate(892,54) scale(2.68)">')
-svg.append(f'  <path d="{MASK}" fill="{INFECT}" opacity=".16" filter="url(#glowWideT)"/>')
+# Infection glowing through the shell. Blurred at this radius the mask's own
+# outline is long gone, so the shape carrying the light may as well be the
+# soft ellipse the blur was turning it into.
+svg.append('  <ellipse cx="50" cy="58" rx="90" ry="96" fill="url(#sporeWarm)" opacity=".2"/>')
 svg.append('  <g>')
 # Horns first, so the head's edge sits over their bases and the join is clean.
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
@@ -99,8 +102,8 @@ svg.append(motes(996, 130, 80, 272, n=18, seed=11, fill=INFECT))
 
 # ── Masthead lettering ────────────────────────────────────────────────────
 svg.append(caps(MARGIN, 150, "Muhid Qaiser", size=64, track=9, glow=True))
-svg.append(f'<path d="M {MARGIN} 182 L 660 182" stroke="{BONE}" stroke-width="1.4" '
-           f'opacity=".28" filter="url(#ink)"/>')
+svg.append(f'<path d="{wobble(MARGIN, 182, 660, 182, seed=7)}" fill="none" '
+           f'stroke="{BONE}" stroke-width="1.4" opacity=".28"/>')
 
 svg.append(prose(MARGIN, 222,
                  "AI Security  |  Computer Vision  |  Gen AI  |  Agentic AI",

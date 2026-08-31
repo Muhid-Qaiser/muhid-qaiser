@@ -89,6 +89,15 @@ stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
 rng = random.Random(20260827)   # fixed, so the file changes only when data does
 
 
+# The soft band around each wall used to be a 7px stroke under a 6px Gaussian
+# — one filter buffer per region, and by measurement the single most
+# expensive thing in the file. Concentric strokes lay down the same profile
+# with plain geometry. The opacities compose to 0.467 at the centre, which is
+# where a 6px blur of a 7px stroke peaks, and the widths step down
+# geometrically so the edge falls off smoothly instead of banding.
+BLOOM = ((46, .042), (34, .058), (24, .080), (16, .105), (10, .135), (6, .170))
+
+
 def path_of(poly, rough=0.0):
     """Emit the outline, optionally with the corners nudged.
 
@@ -149,8 +158,17 @@ for repo in stats["repo_list"]:
     by_area.setdefault(repo["region"], []).append(repo)
 
 DEFS = "".join(
+    # The Abyss no longer needs one: its grain was folded into the map-wide
+    # pass, which is the only thing that ever clipped to it.
     f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
-    for i, a in enumerate(list(AREAS.values()) + [ABYSS]))
+    for i, a in enumerate(AREAS.values())
+) + "".join(
+    # Bare geometry for the wall bloom to reference. It carries no stroke of
+    # its own on purpose: a presentation attribute on the referenced element
+    # beats the one on <use>, so giving this a width would render all six
+    # bloom layers at that width and the falloff would collapse into a band.
+    f'<path id="w{i}" d="{path_of(a["poly"])}"/>'
+    for i, a in enumerate(AREAS.values()))
 
 svg = []
 # Read from the data, never spelled out — the total moves on its own.
@@ -188,8 +206,14 @@ for i, (name, area) in enumerate(AREAS.items()):
     # the presentation attribute, so the old inline .3 was never actually
     # painted. Keeping it now would multiply against the wrapper and dim the
     # bloom to a third of what it always looked like.
-    svg.append(f'  <path d="{d}" fill="none" stroke="{colour}" stroke-width="7" '
-               f'filter="url(#glowMedT)"/>')
+    # The outline is stored once in defs and referenced six times; six copies
+    # of a fifty-point polygon would have cost more bytes than the filter did.
+    for bw, bo in BLOOM:
+        # stroke-opacity, not opacity: `.lit` animates opacity on the wrapper
+        # and a CSS animation overrides the presentation attribute outright.
+        svg.append(f'    <use href="#w{i}" fill="none" stroke="{colour}" '
+                   f'stroke-width="{bw}" stroke-opacity="{bo}" '
+                   f'stroke-linejoin="round" stroke-linecap="round"/>')
     svg.append(f'  <path d="{path_of(poly, rough=1.4)}" fill="none" '
                f'stroke="{colour}" stroke-width="2"/>')
     svg.append('</g>')
@@ -201,20 +225,23 @@ for i, (name, area) in enumerate(AREAS.items()):
                      size=21 if "size" not in area else 15,
                      anchor="middle", opacity=.9))
 
-# One grain pass over the whole map rather than one per area: feTurbulence is
-# the most expensive primitive in the file and seven of them was six too many.
-svg.append('<rect x="40" y="140" width="1130" height="640" '
-           'fill="url(#grainTile)" opacity=".14"/>')
-
 # ── The Abyss ─────────────────────────────────────────────────────────────
 d = path_of(ABYSS["poly"])
 ax0, ay0, ax1, ay1 = bounds(ABYSS["poly"])
 svg.append(f'<path d="{d}" fill="#03060B"/>')
-svg.append(f'<g clip-path="url(#clip{len(AREAS)})"><rect x="{ax0}" y="{ay0}" '
-           f'width="{ax1-ax0}" height="{ay1-ay0}" fill="url(#grainTile)" '
-           f'opacity=".1"/></g>')
-svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="170" ry="56" '
-           f'fill="{SOUL}" opacity=".08" filter="url(#glowWideT)"/>')
+
+# One grain pass for the whole map, laid after the Abyss so it covers that as
+# well. This was seven turbulence passes, then one turbulence pass plus a
+# second clipped one for the Abyss. The Abyss sits well inside the map's own
+# bounds, so a single tiled pass does both.
+svg.append('<rect x="40" y="140" width="1130" height="640" '
+           'fill="url(#grainTile)" opacity=".13"/>')
+# Pale light pooling on the floor. This was a solid ellipse under a 14px
+# blur; the blur spread it by about three sigma either way, so an ellipse of
+# that final size carrying a radial falloff is the same picture without the
+# filter buffer.
+svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="214" ry="100" '
+           f'fill="url(#sporeCool)" opacity=".13"/>')
 ABYSS_EDGE = "#3E6A7C"
 svg.append(f'<path d="{d}" fill="none" stroke="{ABYSS_EDGE}" stroke-width="2.4" '
            f'opacity=".9" stroke-dasharray="5 9"/>')
