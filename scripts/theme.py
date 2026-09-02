@@ -14,7 +14,7 @@ Three rules hold it together:
 import random
 from pathlib import Path
 
-VOID   = "#080B12"   # deepest ground
+VOID   = "#05070B"   # deepest ground
 CAVERN = "#111725"   # midground panels and room fill
 STONE  = "#1D2637"   # carved edges
 BONE   = "#E9E6DC"   # the mask; anything carved or written
@@ -228,6 +228,23 @@ _STYLE = f"""<style>
 </style>"""
 
 
+def _light_defs(extra=""):
+    """Only definitions used by the quiet, single-scene profile."""
+    return f"<defs>{extra}</defs>"
+
+
+_LIGHT_STYLE = f"""<style>
+  {_display_face()}
+  text {{ font-family: {SERIF}; }}
+  .d {{ font-family: {DISPLAY}; }}
+  .tide {{ animation: tide 6.5s steps(39, end) infinite; }}
+  @keyframes tide {{ to {{ transform: translateX(-40px); }} }}
+  @media (prefers-reduced-motion: reduce) {{
+    .tide {{ animation: none; }}
+  }}
+</style>"""
+
+
 def lantern(w, h, cx=None, cy=None, rx=None, ry=None):
     """A pool of light. Sections carry their own, so the ground down the page
     reads as a cave lit at intervals rather than one flat wash."""
@@ -260,16 +277,14 @@ def document(w, sections, extra_defs=""):
     total = sum(h for h, _ in sections)
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{total}" '
            f'     viewBox="0 0 {w} {total}" role="img">',
-           _defs(extra_defs), _STYLE,
-           f'<rect width="{w}" height="{total}" fill="{VOID}"/>',
-           dust(w, total)]
+           _light_defs(extra_defs), _LIGHT_STYLE,
+           f'<rect width="{w}" height="{total}" fill="{VOID}"/>']
     dy = 0
     for h, body in sections:
         out.append(f'<g transform="translate(0,{dy})">')
         out.extend(body)
         out.append('</g>')
         dy += h
-    out.append(edges(w, total))
     out.append('</svg>')
     return chr(10).join(out)
 

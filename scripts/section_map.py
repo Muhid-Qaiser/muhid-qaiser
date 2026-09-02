@@ -1,276 +1,146 @@
 #!/usr/bin/env python3
-"""The map section — every public repository, drawn as Hallownest.
-
-Modelled on the in-game world map rather than on a chart. Each area is one
-continuous rectilinear silhouette with a stepped edge, filled near-black,
-outlined in its own glowing colour, and captioned inside itself — Greenpath
-green, the City of Tears blue, Crystal Peak pink. The areas interlock.
-
-The layout keeps the real geography, so the substitutions carry meaning:
-Foundations sits where Dirtmouth and the Forgotten Crossroads do, because that
-is where everyone starts. Computer Vision takes Greenpath's place in the west.
-Generative AI is the City of Tears. AI Security is the Abyss at the bottom of
-the kingdom — the deepest ground, and the only area the map leaves unlit,
-because that work is private.
-"""
-import json, random, sys
+"""A sparse Hallownest journey whose labels and counts come from live data."""
+import json
+import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 820
-
-# Every outline is orthogonal — Hallownest's areas step, they never slope.
-AREAS = {
-    # Dirtmouth and the Crossroads: wide, shallow, with a bay along the bottom
-    # that Machine Learning fills from below.
-    "FOUNDATIONS": {
-        "poly": [(340, 196), (380, 196), (380, 168), (520, 168), (520, 160),
-                 (600, 160), (600, 188), (660, 188), (660, 168), (700, 168),
-                 (700, 240), (672, 240), (672, 268), (700, 268), (700, 300),
-                 (560, 300), (560, 272), (460, 272), (460, 300), (400, 300),
-                 (400, 268), (340, 268)],
-        "colour": "#C6C9D6", "label": (520, 224), "lines": ["Foundations"],
-    },
-    # Greenpath: the widest ground on the map, stepping down to the south-west.
-    "COMPUTER VISION": {
-        "poly": [(60, 268), (140, 268), (140, 240), (340, 240), (340, 268),
-                 (400, 268), (400, 320), (372, 320), (372, 368), (400, 368),
-                 (400, 440), (348, 440), (348, 412), (300, 412), (300, 468),
-                 (332, 468), (332, 532), (240, 532), (240, 560), (160, 560),
-                 (160, 516), (96, 516), (96, 468), (60, 468)],
-        "colour": "#86D96F", "label": (214, 330), "lines": ["Computer", "Vision"],
-    },
-    # Fungal Wastes: rises into Foundations' bay, drops toward the Abyss.
-    "MACHINE LEARNING": {
-        "poly": [(400, 300), (460, 300), (460, 272), (560, 272), (560, 300),
-                 (700, 300), (700, 348), (672, 348), (672, 396), (700, 396),
-                 (700, 460), (660, 460), (660, 512), (692, 512), (692, 568),
-                 (600, 568), (600, 600), (500, 600), (500, 556), (452, 556),
-                 (452, 508), (420, 508), (420, 440), (400, 440)],
-        "colour": "#C9C271", "label": (548, 416), "lines": ["Machine", "Learning"],
-    },
-    # The City of Tears: the tall capital, notched along its eastern wall.
-    "GENERATIVE AI": {
-        "poly": [(720, 300), (1010, 300), (1010, 360), (980, 360), (980, 412), (1010, 412),
-                 (1010, 500), (968, 500), (968, 544), (1010, 544), (1010, 580),
-                 (880, 580), (880, 548), (800, 548), (800, 580), (720, 580),
-                 (720, 520), (748, 520), (748, 468), (720, 468)],
-        "colour": "#74ADEC", "label": (856, 398), "lines": ["Generative", "AI"],
-    },
-    # Crystal Peak: high in the east, its floor toothed where it meets the City.
-    "AGENTIC AI": {
-        "poly": [(750, 190), (790, 190), (790, 158), (920, 158), (920, 182),
-                 (975, 182), (975, 250), (940, 250), (940, 288), (858, 288),
-                 (858, 258), (806, 258), (806, 288), (750, 288)],
-        "colour": "#E28FCB", "label": (866, 186), "lines": ["Agentic", "AI"],
-    },
-    # Kingdom's Edge: narrow, far out, barely joined to anything.
-    "PARALLEL COMPUTE": {
-        "poly": [(1030, 340), (1070, 340), (1070, 312), (1150, 312),
-                 (1150, 420), (1122, 420), (1122, 460), (1150, 460),
-                 (1150, 580), (1080, 580), (1080, 548), (1030, 548)],
-        "colour": "#E8874A", "label": (1090, 380), "lines": ["Parallel", "Compute"],
-        "size": 11,
-    },
-}
-
-# The Abyss, drawn but never lit.
-ABYSS = {
-    "poly": [(380, 640), (470, 640), (470, 620), (560, 620), (560, 600),
-             (700, 600), (700, 620), (900, 620), (900, 680), (860, 680),
-             (860, 720), (900, 720), (900, 752), (700, 752), (700, 724),
-             (600, 724), (600, 752), (440, 752), (440, 712), (380, 712)],
-    "label": (650, 686),
-}
+W, H = 1200, 1050
+DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
-rng = random.Random(20260827)   # fixed, so the file changes only when data does
+counts = {r["name"]: r["count"] for r in stats["regions"]}
+
+# The silhouettes stay fixed so daily redraws do not shuffle the page. Their
+# labels and counts are live; the route is the constant journey through them.
+AREAS = [
+    ("FOUNDATIONS", 500, 135,
+     "M 350 70 Q 382 38 432 42 L 474 36 L 516 43 L 560 37 L 625 45 "
+     "Q 681 55 694 98 L 681 190 Q 651 229 593 233 L 525 226 "
+     "L 472 234 L 404 225 Q 353 213 340 174 L 345 117 Z"),
+    ("COMPUTER VISION", 214, 352,
+     "M 72 276 Q 101 237 151 231 L 206 237 L 258 232 L 300 246 "
+     "Q 337 262 345 300 L 337 429 Q 310 469 259 479 L 209 474 "
+     "L 164 481 L 124 463 Q 80 445 66 405 L 71 348 L 64 317 Z"),
+    ("AGENTIC AI", 850, 292,
+     "M 700 213 Q 731 178 781 177 L 831 185 L 877 180 L 930 190 "
+     "Q 978 202 995 246 L 987 351 Q 968 391 916 405 L 872 399 "
+     "L 825 407 L 768 395 Q 718 382 701 341 L 707 287 L 697 254 Z"),
+    ("MACHINE LEARNING", 510, 440,
+     "M 353 339 Q 380 303 432 300 L 482 308 L 526 302 L 605 312 "
+     "Q 652 325 670 368 L 661 505 Q 642 548 584 560 L 531 552 "
+     "L 478 562 L 418 549 Q 376 532 357 492 L 364 428 L 352 386 Z"),
+    ("GENERATIVE AI", 824, 604,
+     "M 670 503 Q 701 466 752 465 L 804 473 L 853 468 L 916 478 "
+     "Q 964 492 985 536 L 976 671 Q 957 713 899 724 L 850 717 "
+     "L 796 727 L 730 711 Q 687 695 669 657 L 676 594 L 666 550 Z"),
+    ("PARALLEL COMPUTE", 1069, 659,
+     "M 970 587 Q 990 552 1029 553 L 1063 560 L 1095 554 L 1121 563 "
+     "Q 1152 576 1162 610 L 1155 722 Q 1140 757 1103 768 L 1070 762 "
+     "L 1036 770 L 1014 757 Q 984 743 973 715 L 978 664 L 968 624 Z"),
+]
 
 
-# The soft band around each wall used to be a 7px stroke under a 6px Gaussian
-# — one filter buffer per region, and by measurement the single most
-# expensive thing in the file. Concentric strokes lay down the same profile
-# with plain geometry. The opacities compose to 0.467 at the centre, which is
-# where a 6px blur of a 7px stroke peaks, and the widths step down
-# geometrically so the edge falls off smoothly instead of banding.
-BLOOM = ((46, .042), (34, .058), (24, .080), (16, .105), (10, .135), (6, .170))
-
-
-def path_of(poly, rough=0.0):
-    """Emit the outline, optionally with the corners nudged.
-
-    `rough` bakes in the wobble the ink filter used to add at paint time. The
-    jitter is drawn from a fixed seed, so the file only changes when the data
-    does."""
-    if rough:
-        jr = random.Random(4242)
-        poly = [(x + jr.uniform(-rough, rough), y + jr.uniform(-rough, rough))
-                for x, y in poly]
-    first, *rest = poly
-    return (f"M {first[0]:.1f} {first[1]:.1f} "
-            + " ".join(f"L {x:.1f} {y:.1f}" for x, y in rest) + " Z")
-
-
-def inside(px, py, poly):
-    """Ray casting, so interior marks land inside the silhouette."""
-    hit = False
-    for i in range(len(poly)):
-        x1, y1 = poly[i]
-        x2, y2 = poly[(i + 1) % len(poly)]
-        if (y1 > py) != (y2 > py) and px < x1 + (py - y1) / (y2 - y1) * (x2 - x1):
-            hit = not hit
-    return hit
-
-
-def bounds(poly):
-    xs, ys = [p[0] for p in poly], [p[1] for p in poly]
-    return min(xs), min(ys), max(xs), max(ys)
-
-
-def rooms_in(poly, n, keep_clear):
-    """One small mark per repository, the way the Forgotten Crossroads shows
-    its mapped rooms. Rejection-sampled, and kept off the caption."""
-    x0, y0, x1, y1 = bounds(poly)
-    cx, cy, cw, ch = keep_clear
+def area_label(name, x, y):
+    lines = name.split() if " " in name else [name]
+    start = y - 15 * (len(lines) - 1)
     out = []
-    for _ in range(n * 900):
-        if len(out) == n:
-            break
-        w, h = rng.uniform(9, 20), rng.uniform(7, 13)
-        px, py = rng.uniform(x0 + 8, x1 - 8 - w), rng.uniform(y0 + 8, y1 - 8 - h)
-        # Every corner must sit inside, or the mark straddles a wall.
-        if not all(inside(px + dx, py + dy, poly)
-                   for dx in (-3, w + 3) for dy in (-3, h + 3)):
-            continue
-        if abs(px + w / 2 - cx) < cw / 2 + w and abs(py + h / 2 - cy) < ch / 2 + h:
-            continue
-        if any(abs(px - ox) < ow + 7 and abs(py - oy) < oh + 7
-               for ox, oy, ow, oh in out):
-            continue
-        out.append((px, py, w, h))
-    return out
+    for i, line in enumerate(lines):
+        out.append(caps(x, start + i * 34, line, size=24, track=1.5,
+                        fill=BONE, anchor="middle", opacity=.94))
+    out.append(prose(x, start + len(lines) * 34 + 1,
+                     f'{counts.get(name, 0)} repos', size=18,
+                     fill=BONE, anchor="middle", opacity=.78))
+    return "".join(out)
 
-
-by_area = {}
-for repo in stats["repo_list"]:
-    by_area.setdefault(repo["region"], []).append(repo)
-
-DEFS = "".join(
-    # The Abyss no longer needs one: its grain was folded into the map-wide
-    # pass, which is the only thing that ever clipped to it.
-    f'<clipPath id="clip{i}"><path d="{path_of(a["poly"])}"/></clipPath>'
-    for i, a in enumerate(AREAS.values())
-) + "".join(
-    # Bare geometry for the wall bloom to reference. It carries no stroke of
-    # its own on purpose: a presentation attribute on the referenced element
-    # beats the one on <use>, so giving this a width would render all six
-    # bloom layers at that width and the falloff would collapse into a band.
-    f'<path id="w{i}" d="{path_of(a["poly"])}"/>'
-    for i, a in enumerate(AREAS.values()))
 
 svg = []
-# Read from the data, never spelled out — the total moves on its own.
-svg.append(section("The Map"))
 
-# The way down from Dirtmouth is a well, so the band above Foundations is not
-# empty space — it is the descent. Drawn from above this section's own origin
-# so the beam crosses the gap the masthead leaves, and the spores inside it
-# drift up toward the opening.
-for i, (name, area) in enumerate(AREAS.items()):
-    poly, colour = area["poly"], area["colour"]
-    d = path_of(poly)
-    x0, y0, x1, y1 = bounds(poly)
-    repos = by_area.get(name, [])
+# Cavern bodies. A single edge and one inner echo provide depth without blur.
+for name, lx, ly, path in AREAS:
+    svg.append(f'<path d="{path}" fill="#0C1119" stroke="#202A39" '
+               'stroke-width="3.5" stroke-linejoin="round"/>')
+    svg.append(f'<path d="{path}" fill="none" stroke="#586476" '
+               'stroke-width="1.2" opacity=".42"/>')
 
-    svg.append(f'<path d="{d}" fill="#0B1019"/>')
-    # A breath of the area's own colour. This used to be a blurred copy
-    # clipped to its own outline, so the blur only softened an edge that the
-    # clip then cut off — a flat tint is indistinguishable and free.
-    svg.append(f'<path d="{d}" fill="{colour}" opacity=".07"/>')
+# The Abyss: darker, broader and deliberately less mapped than the six regions.
+ABYSS = ("M 350 760 Q 384 731 438 733 L 714 739 Q 776 749 797 797 "
+         "L 789 948 Q 763 994 700 1002 L 442 996 Q 382 983 356 936 Z")
+svg.append(f'<path d="{ABYSS}" fill="#070A10" stroke="#202A3A" '
+           'stroke-width="5"/>')
+svg.append(f'<path d="{ABYSS}" fill="none" stroke="#536174" '
+           'stroke-width="1.1" opacity=".34"/>')
 
-    lines, (lx, ly) = area["lines"], area["label"]
-    size = area.get("size", 17)
-    clear = (lx, ly + (len(lines) - 1) * 13, 200, 40 + (len(lines) - 1) * 26)
-    svg.append(f'<g clip-path="url(#clip{i})">')
-    for px, py, w, h in rooms_in(poly, len(repos), clear):
-        svg.append(f'  <rect x="{px:.1f}" y="{py:.1f}" width="{w:.1f}" '
-                   f'height="{h:.1f}" fill="none" stroke="{colour}" '
-                   f'stroke-width="1" opacity=".28"/>')
-    svg.append('</g>')
+# Minimal stalactites and flora. These are shared scene cues, not a decoration
+# pass applied to every room.
+svg.append('<path d="M 356 64 l 18 35 17 -38 18 47 20 -55 18 46 21 -58 '
+           '18 52 22 -51 19 45 20 -42 18 43 17 -38 21 46" '
+           'fill="#080B12" opacity=".96"/>')
+for teeth in (
+    "M 78 281 l 18 31 15 -29 17 38 16 -42 18 35 18 -36 17 34 19 -31",
+    "M 711 215 l 17 28 15 -26 18 35 16 -37 18 31 18 -30 18 27",
+    "M 366 340 l 17 29 16 -27 18 38 17 -41 18 34 18 -31 19 28",
+    "M 681 503 l 17 30 16 -28 18 39 17 -42 18 35 18 -32 20 28",
+    "M 982 588 l 14 27 13 -24 15 34 14 -36 16 30 15 -27",
+):
+    svg.append(f'<path d="{teeth}" fill="none" stroke="{VOID}" '
+               'stroke-width="8" stroke-linejoin="miter" opacity=".98"/>')
+svg.append(f'<path d="M 365 765 l 20 34 17 -31 21 42 18 -45 21 38 '
+           f'20 -35 20 32 22 -31 19 34 20 -29 22 35 20 -33 '
+           f'22 38 19 -34 20 29" fill="none" stroke="{VOID}" '
+           'stroke-width="9" stroke-linejoin="miter" opacity=".98"/>')
+svg.append('<path d="M 84 415 q 22 -30 10 -72 q 31 20 30 63 '
+           'M 98 375 q -21 -9 -29 -27 M 110 361 q 19 -12 27 -31" '
+           'fill="none" stroke="#344052" stroke-width="4" opacity=".7"/>')
+svg.append('<path d="M 938 684 q -20 -28 -8 -69 q -29 19 -29 60 '
+           'M 923 646 q 20 -8 28 -25" fill="none" stroke="#344052" '
+           'stroke-width="4" opacity=".7"/>')
 
-    # The wall: a wide bloom under a crisp line, both roughened. This used to
-    # pulse continuously, invalidating almost the entire map on every display
-    # frame. A stable midpoint keeps the same illuminated appearance without
-    # making the largest geometry in the profile repaint forever.
-    svg.append('<g opacity=".82">')
-    # The outline is stored once in defs and referenced six times; six copies
-    # of a fifty-point polygon would have cost more bytes than the filter did.
-    for bw, bo in BLOOM:
-        # stroke-opacity, not opacity: `.lit` animates opacity on the wrapper
-        # and a CSS animation overrides the presentation attribute outright.
-        svg.append(f'    <use href="#w{i}" fill="none" stroke="{colour}" '
-                   f'stroke-width="{bw}" stroke-opacity="{bo}" '
-                   f'stroke-linejoin="round" stroke-linecap="round"/>')
-    svg.append(f'  <path d="{path_of(poly, rough=1.4)}" fill="none" '
-               f'stroke="{colour}" stroke-width="2"/>')
-    svg.append('</g>')
+# One continuous pilgrimage route. Layered plain strokes replace a blur and
+# keep repainting cheap while retaining the pale in-game route treatment.
+ROUTE = ("M 606 -26 C 604 30 700 28 686 112 S 604 194 641 247 "
+         "S 745 292 702 358 S 604 415 637 486 S 764 536 733 610 "
+         "S 659 677 706 735 S 760 812 720 866")
+for width, opacity in ((10, .07), (5, .12)):
+    svg.append(f'<path d="{ROUTE}" fill="none" stroke="{BONE}" '
+               f'stroke-width="{width}" opacity="{opacity}" '
+               'stroke-linecap="round"/>')
+svg.append(f'<path d="{ROUTE}" fill="none" stroke="{BONE}" '
+           'stroke-width="1.8" opacity=".92" stroke-linecap="round"/>')
+svg.append(f'<circle cx="606" cy="-26" r="4" fill="{BONE}"/>')
+svg.append(f'<path d="M 714 855 l 8 12 -8 12 -8 -12 Z" fill="{BONE}"/>')
 
-    for j, line in enumerate(lines):
-        svg.append(caps(lx, ly + j * 37, line, size=size + 7, track=1.8,
-                        anchor="middle", glow=True))
-    svg.append(prose(lx, ly + len(lines) * 37 - 8, f"{len(repos)} repos",
-                     size=21 if "size" not in area else 15,
-                     anchor="middle", opacity=.9))
+# One Stagway sign and one empty bench mark the journey without turning the
+# scene into a catalogue of game references.
+svg.append('<g transform="translate(624,274)" opacity=".78">'
+           f'<circle r="18" fill="{VOID}" stroke="{BONE}" stroke-width="1.5"/>'
+           f'<path d="M -8 5 Q -12 -5 -7 -11 M 8 5 Q 12 -5 7 -11 '
+           f'M -8 5 Q 0 12 8 5" fill="none" stroke="{BONE}" '
+           'stroke-width="1.7" stroke-linecap="round"/></g>')
+svg.append('<g transform="translate(226,714)" opacity=".72">'
+           '<path d="M 0 30 Q 75 21 150 30 M 18 30 L 10 51 M 132 30 L 140 51 '
+           'M 12 12 Q 75 2 138 12 L 147 27 Q 75 19 3 27 Z" '
+           'fill="#111824" stroke="#526073" stroke-width="3" '
+           'stroke-linejoin="round"/>'
+           '<path d="M 5 11 q -18 2 -16 16 M 145 11 q 18 2 16 16 '
+           'M -18 53 Q 58 40 176 54" fill="none" stroke="#273244" '
+           'stroke-width="6" stroke-linecap="round"/></g>')
 
-# ── The Abyss ─────────────────────────────────────────────────────────────
-d = path_of(ABYSS["poly"])
-ax0, ay0, ax1, ay1 = bounds(ABYSS["poly"])
-svg.append(f'<path d="{d}" fill="#03060B"/>')
+# Three distant platforms make the Abyss identifiable without filling it.
+for x, y, w in ((438, 914, 46), (564, 946, 54), (704, 910, 42)):
+    svg.append(f'<path d="M {x} {y} q {w/2:.0f} -10 {w} 0 l -8 13 '
+               f'q {-w/2+8:.0f} 8 {-w+16:.0f} 0 Z" fill="#161E2A" '
+               'stroke="#39475A" stroke-width="1" opacity=".82"/>')
 
-# One grain pass for the whole map, laid after the Abyss so it covers that as
-# well. This was seven turbulence passes, then one turbulence pass plus a
-# second clipped one for the Abyss. The Abyss sits well inside the map's own
-# bounds, so a single tiled pass does both.
-svg.append('<rect x="40" y="140" width="1130" height="640" '
-           'fill="url(#grainTile)" opacity=".13"/>')
-# Pale light pooling on the floor. This was a solid ellipse under a 14px
-# blur; the blur spread it by about three sigma either way, so an ellipse of
-# that final size carrying a radial falloff is the same picture without the
-# filter buffer.
-svg.append(f'<ellipse cx="{(ax0+ax1)/2}" cy="{ay1-24}" rx="214" ry="100" '
-           f'fill="url(#sporeCool)" opacity=".13"/>')
-ABYSS_EDGE = "#3E6A7C"
-svg.append(f'<path d="{d}" fill="none" stroke="{ABYSS_EDGE}" stroke-width="2.4" '
-           f'opacity=".9" stroke-dasharray="5 9"/>')
-# What the Abyss actually looks like: a floor of dead vessels, so the dark
-# is full of small pale eyes looking back up out of it. Rejection-sampled so
-# no pair straddles a wall, and kept clear of the caption.
-_rng = random.Random(5150)
-cap_x, cap_y = ABYSS["label"]
-_eyes = []
-while len(_eyes) < 22:
-    ex = _rng.uniform(ax0 + 16, ax1 - 16)
-    ey = _rng.uniform(ay0 + 14, ay1 - 14)
-    if not inside(ex, ey, ABYSS["poly"]):
-        continue
-    if abs(ex - cap_x) < 190 and abs(ey - cap_y - 8) < 40:   # off the caption
-        continue
-    if any((ex - px) ** 2 + (ey - py) ** 2 < 30 ** 2 for px, py, _ in _eyes):
-        continue
-    _eyes.append((ex, ey, _rng.uniform(1.4, 2.5)))
-for i, (ex, ey, er) in enumerate(_eyes):
-    gap, tilt = er * 2.5, _rng.uniform(-8, 8)
-    svg.append(f'<g opacity=".65" '
-               f'transform="rotate({tilt:.0f} {ex:.0f} {ey:.0f})">'
-               f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
-               f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/>'
-               f'<ellipse cx="{ex+gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
-               f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/></g>')
+for name, lx, ly, _path in AREAS:
+    svg.append(area_label(name, lx, ly))
+svg.append(caps(575, 862, "AI Security", size=27, track=2.1,
+                fill=BONE, anchor="middle", opacity=.9))
 
-svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=31))
-lx, ly = ABYSS["label"]
-svg.append(caps(lx, ly, "AI Security", size=29, track=1.8, fill=SOUL,
-                anchor="middle", glow=True))
-
+svg.append(f'<path d="{wobble(72, 1032, 1128, 1032, amp=.6, seed=31)}" '
+           f'fill="none" stroke="{BONE}" stroke-width="1" opacity=".28"/>')
+svg.append('<path d="M 600 1025 l 7 7 -7 7 -7 -7 Z" fill="none" '
+           f'stroke="{BONE}" stroke-width="1" opacity=".46"/>')
