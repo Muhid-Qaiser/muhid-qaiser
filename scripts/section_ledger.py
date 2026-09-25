@@ -13,10 +13,10 @@ sized from the data as well, so growth cannot break it:
 - labels sit after their figures at the figures' measured width, so a
   four-digit count pushes its label along instead of running into it
 - year vessels: the most recent four years, whatever they are
-- the hour chart: each hour gets one of six crystal sprites, chosen by
-  thresholds that are fractions of the busiest hour. Fixed commit counts would
-  saturate as the all-time totals climb; fractions keep the peak's shape. The
-  legend under the chart prints the ranges the thresholds come to today.
+- the hour chart: each hour gets one of six crystal sprites, chosen by bands
+  of commits per hour that are defined by their lower bounds only (BANDS).
+  The top band, the Crown, has no ceiling, so any count lands in a band. The
+  legend prints the bands.
 
 """
 import json, math, random, sys
@@ -307,32 +307,23 @@ TIERS = [
                 + facet(0, 116, 18, 2, *LIT, edge="#FFFFFF")),
 ]
 HEIGHT = [4, 18, 34, 56, 84, 116]
-# Upper bound of each tier as a fraction of the busiest hour. The busiest hour
-# itself always wears the Crown; an hour with no commits is rubble.
-CUTS = [(1, .15), (2, .35), (3, .60), (4, 1.0)]
+# The bands, by their lower bound only, in commits per hour. Each hour wears
+# the crystal of the highest band it reaches. Nothing has an upper bound: the
+# Crown runs from its floor to infinity, so no hour, however busy, can fall
+# outside a band. Tune the floors here; the legend follows them.
+BANDS = [0, 1, 10, 20, 35, 50]          # rubble, shard, twin, cluster, spire, crown
 
 
 def tier_of(c):
-    if c == 0 or top == 0:
-        return 0
-    if c == top:
-        return 5
-    for t, cut in CUTS:
-        if c <= cut * top:
-            return t
-    return 4
+    return max(t for t, floor in enumerate(BANDS) if c >= floor)
 
 
 def ranges():
-    """What the thresholds come to in commits today, for the legend."""
-    out, lo = [], 1
-    for t, cut in CUTS:
-        hi = min(int(cut * top), top - 1)
-        if hi >= lo:
-            out.append((t, lo, hi))
-        lo = max(lo, hi + 1)
-    if top:
-        out.append((5, top, top))
+    """Each band as the legend prints it: 1-9, 10-19, ... 50+ (hi is None)."""
+    out = []
+    for t in range(1, len(BANDS)):
+        hi = BANDS[t + 1] - 1 if t + 1 < len(BANDS) else None
+        out.append((t, BANDS[t], hi))
     return out
 
 
@@ -424,10 +415,10 @@ for t, lo, hi in ranges():
     svg.append(f'<use href="#cry{t}" transform="translate({lx + 10},{BASE + 80}) scale(.42)"/>')
     svg.append(caps(lx + 26, BASE + 64, TIERS[t][0], size=11, track=2.2,
                     fill=LUMEN if t == 5 else ASH, opacity=.9))
-    rng = f"{lo}" if lo == hi else f"{lo}\u2013{hi}"
+    rng = f"{lo}+" if hi is None else (f"{lo}" if lo == hi else f"{lo}\u2013{hi}")
     svg.append(prose(lx + 26, BASE + 80, f"{rng} {'commit' if hi == 1 else 'commits'}", size=12, opacity=.75))
     lx += 176
-svg.append(prose(W - MARGIN, BASE + 80, "tiers scale with the busiest hour", size=12,
+svg.append(prose(W - MARGIN, BASE + 80, "commits in that hour, all time", size=12,
                  anchor="end", opacity=.6))
 
 svg.append(motes(90, 150, 1030, 560, n=22, seed=17))
