@@ -345,10 +345,16 @@ svg = [lantern(W, H, cx=420, cy=300, rx=560, ry=300)]
 svg.append(section("The Ledger"))
 
 # ── HUD, left ─────────────────────────────────────────────────────────────
-# The Soul orb: full, because it holds every commit ever gathered.
-svg.append(vessel(180, 262, 62, 1.0, 900))
+# The Soul orb holds the last twelve months against the best calendar year on
+# record, so it drains in a quiet year and brims in a busy one. The figure under
+# it is every commit ever gathered.
+recent = stats["year"]["commits"]
+brim = max([recent] + list(stats["commits_by_year"].values())) or 1
+svg.append(vessel(180, 262, 62, recent / brim, 900))
 svg.append(numeral(180, 366, commas(stats["commits"]), size=32, anchor="middle"))
 svg.append(caps(180, 390, "commits gathered", size=13, track=2.4, fill=ASH, anchor="middle"))
+svg.append(prose(180, 410, f"soul: {commas(recent)} in 12 months, of a best {commas(brim)}",
+                 size=12, anchor="middle", opacity=.7))
 
 # Masks: one per day of the longest streak, up to nine; the current run filled.
 longest, current = stats["streak_best"], stats["streak_current"]
@@ -387,7 +393,6 @@ for i, (year, c) in enumerate(years.items()):
     svg.append(caps(cx, 420, year, size=13, track=2, anchor="middle", opacity=.95))
     svg.append(prose(cx, 438, f"{commas(c)} commits", size=13, anchor="middle", opacity=.8))
 
-svg.append(f'<path d="M 742 160 L 742 470" stroke="{BONE}" stroke-width="1" opacity=".13"/>')
 
 # ── The web, right ────────────────────────────────────────────────────────
 svg.append(web(930, 330, 116))

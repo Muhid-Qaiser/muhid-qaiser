@@ -32,6 +32,7 @@ jobs:
       - name: Collect the numbers
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_SEARCH_TOKEN: ${{ secrets.PR_SEARCH_TOKEN }}
           PROFILE_LOGIN: Muhid-Qaiser
         run: python scripts/fetch_stats.py
 
