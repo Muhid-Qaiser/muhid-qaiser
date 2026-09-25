@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """The masthead section — the vessel, and the name.
 
+The shell is shaded toward its lower right, and the Void does not stay in
+the eyes: tendrils lift out of both and pool on the face, all static.
+
 A vessel is a shell built to hold something that must not get out. The seal on
 this one has failed and the light inside is escaping. That is the whole job
 description, so it is the whole picture.
@@ -41,6 +44,29 @@ DEFS = f"""
     <stop offset="100%" stop-color="#B9BDC4"/>
   </linearGradient>"""
 
+DEFS += (
+    '<linearGradient id="shade" gradientUnits="userSpaceOnUse" x1="10" y1="10" x2="90" y2="110">'
+    '<stop offset="0%" stop-color="#000" stop-opacity="0"/>'
+    '<stop offset="55%" stop-color="#000" stop-opacity=".06"/>'
+    '<stop offset="100%" stop-color="#3A3F4B" stop-opacity=".55"/></linearGradient>'
+    f'<radialGradient id="eyeVoid" cx="50%" cy="50%" r="50%">'
+    f'<stop offset="0%" stop-color="#000"/><stop offset="70%" stop-color="{VOID}"/>'
+    f'<stop offset="100%" stop-color="#1A2233"/></radialGradient>'
+    '<radialGradient id="voidPool"><stop offset="0%" stop-color="#000" stop-opacity=".5"/>'
+    '<stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>')
+# The general-purpose glows size their region as a percentage of the
+# element, and the crack is seven units wide: a 14-unit blur in a region
+# 26 units across is cut to a box. These are sized to the crack itself, in
+# its own units, and applied to the three fracture paths as one group, so
+# one buffer carries the whole breach and the light follows its shape.
+DEFS += (
+    '<filter id="crackWide" filterUnits="userSpaceOnUse" x="0" y="10" width="100" height="135">'
+    '<feGaussianBlur stdDeviation="8"/></filter>'
+    '<filter id="crackMed" filterUnits="userSpaceOnUse" x="15" y="25" width="70" height="105">'
+    '<feGaussianBlur stdDeviation="3.2"/></filter>'
+    '<filter id="crackCore" filterUnits="userSpaceOnUse" x="20" y="30" width="60" height="95">'
+    '<feGaussianBlur stdDeviation="1.6" result="b"/>'
+    '<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
 svg = [lantern(W, H)]
 # A second light source behind the shell itself.
 svg.append(lantern(W, H, cx=1020, cy=206, rx=340, ry=258))
@@ -53,10 +79,25 @@ svg.append('  <ellipse cx="50" cy="58" rx="90" ry="96" fill="url(#sporeWarm)" op
 svg.append('  <g>')
 # Horns first, so the head's edge sits over their bases and the join is clean.
 svg.append(f'    <path d="{MASK}" fill="url(#shell)"/>')
+# Depth: the shell turns away from the light toward its lower right, and
+# the brow between the horns catches a thin edge.
+svg.append(f'    <path d="{MASK}" fill="url(#shade)"/>')
+svg.append('    <path d="M 26 46 Q 50 41 73 46" fill="none" stroke="#9AA0AC" '
+           'stroke-width=".7" opacity=".5"/>')
 # Eye voids. Nothing looks back out.
 for sx in (-1, 1):
-    svg.append(f'    <circle cx="{EYE_CX + sx*EYE_DX}" cy="{EYE_CY}" r="{EYE_R}" '
-               f'fill="{VOID}"/>')
+    ex = EYE_CX + sx*EYE_DX
+    svg.append(f'    <circle cx="{ex}" cy="{EYE_CY}" r="{EYE_R}" fill="url(#eyeVoid)"/>')
+    svg.append(f'    <circle cx="{ex}" cy="{EYE_CY}" r="{EYE_R + 1.2}" fill="none" '
+               f'stroke="#B7BAC2" stroke-width=".9" opacity=".7"/>')
+# Void does not stay in the eyes. Three tendrils per eye, rising; one dark
+# pool where they gather. All static: the Void is patient.
+for ex, sd in ((EYE_CX - EYE_DX, 1), (EYE_CX + EYE_DX, -1)):
+    for t, (dx, h, w) in enumerate(((0, 30, 2.2), (sd * 5, 22, 1.4), (-sd * 4, 16, 1))):
+        svg.append(f'    <path d="M {ex+dx:.1f} {EYE_CY-6} q {sd*3} {-h*.4:.1f} {dx*.3:.1f} {-h}" '
+                   f'fill="none" stroke="#000" stroke-width="{w}" stroke-linecap="round" '
+                   f'opacity="{.9 - t*.2:.1f}"/>')
+svg.append('    <ellipse cx="50" cy="62" rx="24" ry="15" fill="url(#voidPool)" opacity=".55"/>')
 svg.append('  </g>')
 
 # The breach: the dark cut first, then the light coming through it.
@@ -64,20 +105,20 @@ for path, w in ((CRACK, 0.7), (BRANCH_A, 0.45), (BRANCH_B, 0.45)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#2A3040" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round"/>')
 svg.append('  <g style="mix-blend-mode:screen">')
-for flt, width, op in (("glowWide", 7, .8), ("glowMed", 3.2, 1)):
+for flt, width, op in (("crackWide", 6, .75), ("crackMed", 3, 1)):
+    svg.append(f'    <g opacity="{op}" filter="url(#{flt})">')
     for path in (CRACK, BRANCH_A, BRANCH_B):
-        svg.append(f'    <path d="{path}" fill="none" stroke="{INFECT}" '
-                   f'stroke-width="{width}" stroke-linecap="round" '
-                   f'stroke-linejoin="round" opacity="{op}" filter="url(#{flt})"/>')
+        svg.append(f'      <path d="{path}" fill="none" stroke="{INFECT}" '
+                   f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round"/>')
+    svg.append('    </g>')
 svg.append('  </g>')
 # Keep the bright fracture at the midpoint of its old pulse. Repainting the
 # filtered breach continuously was expensive and the movement was too subtle
 # to justify it beside the much clearer falling drops.
-svg.append('  <g opacity=".78">')
+svg.append('  <g opacity=".78" filter="url(#crackCore)">')
 for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8), (BRANCH_B, 0.8)):
     svg.append(f'    <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
-               f'stroke-linecap="round" stroke-linejoin="round" '
-               f'filter="url(#glow)"/>')
+               f'stroke-linecap="round" stroke-linejoin="round"/>')
 svg.append('  </g>')
 
 svg.append('</g>')

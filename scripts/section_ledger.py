@@ -1,36 +1,32 @@
 #!/usr/bin/env python3
-"""The ledger section — the counters, the web, and the hours.
+"""The ledger section: the HUD, the web, and the hours as Crystal Peak.
 
-Three figures, none of which repeats another.
+The web is Deepnest: a radar chart drawn as silk, rings sagging between
+anchor threads, on a logarithmic reach so every spoke prints its figure.
 
-The vessel is Hollow Knight's Soul orb as it appears in the HUD: a bowl of
-pale, almost-white liquid behind a rough carved rim, with a mask's eye holes
-cut into it. The big one holds the current year against the best year; the
-three small ones are Soul Vessels, one per year. That is deliberate against
-the masthead — up there a vessel has cracked and is losing what it held, down
-here one is filling.
+Every figure is read from data/stats.json, which the repo's nightly workflow
+rewrites at 03:23 UTC. Nothing here is typed in by hand, and the layout is
+sized from the data as well, so growth cannot break it:
 
-The web is Deepnest. A radar chart is a spider chart, and a spider chart drawn
-properly is a web, so it is drawn as one: rings sagging inward between the
-anchor threads the way silk actually hangs. It plots commits per area rather
-than repositories, because the map above already counts what was made and this
-counts where the work went. The two disagree, which is the point — Foundations
-holds 0.74 of the repositories but 0.98 of the commits.
+- masks: one per day of the longest streak, capped at nine, the most the
+  Knight can ever carry; the exact figures are printed beside them
+- labels sit after their figures at the figures' measured width, so a
+  four-digit count pushes its label along instead of running into it
+- year vessels: the most recent four years, whatever they are
+- the hour chart: each hour gets one of six crystal sprites, chosen by
+  thresholds that are fractions of the busiest hour. Fixed commit counts would
+  saturate as the all-time totals climb; fractions keep the peak's shape. The
+  legend under the chart prints the ranges the thresholds come to today.
 
-Axis order is not arbitrary. It runs clockwise from the top in the same order
-the areas sit on the map, so the two figures can be read against each other.
-
-Deliberately no lines-of-code total. This account is largely Jupyter
-notebooks, whose committed JSON carries base64 image output, so an additions
-figure would measure the file format rather than the work.
 """
 import json, math, random, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
+import section_vessel as SV
 
 ROOT = Path(__file__).resolve().parent.parent
-W, H = 1200, 960
+W, H = 1200, 860
 DEFS = ""
 
 stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
@@ -52,13 +48,6 @@ ORB_MASK = (
     "C 170 86, 189 56, 201 24 C 205 16, 215 19, 213 26 C 206 56, 198 90, 186 120 "
     "C 188 164, 168 212, 110 236 C 52 212, 32 164, 34 120 Z"
 )
-
-COUNTS = [
-    (stats["streak_current"],     "Current streak"),
-    (stats["streak_best"],        "Longest streak"),
-    (stats["pull_requests"],      "Pull requests"),
-    (stats["year"]["commits"],   "12-M commits"),
-]
 
 # Five account-wide figures, largest first, clockwise from the top.
 # Issues, gists and reviews are all zero on this account, so they are left
@@ -247,62 +236,193 @@ def web(cx, cy, R):
     return "".join(out)
 
 
-svg = [lantern(W, H)]
+hours = stats["hours"]
+top = max(hours)
+peak = hours.index(top)
+years = dict(sorted(stats["commits_by_year"].items())[-4:])
+best = max(years.values()) if years else 1
+
+
+def numeral_width(s, size):
+    """Measured advance of the display face: about 0.62em a figure, 0.28em a comma."""
+    return (len(s) - s.count(",")) * size * 0.62 + s.count(",") * size * 0.28
+
+
+def mask(x, y, k, fill=BONE, stroke=None, sw=1.2, eyes=True, opacity=1):
+    """The Knight's mask from the masthead, at scale k (box 100 x 109.5)."""
+    st = f' stroke="{stroke}" stroke-width="{sw/k:.2f}"' if stroke else ""
+    out = [f'<g transform="translate({x:.1f},{y:.1f}) scale({k:.3f})" opacity="{opacity}">',
+           f'<path d="{SV.MASK}" fill="{fill}"{st} stroke-linejoin="round"/>']
+    if eyes:
+        for sx in (-1, 1):
+            out.append(f'<circle cx="{SV.EYE_CX + sx*SV.EYE_DX}" cy="{SV.EYE_CY}" '
+                       f'r="{SV.EYE_R}" fill="{VOID}"/>')
+    out.append('</g>')
+    return "".join(out)
+
+
+def star4(cx, cy, r, fill=LUMEN, cls="", delay=None):
+    d = (f"M {cx:.1f} {cy-r:.1f} Q {cx:.1f} {cy:.1f} {cx+r:.1f} {cy:.1f} Q {cx:.1f} {cy:.1f} {cx:.1f} {cy+r:.1f} "
+         f"Q {cx:.1f} {cy:.1f} {cx-r:.1f} {cy:.1f} Q {cx:.1f} {cy:.1f} {cx:.1f} {cy-r:.1f} Z")
+    c = f' class="{cls}"' if cls else ""
+    st = f' style="animation-delay:{delay:.1f}s"' if delay is not None else ""
+    return f'<path d="{d}" fill="{fill}"{c}{st}/>'
+
+
+# ── Crystal sprites ───────────────────────────────────────────────────────
+# Six drawings, stored once in defs and placed with <use>: twenty-four hours
+# cost twenty-four references, not twenty-four copies of the geometry. Each
+# sprite stands on y=0 and is centred on x=0.
+DIM = ("#B98DB3", "#7A5277")
+MID = ("#E2B4DA", "#A8739F")
+LIT = ("#FBEAF8", "#E2B4DA")
+
+
+def facet(cx, h, w, lean, light, dark, edge=None):
+    """One crystal: a lit face and a shadowed face meeting on a ridge."""
+    bl, br = cx - w / 2, cx + w / 2
+    tx, ty = cx + lean, -h
+    rx = cx + lean * 0.35
+    left = f"M {bl:.1f} 0 L {bl:.1f} {-h*.68:.1f} L {tx:.1f} {ty:.1f} L {rx:.1f} 0 Z"
+    right = f"M {rx:.1f} 0 L {tx:.1f} {ty:.1f} L {br:.1f} {-h*.74:.1f} L {br:.1f} 0 Z"
+    out = f'<path d="{left}" fill="{light}"/><path d="{right}" fill="{dark}"/>'
+    if edge:
+        out += (f'<path d="M {bl:.1f} {-h*.68:.1f} L {tx:.1f} {ty:.1f}" stroke="{edge}" '
+                f'stroke-width="1" opacity=".85"/>')
+    return out
+
+
+ROCK = '<path d="M -20 0 Q -16 -6 -6 -7 Q 6 -8 14 -5 Q 20 -3 21 0 Z" fill="#2E2638"/>'
+TIERS = [
+    # (name, sprite)
+    ("Rubble",  '<path d="M -9 0 L -7 -3 L -3 -4 L -1 0 Z M 1 0 L 3 -2.5 L 7 -3 L 8 0 Z" fill="#3B3447"/>'),
+    ("Shard",   facet(0, 18, 10, 2, *DIM)),
+    ("Twin",    facet(-6, 18, 8, -3, *DIM) + facet(3, 34, 12, 2, *MID)),
+    ("Cluster", facet(-9, 30, 9, -4, *MID) + facet(9, 38, 10, 4, *MID)
+                + facet(0, 56, 14, 1, *MID, edge=LIT[0])),
+    ("Spire",   ROCK + facet(-11, 30, 9, -5, *MID) + facet(11, 44, 11, 5, *MID)
+                + facet(0, 84, 16, 2, *LIT, edge="#FFFFFF")),
+    ("Crown",   '<ellipse cx="0" cy="-56" rx="40" ry="74" fill="url(#cryGlow)"/>'
+                + ROCK + facet(-13, 40, 10, -6, *MID) + facet(13, 62, 12, 6, *LIT)
+                + facet(0, 116, 18, 2, *LIT, edge="#FFFFFF")),
+]
+HEIGHT = [4, 18, 34, 56, 84, 116]
+# Upper bound of each tier as a fraction of the busiest hour. The busiest hour
+# itself always wears the Crown; an hour with no commits is rubble.
+CUTS = [(1, .15), (2, .35), (3, .60), (4, 1.0)]
+
+
+def tier_of(c):
+    if c == 0 or top == 0:
+        return 0
+    if c == top:
+        return 5
+    for t, cut in CUTS:
+        if c <= cut * top:
+            return t
+    return 4
+
+
+def ranges():
+    """What the thresholds come to in commits today, for the legend."""
+    out, lo = [], 1
+    for t, cut in CUTS:
+        hi = min(int(cut * top), top - 1)
+        if hi >= lo:
+            out.append((t, lo, hi))
+        lo = max(lo, hi + 1)
+    if top:
+        out.append((5, top, top))
+    return out
+
+
+DEFS = ('<radialGradient id="cryGlow"><stop offset="0%" stop-color="#F3B6E6" stop-opacity=".42"/>'
+        '<stop offset="100%" stop-color="#F3B6E6" stop-opacity="0"/></radialGradient>'
+        + "".join(f'<g id="cry{i}">{sprite}</g>' for i, (_, sprite) in enumerate(TIERS)))
+
+
+svg = [lantern(W, H, cx=420, cy=300, rx=560, ry=300)]
 svg.append(section("The Ledger"))
 
-# ── The figures across the top, centred ───────────────────────────────────
-# Positions and dividers both come from how many figures survived the
-# zero-guard, so a dropped stat cannot leave a divider standing alone or
-# pull the row off centre.
-STEP = 260
-row_x = [600 + (i - (len(COUNTS) - 1) / 2) * STEP for i in range(len(COUNTS))]
-for x, (value, label) in zip(row_x, COUNTS):
-    svg.append(numeral(x, 190, commas(value), size=58, anchor="middle"))
-    svg.append(caps(x, 220, label, size=17, track=2.1, fill=ASH, anchor="middle"))
-for a, b in zip(row_x, row_x[1:]):
-    svg.append(f'<path d="M {(a+b)/2:.0f} 150 L {(a+b)/2:.0f} 204" '
-               f'stroke="{BONE}" stroke-width="1" opacity=".13"/>')
+# ── HUD, left ─────────────────────────────────────────────────────────────
+# The Soul orb: full, because it holds every commit ever gathered.
+svg.append(vessel(180, 262, 62, 1.0, 900))
+svg.append(numeral(180, 366, commas(stats["commits"]), size=32, anchor="middle"))
+svg.append(caps(180, 390, "commits gathered", size=13, track=2.4, fill=ASH, anchor="middle"))
 
-# ── The vessel, left ──────────────────────────────────────────────────────
-svg.append(vessel(214, 500, 68, 1.0, 0))
-svg.append(numeral(214, 630, commas(stats["commits"]), size=44, anchor="middle"))
-svg.append(caps(214, 658, "commits gathered", size=16, track=2.1, fill=ASH,
-                anchor="middle"))
+# Masks: one per day of the longest streak, up to nine; the current run filled.
+longest, current = stats["streak_best"], stats["streak_current"]
+shown = max(1, min(longest, 9))
+filled = min(current, shown)
+mx, my, k, gap = 292, 172, 0.32, 42
+for i in range(shown):
+    x = mx + i * gap
+    if i < filled:
+        svg.append(f'<ellipse cx="{x+16}" cy="{my+17}" rx="28" ry="28" '
+                   f'fill="url(#sporeCool)" opacity=".55"/>')
+        svg.append(mask(x, my, k, fill=BONE))
+    else:
+        svg.append(mask(x, my, k, fill="#0B1019", stroke=BONE, sw=1.3, eyes=False, opacity=.55))
+svg.append(caps(mx, my + 66, "streak", size=12, track=2.6, fill=ASH))
+n = str(current)
+svg.append(numeral(mx + 66, my + 66, n, size=16, glow=False))
+svg.append(prose(mx + 74 + numeral_width(n, 16), my + 66,
+                 f"of {longest} {'day' if longest == 1 else 'days'} at best", size=13, opacity=.8))
 
-for i, (year, n) in enumerate(sorted(years.items())):
-    cy = 450 + i * 54
-    svg.append(vessel(346, cy, 19, n / best, 10 + i, eyes=False))
-    svg.append(caps(378, cy - 4, year, size=16, track=1.7, opacity=.95))
-    svg.append(prose(378, cy + 17, f"{n} commits", size=17, opacity=.9))
+# Geo: pull requests are what the work was traded for.
+gx, gy = mx + 8, my + 118
+geo = (f"M {gx} {gy-14} L {gx+12} {gy-6} L {gx+12} {gy+6} L {gx} {gy+14} "
+       f"L {gx-12} {gy+6} L {gx-12} {gy-6} Z")
+svg.append(f'<path d="{geo}" fill="#0B1019" stroke="{BONE}" stroke-width="1.6"/>')
+svg.append(f'<path d="M {gx-12} {gy-6} L {gx} {gy-1} L {gx+12} {gy-6} M {gx} {gy-1} L {gx} {gy+14}" '
+           f'fill="none" stroke="{BONE}" stroke-width="1.1" opacity=".8"/>')
+n = commas(stats["pull_requests"])
+svg.append(numeral(gx + 26, gy + 9, n, size=30, glow=False))
+svg.append(caps(gx + 40 + numeral_width(n, 30), gy + 9, "pull requests", size=12, track=2.4, fill=ASH))
+
+# Year vessels: each year's Soul against the best of them.
+for i, (year, c) in enumerate(years.items()):
+    cx = mx + 26 + i * 104
+    svg.append(vessel(cx, 372, 22, c / best, 910 + i, eyes=False))
+    svg.append(caps(cx, 420, year, size=13, track=2, anchor="middle", opacity=.95))
+    svg.append(prose(cx, 438, f"{commas(c)} commits", size=13, anchor="middle", opacity=.8))
+
+svg.append(f'<path d="M 742 160 L 742 470" stroke="{BONE}" stroke-width="1" opacity=".13"/>')
 
 # ── The web, right ────────────────────────────────────────────────────────
-svg.append(web(884, 500, 130))
+svg.append(web(930, 330, 116))
 
-# ── Commits by hour, across the foot ──────────────────────────────────────
-BASE, TALL, X0, SPAN = 862, 62, 72, 1056
+# ── Crystal Peak: commits by hour ─────────────────────────────────────────
+BASE, X0, SPAN = 752, 72, 1056
 SLOT = SPAN / 24
-svg.append(caps(X0, 790, "Every commit, by hour of day (PKT)", size=17, track=2.3, fill=ASH))
-svg.append(caps(1128, 790, f"most commits at {peak:02d}:00", size=17, track=2.3,
+svg.append(caps(X0, 600, "Every commit, by hour of day (PKT)", size=15, track=2.3, fill=ASH))
+svg.append(caps(W - MARGIN, 600, f"most commits at {peak:02d}:00", size=15, track=2.3,
                 fill=SOUL, anchor="end", glow=True))
-
-top = max(hours) or 1
-svg.append('<g filter="url(#bloomT)">')
-for h, count in enumerate(hours):
-    x = X0 + h * SLOT
-    height = max(2.5, count / top * TALL)
-    lit = h == peak
-    if lit:
-        svg.append(f'  <g opacity=".78"><rect x="{x:.1f}" y="{BASE-height:.1f}" '
-                   f'width="{SLOT*0.68:.1f}" height="{height:.1f}" fill="{SOUL}" '
-                   f'filter="url(#glowMed)"/></g>')
-    svg.append(f'  <rect x="{x:.1f}" y="{BASE - height:.1f}" '
-               f'width="{SLOT*0.68:.1f}" height="{height:.1f}" '
-               f'fill="#FFFFFF" opacity="1"/>')
-svg.append('</g>')
-svg.append(f'<path d="M {X0} {BASE+1} L {X0+SPAN} {BASE+1}" stroke="{BONE}" '
-           f'stroke-width="1" opacity=".22"/>')
+glints = []
+for h, c in enumerate(hours):
+    t = tier_of(c)
+    cx = X0 + h * SLOT + SLOT / 2
+    svg.append(f'<use href="#cry{t}" x="{cx:.1f}" y="{BASE}">'
+               f'<title>{h:02d}:00, {commas(c)} {"commit" if c == 1 else "commits"}</title></use>')
+    if t >= 4:
+        glints.append((cx + 4, BASE - HEIGHT[t] * .55, t))
+for i, (gx_, gy_, t) in enumerate(glints):
+    svg.append(star4(gx_, gy_, 5 if t == 5 else 4, LUMEN, cls="glint", delay=-i * 1.1))
+svg.append(f'<path d="{wobble(X0 - 10, BASE + 1, X0 + SPAN + 10, BASE + 1, amp=2.2, step=30, seed=19)}" '
+           f'fill="none" stroke="{BONE}" stroke-width="1.2" opacity=".3"/>')
 for h in (0, 6, 12, 18):
-    svg.append(prose(X0 + h * SLOT + SLOT * .34, BASE + 22, f"{h:02d}", size=17,
-                     anchor="middle", opacity=.75))
+    svg.append(prose(X0 + h * SLOT + SLOT / 2, BASE + 24, f"{h:02d}", size=15, anchor="middle", opacity=.75))
 
-svg.append(motes(90, 150, 1030, 620, n=22, seed=17))
+# The legend: each sprite, small, with the commit range its threshold covers.
+lx = X0
+for t, lo, hi in ranges():
+    svg.append(f'<use href="#cry{t}" transform="translate({lx + 10},{BASE + 80}) scale(.42)"/>')
+    svg.append(caps(lx + 26, BASE + 64, TIERS[t][0], size=11, track=2.2,
+                    fill=LUMEN if t == 5 else ASH, opacity=.9))
+    rng = f"{lo}" if lo == hi else f"{lo}\u2013{hi}"
+    svg.append(prose(lx + 26, BASE + 80, f"{rng} {'commit' if hi == 1 else 'commits'}", size=12, opacity=.75))
+    lx += 176
+svg.append(prose(W - MARGIN, BASE + 80, "tiers scale with the busiest hour", size=12,
+                 anchor="end", opacity=.6))
+
+svg.append(motes(90, 150, 1030, 560, n=22, seed=17))

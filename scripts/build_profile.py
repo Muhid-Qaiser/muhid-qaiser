@@ -27,12 +27,14 @@ except json.JSONDecodeError as exc:
         "If a merge left conflict markers in it, re-run scripts/fetch_stats.py "
         "to overwrite it with fresh data.")
 
-import section_vessel, section_map, section_ledger
+import section_vessel, section_nail, section_map, section_charms
+import section_ledger, section_journal
 
 OUT = Path(__file__).resolve().parent.parent / "assets" / "profile.svg"
 W = 1200
 
-SECTIONS = [section_vessel, section_map, section_ledger]
+SECTIONS = [section_vessel, section_nail, section_map, section_charms,
+            section_ledger, section_journal]
 
 svg = document(
     W,

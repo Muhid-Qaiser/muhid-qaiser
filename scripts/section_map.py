@@ -12,11 +12,17 @@ is where everyone starts. Computer Vision takes Greenpath's place in the west.
 Generative AI is the City of Tears. AI Security is the Abyss at the bottom of
 the kingdom — the deepest ground, and the only area the map leaves unlit,
 because that work is private.
+
+It always rains in the City of Tears. The Knight stands at the edge of the
+Abyss with the compass ping. Pins mark repositories the way the game marks
+its map: Cornifer's red for pushed this year, a shop for starred, a bench
+for built from scratch. Pins never stand on a caption.
 """
 import json, random, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from theme import *
+import section_vessel as SV
 
 ROOT = Path(__file__).resolve().parent.parent
 W, H = 1200, 820
@@ -170,6 +176,55 @@ DEFS = "".join(
     f'<path id="w{i}" d="{path_of(a["poly"])}"/>'
     for i, a in enumerate(AREAS.values()))
 
+def rain_path(poly, period=40, col=30, seed=1201):
+    # It always rains in the City of Tears. One path of short strokes on a
+    # lattice whose rows repeat every 40px, so sliding it 80px and starting
+    # over is seamless. One element, one stroke pass per step: no pattern
+    # tile to rasterise, and the region's own clip does the cutting.
+    rr = random.Random(seed)
+    x0, y0, x1, y1 = bounds(poly)
+    segs = []
+    x = x0 + 8
+    while x < x1 - 4:
+        phase, length = rr.uniform(0, period), rr.uniform(9, 15)
+        y = y0 - 2 * period + phase
+        while y < y1:
+            segs.append(f'M {x:.0f} {y:.0f} v {length:.0f}')
+            y += period
+        x += col + rr.uniform(-6, 6)
+    return ' '.join(segs)
+
+# Pins, as the game colours them: a bench is where you sit down and rebuild,
+# so the builds from scratch get the bench; a shop is where Geo changes hands,
+# so the starred repositories get the shop; Cornifer is wherever the map is
+# still being drawn, so the repositories pushed this year get his pin. A
+# repository gets one pin, the most recent claim first.
+NOW_YEAR = max(r["pushed"][:4] for r in stats["repo_list"])
+PIN = {
+    "cornifer": ("#E8705C", "M -1.7 1.7 L 1.9 -1.9 M 0.4 -1.9 L 1.9 -1.9 L 1.9 -0.4"),
+    "shop":     (BONE,      "M 0 -2 L 2 0 L 0 2 L -2 0 Z"),
+    "bench":    ("#7FB8FF", "M -2.4 -0.3 L 2.4 -0.3 M -1.6 -0.3 L -1.6 1.8 M 1.6 -0.3 L 1.6 1.8"),
+}
+PIN_LEGEND = (("cornifer", "mapped this year"), ("shop", "starred"), ("bench", "built from scratch"))
+
+
+def kind_of(repo):
+    if repo["pushed"][:4] == NOW_YEAR:
+        return "cornifer"
+    if repo.get("stars"):
+        return "shop"
+    if repo.get("scratch"):
+        return "bench"
+    return None
+
+
+def pin(x, y, kind):
+    colour, mark = PIN[kind]
+    return (f'<circle cx="{x:.1f}" cy="{y-9:.1f}" r="3.8" fill="{colour}"/>'
+            f'<path d="{mark}" transform="translate({x:.1f},{y-9:.1f})" fill="none" '
+            f'stroke="{VOID}" stroke-width=".9" stroke-linecap="round"/>'
+            f'<path d="M {x:.1f} {y-5:.1f} L {x:.1f} {y+2:.1f}" stroke="{colour}" stroke-width="1.4"/>')
+
 svg = []
 # Read from the data, never spelled out — the total moves on its own.
 svg.append(section("The Map"))
@@ -194,11 +249,33 @@ for i, (name, area) in enumerate(AREAS.items()):
     size = area.get("size", 17)
     clear = (lx, ly + (len(lines) - 1) * 13, 200, 40 + (len(lines) - 1) * 26)
     svg.append(f'<g clip-path="url(#clip{i})">')
-    for px, py, w, h in rooms_in(poly, len(repos), clear):
+    if name == "GENERATIVE AI":
+        svg.append(f'  <path class="rain" d="{rain_path(poly)}" stroke="{SOUL}" '
+                   f'stroke-width="1" opacity=".38" fill="none"/>')
+    rooms = rooms_in(poly, len(repos), clear)
+    # A pin stands 14px above its room's centre, so a room that is clear of
+    # the caption can still put a pin head across the words. Pinned
+    # repositories take rooms whose whole pin is clear of the caption and its
+    # count line, and whose head stays inside the walls. Rooms come out of
+    # the sampler in random order, so the pins stay spread out.
+    words_top, words_bottom = ly - 34, ly + len(lines) * 37 + 6
+    def takes_a_pin(room):
+        rx, ry = room[0] + room[2] / 2, room[1] + room[3] / 2
+        on_words = abs(rx - lx) < 86 and ry + 3 > words_top and ry - 14 < words_bottom
+        return not on_words and inside(rx, ry - 15, poly)
+    kinds = [kind_of(r) for r in repos if kind_of(r)]
+    assigned = dict(zip((j for j, room in enumerate(rooms) if takes_a_pin(room)), kinds))
+    pins = []
+    for j, (px, py, w, h) in enumerate(rooms):
+        k = assigned.get(j)
         svg.append(f'  <rect x="{px:.1f}" y="{py:.1f}" width="{w:.1f}" '
                    f'height="{h:.1f}" fill="none" stroke="{colour}" '
-                   f'stroke-width="1" opacity=".28"/>')
+                   f'stroke-width="1" opacity="{.55 if k else .28}"/>')
+        if k:
+            pins.append((px + w / 2, py + h / 2, k))
     svg.append('</g>')
+    for px, py, k in pins:
+        svg.append(pin(px, py, k))
 
     # The wall: a wide bloom under a crisp line, both roughened. This used to
     # pulse continuously, invalidating almost the entire map on every display
@@ -262,7 +339,8 @@ while len(_eyes) < 22:
     _eyes.append((ex, ey, _rng.uniform(1.4, 2.5)))
 for i, (ex, ey, er) in enumerate(_eyes):
     gap, tilt = er * 2.5, _rng.uniform(-8, 8)
-    svg.append(f'<g opacity=".65" '
+    cls = ' class="breathe"' if i == 3 else ''
+    svg.append(f'<g opacity=".65"{cls} '
                f'transform="rotate({tilt:.0f} {ex:.0f} {ey:.0f})">'
                f'<ellipse cx="{ex-gap:.1f}" cy="{ey:.1f}" rx="{er*1.6:.1f}" '
                f'ry="{er*2.1:.1f}" fill="url(#sporeCool)"/>'
@@ -273,4 +351,21 @@ svg.append(motes(ax0 + 30, ay0 + 20, ax1 - ax0 - 60, ay1 - ay0 - 40, n=12, seed=
 lx, ly = ABYSS["label"]
 svg.append(caps(lx, ly, "AI Security", size=29, track=1.8, fill=SOUL,
                 anchor="middle", glow=True))
+# The Wayward Compass: the Knight's own mark on the map, and where it
+# stands is the one area the map does not light.
+kx, ky = 822, 652
+svg.append(f'<circle class="ping" cx="{kx}" cy="{ky+2}" r="26" fill="none" '
+           f'stroke="{SOUL}" stroke-width="1.4"/>')
+svg.append(f'<ellipse cx="{kx}" cy="{ky+4}" rx="16" ry="16" fill="url(#sporeCool)" opacity=".55"/>')
+svg.append(f'<g transform="translate({kx-9},{ky-10}) scale(.18)">'
+           f'<path d="{SV.MASK}" fill="{LUMEN}"/>'
+           + ''.join(f'<circle cx="{SV.EYE_CX + sx*SV.EYE_DX}" cy="{SV.EYE_CY}" r="{SV.EYE_R}" fill="{VOID}"/>'
+                     for sx in (-1, 1)) + '</g>')
+svg.append(prose(kx, ky + 40, "you are here", size=12, anchor="middle", opacity=.7))
+# Legend for the pins, under the map.
+lx = MARGIN + 4
+for kind, label in PIN_LEGEND:
+    svg.append(pin(lx, 806, kind))
+    svg.append(prose(lx + 12, 804, label, size=13, opacity=.75))
+    lx += 26 + len(label) * 6.4
 

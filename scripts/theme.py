@@ -220,6 +220,25 @@ _STYLE = f"""<style>
                  transform: translateX(var(--w, 0)) !important; }}
     .caret {{ display: none; }}
   }}
+  /* Motion added with the Descent. Every one is steps() and none runs
+     through a filter: an animated SVG shown as an image re-rasterises on every
+     step, so steps per second is the cost. Rain 3.75, ping 3, breath 1.6,
+     glint 0.6. */
+  .glint {{ animation: glint 3.2s steps(2,end) infinite;
+            transform-box: fill-box; transform-origin: center; }}
+  @keyframes glint {{ 0%,70% {{ opacity: 0; transform: scale(.4); }}
+                     71%,100% {{ opacity: .95; transform: scale(1); }} }}
+  .rain {{ animation: rain 1.6s steps(6,end) infinite; }}
+  @keyframes rain {{ to {{ transform: translateY(80px); }} }}
+  .ping {{ animation: ping 2.6s steps(8,end) infinite;
+           transform-box: fill-box; transform-origin: center; }}
+  @keyframes ping {{ 0% {{ transform: scale(.25); opacity: .9; }}
+                    100% {{ transform: scale(1); opacity: 0; }} }}
+  .breathe {{ animation: breathe 5s steps(8,end) infinite alternate; }}
+  @keyframes breathe {{ from {{ opacity: .35; }} to {{ opacity: .9; }} }}
+  @media (prefers-reduced-motion: reduce) {{
+    .glint, .rain, .ping, .breathe {{ animation: none; opacity: .6; }}
+  }}
   @media (prefers-reduced-motion: reduce) {{
     .drip, .tide {{
       animation: none; opacity: .7;
@@ -263,12 +282,17 @@ def document(w, sections, extra_defs=""):
            _defs(extra_defs), _STYLE,
            f'<rect width="{w}" height="{total}" fill="{VOID}"/>',
            dust(w, total)]
-    dy = 0
-    for h, body in sections:
-        out.append(f'<g transform="translate(0,{dy})">')
-        out.extend(body)
-        out.append('</g>')
-        dy += h
+    # Every section's pool of light goes down first, under all of them, and
+    # the bodies after. Stacked one section at a time, the next section's pool
+    # painted over the one above and cut the masthead's halo flat at the line.
+    is_pool = lambda el: el.startswith("<ellipse") and 'fill="url(#lantern)"' in el
+    for pools in (True, False):
+        dy = 0
+        for h, body in sections:
+            out.append(f'<g transform="translate(0,{dy})">')
+            out.extend(el for el in body if is_pool(el) == pools)
+            out.append('</g>')
+            dy += h
     out.append(edges(w, total))
     out.append('</svg>')
     return chr(10).join(out)
