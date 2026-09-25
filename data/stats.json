@@ -15,12 +15,12 @@
     "date": "2026-08-28",
     "count": 67
   },
-  "pull_requests": 48,
-  "pull_requests_merged": 46,
+  "pull_requests": 66,
+  "pull_requests_merged": 64,
   "issues": 0,
   "starred": 66,
   "following": 4,
-  "contributed_to": 0,
+  "contributed_to": 5,
   "year": {
     "commits": 122,
     "pull_requests": 1,
@@ -141,17 +141,6 @@
   ],
   "repo_list": [
     {
-      "name": "calorie-tracker-updates",
-      "description": "Calorie Tracker Android preview builds and release notes. APK-only distribution; application source and user data are not hosted here.",
-      "created": "2026-09-22",
-      "pushed": "2026-09-25",
-      "stars": 0,
-      "language": "",
-      "commits": 2,
-      "region": "FOUNDATIONS",
-      "scratch": false
-    },
-    {
       "name": "muhid-qaiser",
       "description": "",
       "created": "2026-08-27",
@@ -159,6 +148,17 @@
       "stars": 0,
       "language": "Python",
       "commits": 82,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
+      "name": "calorie-tracker-updates",
+      "description": "Calorie Tracker Android preview builds and release notes. APK-only distribution; application source and user data are not hosted here.",
+      "created": "2026-09-22",
+      "pushed": "2026-09-25",
+      "stars": 0,
+      "language": "",
+      "commits": 2,
       "region": "FOUNDATIONS",
       "scratch": false
     },

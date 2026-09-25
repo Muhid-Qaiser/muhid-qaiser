@@ -21,6 +21,12 @@ OUT = ROOT / "data" / "stats.json"
 if not TOKEN:
     sys.exit("Set GITHUB_TOKEN (locally: export GITHUB_TOKEN=$(gh auth token))")
 
+# Pull requests live mostly in private and organisation repositories, which
+# the workflow's own token cannot search: it finds only the public ones. An
+# optional PR_SEARCH_TOKEN (a read-only token of the account) is used for
+# those two searches alone; every other call stays on the public token, so
+# nothing private reaches the map. Only the totals are ever stored.
+PR_TOKEN = os.environ.get("PR_SEARCH_TOKEN")
 HEADERS = {"Authorization": f"Bearer {TOKEN}", "User-Agent": "muhid-profile",
            "Accept": "application/vnd.github+json"}
 
@@ -43,9 +49,9 @@ REGIONS = [
 SCRATCH = re.compile(r"scratch|vanilla", re.I)
 
 
-def rest(path, tries=6):
+def rest(path, tries=6, headers=None):
     for attempt in range(tries):
-        req = urllib.request.Request(f"https://api.github.com{path}", headers=HEADERS)
+        req = urllib.request.Request(f"https://api.github.com{path}", headers=headers or HEADERS)
         try:
             with urllib.request.urlopen(req, timeout=45) as r:
                 if r.status == 202:      # GitHub is still computing the stats
@@ -67,7 +73,8 @@ def search_count(query):
     with the workflow's repo-scoped token, where user.pullRequests does not."""
     import urllib.parse
     try:
-        body = rest(f"/search/issues?q={urllib.parse.quote(query)}&per_page=1")
+        headers = dict(HEADERS, Authorization=f"Bearer {PR_TOKEN}") if PR_TOKEN else None
+        body = rest(f"/search/issues?q={urllib.parse.quote(query)}&per_page=1", headers=headers)
         return body.get("total_count", 0) if isinstance(body, dict) else 0
     except Exception as exc:
         print(f"  ! search '{query}' failed: {exc}")

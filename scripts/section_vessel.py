@@ -34,7 +34,8 @@ EYE_CX = 49.7
 # The failed seal, running the centre line between the eyes.
 CRACK = "M 49 45 L 45 57 L 52 69 L 46 80 L 52 92 L 48 106"
 BRANCH_A = "M 45 57 L 37 54"
-BRANCH_B = "M 46 80 L 38 86"
+# One branch only, and it stays on the brow. A second one used to run
+# into the left eye socket; the eyes are holes, and a hole cannot crack.
 
 DEFS = f"""
   <linearGradient id="shell" gradientUnits="userSpaceOnUse"
@@ -101,13 +102,13 @@ svg.append('    <ellipse cx="50" cy="62" rx="24" ry="15" fill="url(#voidPool)" o
 svg.append('  </g>')
 
 # The breach: the dark cut first, then the light coming through it.
-for path, w in ((CRACK, 0.7), (BRANCH_A, 0.45), (BRANCH_B, 0.45)):
+for path, w in ((CRACK, 0.7), (BRANCH_A, 0.45)):
     svg.append(f'  <path d="{path}" fill="none" stroke="#2A3040" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round"/>')
 svg.append('  <g style="mix-blend-mode:screen">')
 for flt, width, op in (("crackWide", 6, .75), ("crackMed", 3, 1)):
     svg.append(f'    <g opacity="{op}" filter="url(#{flt})">')
-    for path in (CRACK, BRANCH_A, BRANCH_B):
+    for path in (CRACK, BRANCH_A):
         svg.append(f'      <path d="{path}" fill="none" stroke="{INFECT}" '
                    f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round"/>')
     svg.append('    </g>')
@@ -116,7 +117,7 @@ svg.append('  </g>')
 # filtered breach continuously was expensive and the movement was too subtle
 # to justify it beside the much clearer falling drops.
 svg.append('  <g opacity=".78" filter="url(#crackCore)">')
-for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8), (BRANCH_B, 0.8)):
+for path, w in ((CRACK, 1.35), (BRANCH_A, 0.8)):
     svg.append(f'    <path d="{path}" fill="none" stroke="#FFD98A" stroke-width="{w}" '
                f'stroke-linecap="round" stroke-linejoin="round"/>')
 svg.append('  </g>')
