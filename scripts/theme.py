@@ -187,62 +187,94 @@ def _defs(extra=""):
 </defs>"""
 
 
+# ── Motion ─────────────────────────────────────────────────────────────────
+# GitHub shows the profile as an <img>, and a browser repaints an animated SVG
+# image whole every time anything in it changes: about 38 ms of work per
+# repaint at retina density, whatever changed, filters or not. Eight
+# animations on unrelated clocks came to about 14 repaints a second, half a CPU
+# core, just to show the page. So every animation changes only on one shared
+# half-second beat, through step-end keyframes (a steps() timing restarts at
+# every keyframe, which is how the old drip and typed line fired far more often
+# than their step counts said). Their changes land in the same frame, so the
+# whole profile repaints at most twice a second.
+BEAT = 0.5
+
+
+def beats(name, seconds, frame):
+    """Keyframes holding frame(i, n) for beat i of an n-beat cycle."""
+    n = round(seconds / BEAT)
+    assert abs(n * BEAT - seconds) < 1e-9, f"{name}: a cycle is a whole number of beats"
+    out, last = [], None
+    for i in range(n):
+        decl = frame(i, n)
+        if decl != last:
+            out.append(f"{100 * i / n:.4f}% {{ {decl} }}")
+            last = decl
+    return f"@keyframes {name} {{ {' '.join(out)} }}"
+
+
+def _lerp(stops, p):
+    for (p0, *a), (p1, *b) in zip(stops, stops[1:]):
+        if p0 <= p <= p1:
+            f = (p - p0) / (p1 - p0)
+            return [x + (y - x) * f for x, y in zip(a, b)], f
+    return stops[-1][1:], 1.0
+
+
+def _drip(i, n):
+    # Infection gathering at the breach, swelling, and falling away.
+    p = i / n
+    if p <= .38:
+        (y, k, o), _ = _lerp([(0, 0, .35, 0), (.22, 2, 1, .95), (.38, 6, 1, .95)], p)
+        return f"transform: translateY({y:.1f}px) scale({k:.2f}); opacity: {o:.2f};"
+    (k, o), f = _lerp([(.38, 1, .95), (1, .5, 0)], p)
+    return (f"transform: translateY(calc(6px + (var(--fall, 74px) - 6px) * {f:.3f})) "
+            f"scale({k:.2f}); opacity: {o:.2f};")
+
+
+def _ping(i, n):
+    ring = [(.25, .9), (.5, .65), (.75, .4), (1, .15)]
+    k, o = ring[i] if i < len(ring) else (1, 0)
+    return f"transform: scale({k}); opacity: {o};"
+
+
+MOTION = " ".join([
+    beats("drip", 7, _drip),
+    # Soul is a liquid: one crest crosses the large meter and repeats.
+    beats("tide", 8, lambda i, n: f"transform: translateX({-40 * i / n:.1f}px);"),
+    beats("caret", 1, lambda i, n: f"opacity: {1 - i};"),
+    beats("glint", 3, lambda i, n: "opacity: .95; transform: scale(1);" if i == n - 1
+          else "opacity: 0; transform: scale(.4);"),
+    # The rain path repeats every 40px, so one period of travel loops seamlessly.
+    beats("rain", 2, lambda i, n: f"transform: translateY({40 * i / n:.0f}px);"),
+    beats("ping", 3, _ping),
+    beats("breathe", 4, lambda i, n: f"opacity: {(.35, .6, .9, .6)[i // 2]};"),
+])
+
+
+def _anim(name, seconds):
+    return f"animation: {name} {seconds}s step-end infinite;"
+
+
 _STYLE = f"""<style>
   {_display_face()}
   text {{ font-family: {SERIF}; }}
   .d {{ font-family: {DISPLAY}; }}
-  /* Infection gathering at the breach, swelling, and falling away. */
-  .drip {{ animation: drip 7s steps(28, end) infinite;
-           transform-box: fill-box; transform-origin: center; }}
-  @keyframes drip {{
-    0%   {{ transform: translateY(0) scale(.35); opacity: 0; }}
-    22%  {{ transform: translateY(2px) scale(1);  opacity: .95; }}
-    38%  {{ transform: translateY(6px) scale(1);  opacity: .95; }}
-    100% {{ transform: translateY(var(--fall, 74px)) scale(.5); opacity: 0; }}
-  }}
-  /* Soul is a liquid. One crest crosses the large meter and repeats; the tiny
-     year vessels stay still because their surface motion is not readable. */
-  .tide {{ animation: tide 6.5s steps(39, end) infinite; }}
-  @keyframes tide {{ to {{ transform: translateX(-40px); }} }}
-
-  /* A line typed one character at a time: a clip slid right in steps, one
-     step per character, with the caret riding the same timing. */
-  @keyframes typeline {{
-    0%        {{ transform: translateX(0); }}
-    62%, 100% {{ transform: translateX(var(--w, 0)); }}
-  }}
-  @keyframes caret {{ 0%,49% {{ opacity: 1 }} 50%,100% {{ opacity: 0 }} }}
-
+  {MOTION}
+  .drip {{ {_anim("drip", 7)} transform-box: fill-box; transform-origin: center; }}
+  .tide {{ {_anim("tide", 8)} }}
+  .glint {{ {_anim("glint", 3)} transform-box: fill-box; transform-origin: center; }}
+  .rain {{ {_anim("rain", 2)} }}
+  .ping {{ {_anim("ping", 3)} transform-box: fill-box; transform-origin: center; }}
+  .breathe {{ {_anim("breathe", 4)} }}
   @media (prefers-reduced-motion: reduce) {{
     /* Stopping the reveal mid-way would leave the line half-invisible, so it
        jumps to fully typed and the caret goes away. */
     .typeline {{ animation: none !important;
                  transform: translateX(var(--w, 0)) !important; }}
     .caret {{ display: none; }}
-  }}
-  /* Motion added with the Descent. Every one is steps() and none runs
-     through a filter: an animated SVG shown as an image re-rasterises on every
-     step, so steps per second is the cost. Rain 3.75, ping 3, breath 1.6,
-     glint 0.6. */
-  .glint {{ animation: glint 3.2s steps(2,end) infinite;
-            transform-box: fill-box; transform-origin: center; }}
-  @keyframes glint {{ 0%,70% {{ opacity: 0; transform: scale(.4); }}
-                     71%,100% {{ opacity: .95; transform: scale(1); }} }}
-  .rain {{ animation: rain 1.6s steps(6,end) infinite; }}
-  @keyframes rain {{ to {{ transform: translateY(80px); }} }}
-  .ping {{ animation: ping 2.6s steps(8,end) infinite;
-           transform-box: fill-box; transform-origin: center; }}
-  @keyframes ping {{ 0% {{ transform: scale(.25); opacity: .9; }}
-                    100% {{ transform: scale(1); opacity: 0; }} }}
-  .breathe {{ animation: breathe 5s steps(8,end) infinite alternate; }}
-  @keyframes breathe {{ from {{ opacity: .35; }} to {{ opacity: .9; }} }}
-  @media (prefers-reduced-motion: reduce) {{
     .glint, .rain, .ping, .breathe {{ animation: none; opacity: .6; }}
-  }}
-  @media (prefers-reduced-motion: reduce) {{
-    .drip, .tide {{
-      animation: none; opacity: .7;
-    }}
+    .drip, .tide {{ animation: none; opacity: .7; }}
   }}
 </style>"""
 
@@ -380,39 +412,61 @@ def numeral(x, y, s, size=40, fill=None, anchor="start", glow=True):
     return _lit(body, txt, fill, size)
 
 
-def typeline(x, y, text, size=17, fill=None, cycle=14, italic=True,
-             em=0.397):
-    """One line, typed out a character at a time, then held and repeated.
+# Advance widths in em, measured off Palatino Linotype Italic (palai.ttf, 2048
+# units per em), for the characters the typed line uses. Other characters fall
+# back to the face's average.
+PALATINO_ITALIC = {
+    " ": .25, ".": .25, "N": .778, "a": .444, "b": .463, "c": .407, "d": .5,
+    "e": .389, "f": .278, "g": .5, "h": .5, "i": .278, "k": .444, "l": .278,
+    "m": .778, "n": .556, "o": .444, "r": .389, "s": .389, "t": .333, "u": .556,
+    "v": .5, "w": .722, "y": .5,
+}
 
-    The reveal is a clip rectangle slid right in steps() — one step per
-    character — and the caret runs the same animation so it always sits at the
-    reveal edge. textLength pins the line to the width the steps were computed
-    from, so the caret lands exactly on the final glyph instead of drifting
-    past it. `em` is the measured average advance for the face: 0.397 for
-    Palatino italic, 0.464 upright.
+
+def typeline(x, y, text, size=17, fill=None, cycle=15, italic=True,
+             em=0.397):
+    """One line, typed out a word per beat, then held and repeated.
+
+    The reveal is a clip rectangle slid right to the end of each word in turn,
+    on the shared beat, and the caret rides the same keyframes so it always
+    sits at the reveal edge. A letter per step was nine repaints a second of
+    the whole image. Each word is its own run at its measured Palatino width,
+    pinned there by textLength, so a word ends where the reveal stops in any
+    font: one run placed off an average width let the glyphs drift and the
+    reveal cut words in half, and average-width slots crushed wide words.
+    `em` is the fallback advance for a character the table does not hold.
     """
-    import zlib
+    import re, zlib
     fill = SOUL if fill is None else fill
-    n = len(text)
-    w = size * em * n
+    at = [0.0]                                     # x offset before each char
+    for c in text:
+        at.append(at[-1] + size * PALATINO_ITALIC.get(c, em))
+    w = at[-1]
+    lean = size * 0.12      # an italic's last glyph leans past its slot
     uid = zlib.crc32(text.encode()) % 100000     # stable across runs
-    anim = f"animation:typeline {cycle}s steps({n},end) infinite"
+    words = [(m.start(), m.end(), m.group()) for m in re.finditer(r"\S+", text)]
+    edges = [0] + [at[end] + lean for _, end, _ in words]
+    reveal = beats(f"tw{uid}", cycle, lambda i, _: f"transform: translateX("
+                   f"{min(edges[min(i, len(edges) - 1)], w):.1f}px);")
+    anim = f"animation:tw{uid} {cycle}s step-end infinite"
     style = ' font-style="italic"' if italic else ""
+    runs = "".join(
+        f'<text x="{x + at[a]:.1f}" y="{y}" textLength="{at[b] - at[a]:.1f}" '
+        f'lengthAdjust="spacing">{esc(word)}</text>' for a, b, word in words)
     return (
+        f'<style>{reveal}</style>'
         f'<clipPath id="tw{uid}"><rect class="typeline" x="{x - w:.1f}" '
         f'y="{y - size * 1.15:.1f}" width="{w:.1f}" height="{size * 1.6:.1f}" '
         f'style="--w:{w:.1f}px;{anim}"/></clipPath>'
-        # Halo and core are both inside the clip, so they reveal together.
-        f'<g clip-path="url(#tw{uid})">'
-        f'<text x="{x}" y="{y}" font-size="{size}" fill="{SOUL}" opacity=".7"{style} '
-        f'filter="url(#haloM)" textLength="{w:.1f}" lengthAdjust="spacing">'
-        f'{esc(text)}</text>'
-        f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}"{style} '
-        f'textLength="{w:.1f}" lengthAdjust="spacing">{esc(text)}</text></g>'
+        # Halo and core are both inside the clip, so they reveal together. The
+        # halo is one filter over the group, not one per word.
+        f'<g clip-path="url(#tw{uid})" font-size="{size}"{style}>'
+        f'<g fill="{SOUL}" opacity=".7" filter="url(#haloM)">{runs}</g>'
+        f'<g fill="{fill}">{runs}</g></g>'
         f'<rect class="typeline caret" x="{x - 1.4:.1f}" '
         f'y="{y - size * 0.95:.1f}" width="1.9" height="{size * 1.18:.1f}" '
         f'fill="{fill}" '
-        f'style="--w:{w:.1f}px;{anim},caret .85s step-end infinite"/>'
+        f'style="--w:{w:.1f}px;{anim},caret 1s step-end infinite"/>'
     )
 
 

@@ -403,7 +403,7 @@ for h, c in enumerate(hours):
     if t >= 4:
         glints.append((cx + 4, BASE - HEIGHT[t] * .55, t))
 for i, (gx_, gy_, t) in enumerate(glints):
-    svg.append(star4(gx_, gy_, 5 if t == 5 else 4, LUMEN, cls="glint", delay=-i * 1.1))
+    svg.append(star4(gx_, gy_, 5 if t == 5 else 4, LUMEN, cls="glint", delay=-i * 1.0))
 svg.append(f'<path d="{wobble(X0 - 10, BASE + 1, X0 + SPAN + 10, BASE + 1, amp=2.2, step=30, seed=19)}" '
            f'fill="none" stroke="{BONE}" stroke-width="1.2" opacity=".3"/>')
 for h in (0, 6, 12, 18):
