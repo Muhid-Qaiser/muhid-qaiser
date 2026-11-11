@@ -7,7 +7,7 @@
   "stars": 2,
   "commits": 327,
   "contributions_year": 152,
-  "streak_current": 1,
+  "streak_current": 0,
   "streak_best": 9,
   "active_days": 46,
   "commit_days": 46,
@@ -141,6 +141,17 @@
   ],
   "repo_list": [
     {
+      "name": "muhid-qaiser",
+      "description": "",
+      "created": "2026-08-27",
+      "pushed": "2026-11-10",
+      "stars": 0,
+      "language": "Python",
+      "commits": 88,
+      "region": "FOUNDATIONS",
+      "scratch": false
+    },
+    {
       "name": "wallet-map",
       "description": "Ethereum wallet relationship explorer with transfer evidence, graph expansion, comparison, and local investigations.",
       "created": "2026-11-05",
@@ -148,17 +159,6 @@
       "stars": 0,
       "language": "TypeScript",
       "commits": 13,
-      "region": "FOUNDATIONS",
-      "scratch": false
-    },
-    {
-      "name": "muhid-qaiser",
-      "description": "",
-      "created": "2026-08-27",
-      "pushed": "2026-11-09",
-      "stars": 0,
-      "language": "Python",
-      "commits": 88,
       "region": "FOUNDATIONS",
       "scratch": false
     },
